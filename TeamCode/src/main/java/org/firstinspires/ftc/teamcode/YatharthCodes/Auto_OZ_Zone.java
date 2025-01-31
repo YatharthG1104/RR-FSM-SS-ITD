@@ -29,6 +29,7 @@ public class Auto_OZ_Zone extends LinearOpMode {
         S3_DRAG_3BLOCKS,
         S4_READY_FOR_INTAKE,
         S5_READY_TO_HANG,
+        S6_READY_FOR_NEXT_HANG,
         S6_PARKING
     }
 
@@ -115,8 +116,8 @@ public class Auto_OZ_Zone extends LinearOpMode {
                 Actions.runBlocking(
                         new SequentialAction(
                              new SS_DeliveryArm.HangDone(),
+                                new SS_CLAW.ClawOpen(),
                                 new ParallelAction(
-                                    new SS_CLAW.ClawOpen(),
                                     new SS_Elbow.ElbowLeftIntake(),
                                     new SS_Elbow.ElbowRightIntake(),
                                     new SS_Wrist.WristIntake()
@@ -136,7 +137,6 @@ public class Auto_OZ_Zone extends LinearOpMode {
                 System.out.println("S3_DRAG_3BLOCKS");
                 CurrentState(State.S4_READY_FOR_INTAKE);
                 break;
-
 
             default:
                 System.out.println("Unknown state!");
