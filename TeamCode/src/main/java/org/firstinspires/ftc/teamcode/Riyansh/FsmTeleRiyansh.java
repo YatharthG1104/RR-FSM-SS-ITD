@@ -35,7 +35,7 @@ public class FsmTeleRiyansh extends OpMode {
         RetractAll,//retract all sorts of arm etc
         SubmersibleReady,//aka picking up a block with the slide
         SamplePicked,
-        ClawReadyForSample,//transer of sample
+        ClawReadyForSample,//transfer of sample
         FinishedBasket,
         SampleDrop,
         SpecimenPicked,

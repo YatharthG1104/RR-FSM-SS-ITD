@@ -9,6 +9,8 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
@@ -16,6 +18,9 @@ import org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_CLAW;
 import org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_DeliveryArm;
 import org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_Elbow;
 import org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_Wrist;
+import org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_Grabber;
+import org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_Twist;
+import org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_FrontSlide;
 
 // Auto for Observation zone to hang specimens
 @Autonomous(name="Observation zone auton" )
@@ -50,6 +55,10 @@ public class Auto_OZ_Zone extends LinearOpMode {
 
         //Importing the hardware maps for all drive motors and setting the robot position
         MecanumDrive drive = new MecanumDrive(hardwareMap, InitialPose);
+
+        // Color Sensor Hardware Map
+        ColorSensor sensorColor;
+        sensorColor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
 
         // Add all other non drive motors to respective subsystems
         //Add all servos to subsystems as well
