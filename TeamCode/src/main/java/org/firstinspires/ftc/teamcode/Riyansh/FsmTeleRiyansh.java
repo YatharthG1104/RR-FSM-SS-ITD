@@ -42,7 +42,9 @@ public class FsmTeleRiyansh extends OpMode {
         SpecimenHanged,
 
         LIFT_START, FINAL
-    };
+    }
+
+    ;
 
     LiftState liftState = LiftState.LIFT_START;
 
@@ -51,14 +53,14 @@ public class FsmTeleRiyansh extends OpMode {
 
     TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)//this is our goal pose with our goal heading
             .lineToX(25)
-            .splineTo(new Vector2d(52, -52), Math.PI /2)
+            .splineTo(new Vector2d(52, -52), Math.PI / 2)
             .waitSeconds(3);
 
     Pose2d initialPose2 = new Pose2d(50, -60, Math.toRadians(90));//set a inistal pose but will need to change this
 
     TrajectoryActionBuilder tab2 = drive.actionBuilder(initialPose2)//this is our goal pose with our goal heading
             .lineToX(25)
-            .splineTo(new Vector2d(52, -52), Math.PI /2)
+            .splineTo(new Vector2d(52, -52), Math.PI / 2)
             .waitSeconds(3);
 
 
@@ -80,8 +82,8 @@ public class FsmTeleRiyansh extends OpMode {
 
     ElapsedTime liftTimer = new ElapsedTime();
 
-     double Geco_Wrist_Reset;//geco wrist is in the middle position
-     double Geco_Wrist_Down;
+    double Geco_Wrist_Reset;//geco wrist is in the middle position
+    double Geco_Wrist_Down;
     double Geco_Wrist_Claw_Deposit;
 
 
@@ -99,11 +101,6 @@ public class FsmTeleRiyansh extends OpMode {
 
     double wrist_Specimen_Pick;
     double getWrist_Specimen_Drop;
-
-
-
-
-
 
 
     int Back_SLide_Up_Specimen; // the low encoder position for the lift
@@ -151,8 +148,6 @@ public class FsmTeleRiyansh extends OpMode {
         ClawArmL = hardwareMap.get(Servo.class, "BLM");
 
 
-
-
 //        sensorColor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
         int relativeLayoutId = hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id", hardwareMap.appContext.getPackageName());
         final View relativeLayout = ((Activity) hardwareMap.appContext).findViewById(relativeLayoutId);
@@ -187,7 +182,7 @@ public class FsmTeleRiyansh extends OpMode {
                 (int) (sensorColor.blue() * SCALE_FACTOR),
                 hsvValues);
         double hue = hsvValues[0];
-        FrontSLidePower    = Range.clip(LeftStick, -1.0, 1.0) ;
+        FrontSLidePower = Range.clip(LeftStick, -1.0, 1.0);
 
 
         switch (liftState) {
@@ -299,7 +294,8 @@ public class FsmTeleRiyansh extends OpMode {
                         Claw.setPosition(Claw_Open);
                         liftState = LiftState.SpecimenHanged;
                         //drops sample in obsevatrey zone
-                    } if (gamepad2.right_bumper) {//click right bumber if we are doing basket
+                    }
+                    if (gamepad2.right_bumper) {//click right bumber if we are doing basket
                         drive.leftFront.setPower(lfPower);
                         drive.rightFront.setPower(rfPower);
                         drive.leftBack.setPower(lbPower);
@@ -319,7 +315,7 @@ public class FsmTeleRiyansh extends OpMode {
                 }
                 break;
             case FinishedBasket:
-                if(Math.abs(SlideBackL.getCurrentPosition() - Back_slide_Bucket) < 30 ){
+                if (Math.abs(SlideBackL.getCurrentPosition() - Back_slide_Bucket) < 30) {
                     Claw.setPosition(Claw_Open);
                     SlideBackL.setTargetPosition(-Back_slide_Reset);
                     SlideBackL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -332,7 +328,7 @@ public class FsmTeleRiyansh extends OpMode {
                 break;
 
             case SpecimenPicked:
-                if ( gamepad2.dpad_up) {//waiting for humen can change to an if statment
+                if (gamepad2.dpad_up) {//waiting for humen can change to an if statment
                     Claw.setPosition(Claw_Close);
                     SlideBackL.setTargetPosition(Back_SLide_Up_Specimen);
                     SlideBackL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -344,31 +340,21 @@ public class FsmTeleRiyansh extends OpMode {
                 }
                 break;
             case SpecimenHanged:
-                if(Math.abs(SlideBackR.getCurrentPosition() - Back_SLide_Up_Specimen) < 30 && gamepad2.dpad_down){//waiting to ensure no ones in the way
+                if (Math.abs(SlideBackR.getCurrentPosition() - Back_SLide_Up_Specimen) < 30 && gamepad2.dpad_down) {//waiting to ensure no ones in the way
                     Actions.runBlocking(new SequentialAction(trajectoryActionChosen2));//moving to hang specimen
                     SlideBackL.setTargetPosition(Back_slide_Reset);
                     SlideBackL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    SlideBackR.setTargetPosition(Back_slide_Reset);
-                    SlideBackR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    Claw.setPosition(Claw_Open);
-                    liftState = LiftState.RetractAll;
-                    //drops specimen
-                }
-                break;
-            default:
-                // should never be reached, as liftState should never be null
-                liftState = LiftState.RetractAll;
-        }
-    }
-    public void Move(){
-        double drive = gamepad1.right_stick_x * 0.68;
-        double strafe = gamepad1.left_stick_x * 0.60;
-        double turn = -gamepad1.left_stick_y * 0.63;
-        lfPower = Range.clip(turn + strafe + drive, -1.0, 1.0);
-        rfPower = Range.clip(turn - strafe - drive, -1.0, 1.0);
-        lbPower = Range.clip(turn - strafe + drive, -1.0, 1.0);
-        rbPower = Range.clip(turn + strafe - drive, -1.0, 1.0);
+                    double drive = gamepad1.right_stick_x * 0.68;
+                    double strafe = gamepad1.left_stick_x * 0.60;
+                    double turn = -gamepad1.left_stick_y * 0.63;
+                    lfPower = Range.clip(turn + strafe + drive, -1.0, 1.0);
+                    rfPower = Range.clip(turn - strafe - drive, -1.0, 1.0);
+                    lbPower = Range.clip(turn - strafe + drive, -1.0, 1.0);
+                    rbPower = Range.clip(turn + strafe - drive, -1.0, 1.0);
 
+
+                }
+        }
 
     }
 }
