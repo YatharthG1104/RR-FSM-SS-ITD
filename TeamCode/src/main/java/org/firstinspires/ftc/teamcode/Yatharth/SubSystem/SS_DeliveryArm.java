@@ -23,6 +23,7 @@ public class SS_DeliveryArm {
     public static int Delivery_Arm_Resting_Enc = 100;
     public static int Delivery_Arm_HangReady_Enc = 3000;
     public static int Delivery_Arm_HangDone_Enc = 2000;
+    public static int Delivery_Arm_IntakeDone_Enc = 800;
     public static int Delivery_Arm_HangIntake_Enc = 500;
     public static double Delivery_Arm_Extend_Power = 0.7;
     public static double Delivery_Arm_Retract_Power = -0.7;
@@ -152,6 +153,35 @@ public class SS_DeliveryArm {
             packet.put("DeliveryArmRightPos", posr);
 
             if (posl > Delivery_Arm_Resting_Enc && posr > Delivery_Arm_Resting_Enc) {
+                return true; // Continue running
+            } else {
+                deliveryArmRight.setPower(0);
+                deliveryArmLeft.setPower(0);
+                packet.put("DeliveryArmLeftPos", posl);
+                packet.put("DeliveryArmRightPos", posr);
+                return false; // Stop action
+            }
+        }
+    }
+
+    //Action 5. Implement an Intake done action for Delivery Arm
+    public static class IntakeDone implements Action {
+        private boolean initialized = false;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                deliveryArmLeft.setPower(Delivery_Arm_Extend_Power);
+                deliveryArmRight.setPower(Delivery_Arm_Extend_Power);
+                initialized = true;
+            }
+
+            double posl = deliveryArmLeft.getCurrentPosition();
+            packet.put("DeliveryArmLeftPos", posl);
+            double posr = deliveryArmRight.getCurrentPosition();
+            packet.put("DeliveryArmRightPos", posr);
+
+            if (posl > Delivery_Arm_IntakeDone_Enc && posr > Delivery_Arm_IntakeDone_Enc) {
                 return true; // Continue running
             } else {
                 deliveryArmRight.setPower(0);

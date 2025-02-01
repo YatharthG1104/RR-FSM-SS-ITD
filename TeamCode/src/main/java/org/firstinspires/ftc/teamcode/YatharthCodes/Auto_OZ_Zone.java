@@ -98,7 +98,6 @@ public class Auto_OZ_Zone extends LinearOpMode {
         switch (CurrentState) {
             //Resting state at the start of the match
             case S0_RESTING:
-                System.out.println("S0_RESTING");
                 Actions.runBlocking(
                         new ParallelAction(
                                 new SS_Elbow.ElbowLeftHang(),
@@ -106,6 +105,7 @@ public class Auto_OZ_Zone extends LinearOpMode {
                                 new SS_Wrist.WristHang()
                         )
                 );
+                System.out.println("S0_RESTING");
                 CurrentState(State.S1_GET_READY_TO_HANG);
                 break;
 
@@ -133,6 +133,7 @@ public class Auto_OZ_Zone extends LinearOpMode {
                                     new SS_Elbow.ElbowLeftIntake(),
                                     new SS_Elbow.ElbowRightIntake(),
                                     new SS_Wrist.WristIntake(),
+                                    new SS_DeliveryArm.HangIntake(),
                                     trajectorychosen
                                 )
                             )
