@@ -158,8 +158,9 @@ public class Auto_OZ_Zone extends LinearOpMode {
                 Actions.runBlocking(
                         new SequentialAction(
                                 new SS_CLAW.ClawClose(),
-                                new SS_DeliveryArm.HangReady(),
+                                new SS_DeliveryArm.IntakeDone(),
                                 new ParallelAction(
+                                        new SS_DeliveryArm.HangReady(),
                                         new SS_Elbow.ElbowLeftHang(),
                                         new SS_Elbow.ElbowRightHang(),
                                         new SS_Wrist.WristHang(),

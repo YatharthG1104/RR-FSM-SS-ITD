@@ -15,9 +15,15 @@ import com.acmerobotics.roadrunner.VelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_CRServoAction;
 import org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_Elbow;
+import org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_MotorAction;
+import org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_ServoAction;
 import org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_Wrist;
 
 import java.util.Arrays;
@@ -34,27 +40,28 @@ public class Trajectory_Test extends LinearOpMode{
         // Define other non drive motors before you move forward
         MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
 
-        // Define all servos here or put all hardware initialization separately
-        // Servo servo= hardwareMap.servo.get("servo");
+        DcMotor motorl = null;
+        motorl = hardwareMap.get(DcMotor.class,"Left Motor");
+
+        Servo servol = null;
+        servol = hardwareMap.get(Servo.class, "Left Servo");
+
+        CRServo servor = null;
+        servor = hardwareMap.get(CRServo.class, "Right Servo");
+
+
 
         waitForStart();
 
-        /*Pose2d poseEstimate = drivetrain.localizer.getPose();
-        telemetry.addData("heading", poseEstimate.heading);
-        telemetry.addData("X,Y", poseEstimate.position);
-        telemetry.update();
-*/
-        /*Actions.runBlocking(
-                drivetrain.actionBuilder(new Pose2d(0, 0, Math.toRadians(0)))
+        /*
+        Actions.runBlocking(
+                drive.actionBuilder(new Pose2d(0, 0, Math.toRadians(0)))
                         .lineToX(5)
-                      //  .splineTo(new Vector2d(20,-20), Math.toRadians(90))
-                        .build());*/
-
-       /* VelConstraint baseVelConstraint = new MinVelConstraint(Arrays.asList(
-                new TranslationalVelConstraint(150.0),
-                new AngularVelConstraint(Math.PI / 2)
-        ));
-        AccelConstraint baseAccelConstraint = new ProfileAccelConstraint(-10.0, 100.0);*/
+                        .stopAndAdd(new SS_MotorAction(motorl,2000, 0.7))
+                        .stopAndAdd(new SS_ServoAction(servol, 0.5, 1))
+                        .stopAndAdd(new SS_CRServoAction(servor, 0.8, 3))
+                        .build());
+    */
 
         TrajectoryActionBuilder Path1 = drive.actionBuilder(beginPose)
                 .lineToX(10)
@@ -108,3 +115,18 @@ public class Trajectory_Test extends LinearOpMode{
                         .strafeTo(new Vector2d(5, -63))
                         .strafeTo(new Vector2d(5, -39))
                         .build());*/
+
+
+
+        /*Pose2d poseEstimate = drivetrain.localizer.getPose();
+        telemetry.addData("heading", poseEstimate.heading);
+        telemetry.addData("X,Y", poseEstimate.position);
+        telemetry.update();
+
+*/
+
+           /* VelConstraint baseVelConstraint = new MinVelConstraint(Arrays.asList(
+                new TranslationalVelConstraint(150.0),
+                new AngularVelConstraint(Math.PI / 2)
+        ));
+        AccelConstraint baseAccelConstraint = new ProfileAccelConstraint(-10.0, 100.0);*/
