@@ -160,20 +160,18 @@ public class Tele extends LinearOpMode {
 
             // POV Mode uses left stick to go forward, and right stick to turn.
             // - This uses basic math to combine motions and is easier to drive straight.
-            double y = -gamepad1.left_stick_y;
-            double x = gamepad1.left_stick_x; // this is strafing
-            double rx = gamepad1.right_stick_x;
+            double drive = gamepad1.right_stick_x ;//* 0.68
+            double strafe = gamepad1.left_stick_x; //* 0.60;
+            double turn = -gamepad1.left_stick_y; //* 0.63;
+            double lfPower = Range.clip(turn + strafe + drive, -1.0, 1.0);
+            double rfPower = Range.clip(turn - strafe - drive, -1.0, 1.0);
+            double lbPower = Range.clip(turn - strafe + drive, -1.0, 1.0);
+            double rbPower = Range.clip(turn + strafe - drive, -1.0, 1.0);
 
-            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-            double leftFrontPower = (y + x + rx) / denominator;
-            double leftRearPower = (y - x + rx) / denominator;
-            double rightFrontPower = (y - x - rx) / denominator;
-            double rightRearPower = (y + x - rx) / denominator;
-
-            leftFront.setPower(leftFrontPower);
-            leftRear.setPower(leftRearPower);
-            rightFront.setPower(rightFrontPower);
-            rightRear.setPower(rightRearPower);
+            leftFront.setPower(lfPower);
+            leftRear.setPower(rfPower);
+            rightFront.setPower(lbPower);
+            rightRear.setPower(rbPower);
 
 
             if(gamepad2.x){
@@ -218,9 +216,9 @@ public class Tele extends LinearOpMode {
                 leftmisumi.setPosition(0.2);
             }
 
-            double drive = gamepad2.left_stick_y;
+            double d = gamepad2.left_stick_y;
 
-            p = Range.clip(drive, -0.5, 0.5) ;
+            p = Range.clip(d, -0.5, 0.5) ;
             MRightckMisumi.setPower(p);
             MLeftBackMisumi.setPower(-p);
 
