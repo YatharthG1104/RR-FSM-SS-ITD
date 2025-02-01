@@ -22,7 +22,8 @@ public class SS_DeliveryArm {
     //Define all Delivery Arm Encoder positions and power
     public static int Delivery_Arm_Resting_Enc = 100;
     public static int Delivery_Arm_HangReady_Enc = 3000;
-    public static int Delivery_Arm_HangDone_Enc = 500;
+    public static int Delivery_Arm_HangDone_Enc = 2000;
+    public static int Delivery_Arm_HangIntake_Enc = 500;
     public static double Delivery_Arm_Extend_Power = 0.7;
     public static double Delivery_Arm_Retract_Power = -0.7;
 
@@ -104,7 +105,36 @@ public class SS_DeliveryArm {
         }
     }
 
-    //Action 3. Implement AtRest Action for Delivery Arm
+    //Action 3. Implement Specimen HangIntake Action for Delivery Arm
+    public static class HangIntake implements Action {
+        private boolean initialized = false;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                deliveryArmLeft.setPower(Delivery_Arm_Retract_Power);
+                deliveryArmRight.setPower(Delivery_Arm_Retract_Power);
+                initialized = true;
+            }
+
+            double posl = deliveryArmLeft.getCurrentPosition();
+            packet.put("DeliveryArmLeftPos", posl);
+            double posr = deliveryArmRight.getCurrentPosition();
+            packet.put("DeliveryArmRightPos", posr);
+
+            if (posl > Delivery_Arm_HangIntake_Enc && posr > Delivery_Arm_HangIntake_Enc) {
+                return true; // Continue running
+            } else {
+                deliveryArmRight.setPower(0);
+                deliveryArmLeft.setPower(0);
+                packet.put("DeliveryArmLeftPos", posl);
+                packet.put("DeliveryArmRightPos", posr);
+                return false; // Stop action
+            }
+        }
+    }
+
+    //Action 4. Implement AtRest Action for Delivery Arm
      public static class AtRest implements Action {
         private boolean initialized = false;
 

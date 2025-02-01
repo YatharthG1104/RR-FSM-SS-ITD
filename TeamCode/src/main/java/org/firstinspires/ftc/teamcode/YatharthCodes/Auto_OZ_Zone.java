@@ -29,8 +29,7 @@ public class Auto_OZ_Zone extends LinearOpMode {
         S3_DRAG_3BLOCKS,
         S4_READY_FOR_INTAKE,
         S5_READY_TO_HANG,
-        S6_READY_FOR_NEXT_HANG,
-        S6_PARKING
+        S6_PARK
     }
 
     public ElapsedTime mRuntime = new ElapsedTime();   // Time into the Autonomous round.
@@ -44,7 +43,10 @@ public class Auto_OZ_Zone extends LinearOpMode {
         //Define all Poses here
         Pose2d InitialPose = new Pose2d(0,0,0);     //Beginning pose
         Pose2d Pose1 = new Pose2d(30,0,0);          //Ready for 1st hang
-        Pose2d Pose2 = new Pose2d(25,0,0);          // After 1st Hang
+        Pose2d Pose2 = new Pose2d(25,0,0);// After 1st Hang
+        Pose2d Pose3  = new Pose2d(44, -70,0 );// Ready for Intake
+        Pose2d Pose4  = new Pose2d(30, 0,0); // Ready for next hang
+
 
         //Importing the hardware maps for all drive motors and setting the robot position
         MecanumDrive drive = new MecanumDrive(hardwareMap, InitialPose);
@@ -76,6 +78,16 @@ public class Auto_OZ_Zone extends LinearOpMode {
                 .strafeTo(new Vector2d(68, -10))
                 .strafeTo(new Vector2d(68, -65))
                 .strafeTo(new Vector2d(44, -70));
+
+        TrajectoryActionBuilder Path4 = drive.actionBuilder(Pose3)
+         .strafeTo(new Vector2d(30, 0));
+
+
+        TrajectoryActionBuilder Path5 = drive.actionBuilder(Pose4)
+                .strafeTo(new Vector2d(44, -70));
+
+        TrajectoryActionBuilder Path6 = drive.actionBuilder(Pose4)
+                .strafeTo(new Vector2d(5, -65));
 
 
         Action trajectorychosen;       // Define Action to choose the trajectory in the FSM code
@@ -120,9 +132,10 @@ public class Auto_OZ_Zone extends LinearOpMode {
                                 new ParallelAction(
                                     new SS_Elbow.ElbowLeftIntake(),
                                     new SS_Elbow.ElbowRightIntake(),
-                                    new SS_Wrist.WristIntake()
-                                ),
-                            trajectorychosen)
+                                    new SS_Wrist.WristIntake(),
+                                    trajectorychosen
+                                )
+                            )
                 );
                 System.out.println("S2_HANG_ONE_COMPLETE");
                 CurrentState(State.S3_DRAG_3BLOCKS);
@@ -136,6 +149,61 @@ public class Auto_OZ_Zone extends LinearOpMode {
                 );
                 System.out.println("S3_DRAG_3BLOCKS");
                 CurrentState(State.S4_READY_FOR_INTAKE);
+                break;
+
+            // Get Specimen Intake from the human player
+            case S4_READY_FOR_INTAKE:
+                trajectorychosen= Path4.build();
+                Actions.runBlocking(
+                        new SequentialAction(
+                                new SS_CLAW.ClawClose(),
+                                new SS_DeliveryArm.HangReady(),
+                                new ParallelAction(
+                                        new SS_Elbow.ElbowLeftHang(),
+                                        new SS_Elbow.ElbowRightHang(),
+                                        new SS_Wrist.WristHang(),
+                                        trajectorychosen
+                                )
+                        )
+                );
+                System.out.println("S4_READY_FOR_INTAKE");
+                CurrentState(State.S5_READY_TO_HANG);
+                break;
+
+            // Hang the Next Specimen
+            case S5_READY_TO_HANG:
+                trajectorychosen= Path5.build();
+                Actions.runBlocking(
+                        new SequentialAction(
+                                new SS_DeliveryArm.HangDone(),
+                                new SS_CLAW.ClawOpen(),
+                                new ParallelAction(
+                                        new SS_DeliveryArm.HangIntake(),
+                                        new SS_Elbow.ElbowRightIntake(),
+                                        new SS_Elbow.ElbowLeftIntake(),
+                                        new SS_Wrist.WristIntake(),
+                                        trajectorychosen
+                                )
+                        )
+                );
+                System.out.println("S5_READY_TO_HANG");
+                CurrentState(State.S6_PARK);
+                break;
+
+            // Park at the end of Auto
+            case S6_PARK:
+                trajectorychosen= Path6.build();
+                Actions.runBlocking(
+                        new ParallelAction(
+                                new SS_DeliveryArm.AtRest(),
+                                new SS_Elbow.ElbowLeftRest(),
+                                new SS_Elbow.ElbowRightRest(),
+                                new SS_Wrist.WristRest(),
+                                new SS_CLAW.ClawRest(),
+                                trajectorychosen
+                                )
+                );
+                System.out.println("S6_PARKING");
                 break;
 
             default:
