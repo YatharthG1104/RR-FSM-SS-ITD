@@ -181,7 +181,8 @@ public class FSM_TeleOps extends OpMode {
         FrontSLidePower    = Range.clip(LeftStick, -1.0, 1.0) ;
 
 
-        switch (liftState) {
+        switch (liftState)
+        {
             case RetractAll:
                 if (SlideBackL.getCurrentPosition() - Back_SLide_Up_Specimen < 30) {//set to what color it sees when sample is out of geco wheels
 //                    ClawElbow.setPosition(Claw_Arm_Reset);

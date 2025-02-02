@@ -7,12 +7,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 @TeleOp(name = "Servo Position Helper", group = "Concept")
 public class ServoPositionHelper extends OpMode {
 
-    private Servo axon = null;
+    //private Servo axon = null;
+    private Servo el = null;
     private double servoPosition = 0.5;
-    private double positionAdjustment = 0.05;
+    private double positionAdjustment = 0.1;
     private final double STEP_ADJUSTMENT = 0.01;
-    private final double MIN_POSITION = 0;
-    private final double MAX_POSITION = 1;
+    private final double MIN_POSITION = 0.0;
+    private final double MAX_POSITION = 1.5;
 
     private boolean previousGamepadY = false;
     private boolean previousGamePadA = false;
@@ -21,8 +22,10 @@ public class ServoPositionHelper extends OpMode {
 
     @Override
     public void init() {
-        axon = hardwareMap.get(Servo.class, "axon");
-        axon.setPosition(servoPosition);
+       // axon = hardwareMap.get(Servo.class, "Elbow Right");
+        el = hardwareMap.get(Servo.class, "Elbow Left");
+     //   axon.setPosition(servoPosition);
+        el.setPosition(servoPosition);
         telemetry.addData("Status", "Initialized");
     }
 
@@ -57,7 +60,8 @@ public class ServoPositionHelper extends OpMode {
             servoPosition = MIN_POSITION;
         }
 
-        axon.setPosition(servoPosition);
+      //  axon.setPosition(servoPosition);
+        el.setPosition(servoPosition);
 
         previousGamepadY = currentGamepadY;
         previousGamePadA = currentGamepadA;

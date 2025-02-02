@@ -104,7 +104,8 @@ public class Auto_OZ_Zone extends LinearOpMode {
         waitForStart();
 
         // Actions based on states
-        switch (CurrentState) {
+        switch (CurrentState)
+        {
             //Resting state at the start of the match
             case S0_RESTING:
                 Actions.runBlocking(

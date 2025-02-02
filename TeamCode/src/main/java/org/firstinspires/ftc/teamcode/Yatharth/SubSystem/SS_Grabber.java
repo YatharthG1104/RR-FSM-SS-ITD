@@ -18,8 +18,8 @@ public class SS_Grabber {
     public static CRServo GrabRight;
 
     //Define all Grab speed
-    public static double GrabL_Speed = -0.8;
-    public static double GrabR_Speed = 0.8;
+    public static double GrabL_Speed = -0.9;
+    public static double GrabR_Speed = 0.9;
     public static int RunTime = 2;
     
     // Define hardware properties

@@ -21,12 +21,12 @@ public class SS_DeliveryArm {
 
     //Define all Delivery Arm Encoder positions and power
     public static int Delivery_Arm_Resting_Enc = 100;
-    public static int Delivery_Arm_HangReady_Enc = 3000;
-    public static int Delivery_Arm_HangDone_Enc = 2000;
+    public static int Delivery_Arm_HangReady_Enc = 2600;
+    public static int Delivery_Arm_HangDone_Enc = 2300;
     public static int Delivery_Arm_IntakeDone_Enc = 800;
-    public static int Delivery_Arm_HangIntake_Enc = 500;
-    public static double Delivery_Arm_Extend_Power = 0.7;
-    public static double Delivery_Arm_Retract_Power = -0.7;
+    public static int Delivery_Arm_HangIntake_Enc = 540;
+    public static double Delivery_Arm_Extend_Power = 0.9;
+    public static double Delivery_Arm_Retract_Power = -0.9;
 
     //HardwareMap and RunModes definition
     public SS_DeliveryArm(HardwareMap hardwareMap) {

@@ -65,7 +65,7 @@ public class Tele extends LinearOpMode {
     Servo backClaw; // back claw
     CRServo LeftGeko; // front left gecko
     CRServo RightGeko; // front right gecko
-    CRServo wrist; // wrist pivot point
+    Servo wrist; // wrist pivot point
     Servo leftmisumi    ; // left misumi slide
     Servo rightmisumi; // right misumi slide
 
@@ -87,9 +87,9 @@ public class Tele extends LinearOpMode {
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
         DcMotor leftFront = hardwareMap.get(DcMotor.class, "leftFront");
-        DcMotor leftRear = hardwareMap.get(DcMotor.class, "leftRear");
+        DcMotor leftRear = hardwareMap.get(DcMotor.class, "leftBack");
         DcMotor rightFront = hardwareMap.get(DcMotor.class, "rightFront");
-        DcMotor rightRear = hardwareMap.get(DcMotor.class, "rightRear");
+        DcMotor rightRear = hardwareMap.get(DcMotor.class, "rightBack");
 
 
 
@@ -100,7 +100,7 @@ public class Tele extends LinearOpMode {
         // Init servos
         backClaw = hardwareMap.get(Servo.class, "Claw");
 
-        wrist = hardwareMap.get(CRServo.class, "Wrist");
+        wrist = hardwareMap.get(Servo.class, "Wrist");
 
         RightGeko = hardwareMap.get(CRServo.class, "Grab Right");
         LeftGeko = hardwareMap.get(CRServo.class, "Grab Left");
@@ -185,7 +185,7 @@ public class Tele extends LinearOpMode {
 
             double dd = gamepad2.right_stick_x;
 
-            cp    = Range.clip(dd, -0.5, 0.5) ;
+            cp    = Range.clip(dd, -0.3, 0.3) ;
 
             LeftLinkage.setPower(-cp);
             RightLinkage.setPower(cp);

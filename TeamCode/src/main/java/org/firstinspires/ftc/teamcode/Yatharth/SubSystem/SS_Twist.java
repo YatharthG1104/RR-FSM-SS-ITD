@@ -20,11 +20,11 @@ public class SS_Twist {
     public static Servo TwistRight;
 
     //Define all Twist positions
-    public static double TwistL_Intake_Pos = -0.8;
-    public static double TwistR_Intake_Pos = 0.8;
+    public static double TwistL_Intake_Pos = -0.6;
+    public static double TwistR_Intake_Pos = 0.6;
     
-    public static double TwistL_Transfer_Pos = -0.5;
-    public static double TwistR_Transfer_Pos = 0.5;
+    public static double TwistL_Transfer_Pos = -0.1;
+    public static double TwistR_Transfer_Pos = 0.1;
 
     public static double TwistL_Rest_Pos = 0.0;
     public static double TwistR_Rest_Pos = 0.0;

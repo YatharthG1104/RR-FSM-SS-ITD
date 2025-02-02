@@ -19,11 +19,11 @@ public class SS_Wrist {
     public static Servo Wrist;
 
     //Define all Wrist positions 
-    public static double Wrist_Intake_Pos = 0.8;
-    public static double Wrist_Hang_Pos = 0.5;
+    public static double Wrist_Intake_Pos = 0.3;
+    public static double Wrist_Hang_Pos = 0.95;
     public static double Wrist_Basket_Pos = 0.5;
-    public static double Wrist_Sample_Trnsf_Pos = 0.2;
-    public static double Wrist_Rest_Pos = 0.0;
+    public static double Wrist_Sample_Trnsf_Pos = 0.3;
+    public static double Wrist_Rest_Pos = 0.3;
 
     // Define hardware properties
     public SS_Wrist(HardwareMap hardwareMap) {

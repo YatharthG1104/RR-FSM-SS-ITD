@@ -31,7 +31,7 @@ import java.util.Arrays;
 
 @Autonomous(name = "First trajectory test")
 
-public class Trajectory_Test extends LinearOpMode{
+public class Trajectory_Test extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         Pose2d beginPose = new Pose2d(0, 0, 0);
@@ -40,29 +40,34 @@ public class Trajectory_Test extends LinearOpMode{
         // Define other non drive motors before you move forward
         MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
 
-        DcMotor motorl = null;
-        motorl = hardwareMap.get(DcMotor.class,"Left Motor");
+        //DcMotor motorl = null;
+        //motorl = hardwareMap.get(DcMotor.class, "Left Motor");
 
         Servo servol = null;
-        servol = hardwareMap.get(Servo.class, "Left Servo");
+        Servo servor = null;
+        servol = hardwareMap.get(Servo.class, "Twist Left");
+        servor = hardwareMap.get(Servo.class, "Twist Right");
 
-        CRServo servor = null;
-        servor = hardwareMap.get(CRServo.class, "Right Servo");
 
+        //CRServo servor = null;
+        //servor = hardwareMap.get(CRServo.class, "Right Servo");
 
 
         waitForStart();
 
-        /*
+
         Actions.runBlocking(
                 drive.actionBuilder(new Pose2d(0, 0, Math.toRadians(0)))
-                        .lineToX(5)
-                        .stopAndAdd(new SS_MotorAction(motorl,2000, 0.7))
-                        .stopAndAdd(new SS_ServoAction(servol, 0.5, 1))
-                        .stopAndAdd(new SS_CRServoAction(servor, 0.8, 3))
+                        //.lineToX(5)
+                        // .stopAndAdd(new SS_MotorAction(motorl,2000, 0.7))
+                        .stopAndAdd(new SS_ServoAction(servol, 0.5, -1))
+                        .stopAndAdd(new SS_ServoAction(servor, 0.5, 1))
+                        //  .stopAndAdd(new SS_CRServoAction(servor, 0.8, 3))
                         .build());
-    */
+    }
+}
 
+/*
         TrajectoryActionBuilder Path1 = drive.actionBuilder(beginPose)
                 .lineToX(10)
                 .waitSeconds(1);
