@@ -3,9 +3,11 @@ package org.firstinspires.ftc.teamcode.YatharthCodes;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.VelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -45,6 +47,7 @@ public class Auto_OZ_Zone extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
+
         //Define all Poses here
         Pose2d InitialPose = new Pose2d(0,0,0);     //Beginning pose
         Pose2d Pose1 = new Pose2d(28,0,0);          //Ready for 1st hang
@@ -79,6 +82,7 @@ public class Auto_OZ_Zone extends LinearOpMode {
 
         TrajectoryActionBuilder Path3 = drive.actionBuilder(Pose2)
                 //need to update all coordinates
+                //.fresh()
                 .strafeTo(new Vector2d(15, -25))
                 .strafeTo(new Vector2d(50, -40))
                 .setReversed(true)
@@ -103,6 +107,8 @@ public class Auto_OZ_Zone extends LinearOpMode {
         TrajectoryActionBuilder Path6 = drive.actionBuilder(Pose4)
                 .strafeTo(new Vector2d(3, -55));
 
+        Pose2d poseEstimate = drive.localizer.getPose();            //Get current pose
+        PoseVelocity2d velEstimate = drive.updatePoseEstimate();    //Get current velocity
 
         Action trajectorychosen;       // Define Action to choose the trajectory in the FSM code
 
@@ -124,6 +130,9 @@ public class Auto_OZ_Zone extends LinearOpMode {
                         )
                 );
                 System.out.println("S0_RESTING");
+                telemetry.addData("heading", poseEstimate.heading);
+                telemetry.addData("X,Y", poseEstimate.position);
+                telemetry.update();
                 CurrentState(State.S1_GET_READY_TO_HANG);
                 break;
 
@@ -137,6 +146,9 @@ public class Auto_OZ_Zone extends LinearOpMode {
                         )
                 );
                 System.out.println("S1_GET_READY_TO_HANG");
+                telemetry.addData("heading", poseEstimate.heading);
+                telemetry.addData("X,Y", poseEstimate.position);
+                telemetry.update();
                 CurrentState(State.S2_HANG_ONE_COMPLETE);
                 break;
 
@@ -157,6 +169,9 @@ public class Auto_OZ_Zone extends LinearOpMode {
                             )
                 );
                 System.out.println("S2_HANG_ONE_COMPLETE");
+                telemetry.addData("heading", poseEstimate.heading);
+                telemetry.addData("X,Y", poseEstimate.position);
+                telemetry.update();
                 CurrentState(State.S3_DRAG_3BLOCKS);
                 break;
 
@@ -167,6 +182,9 @@ public class Auto_OZ_Zone extends LinearOpMode {
                         trajectorychosen
                 );
                 System.out.println("S3_DRAG_3BLOCKS");
+                telemetry.addData("heading", poseEstimate.heading);
+                telemetry.addData("X,Y", poseEstimate.position);
+                telemetry.update();
                 CurrentState(State.S4_READY_FOR_INTAKE);
                 break;
 
@@ -187,6 +205,9 @@ public class Auto_OZ_Zone extends LinearOpMode {
                         )
                 );
                 System.out.println("S4_READY_FOR_INTAKE");
+                telemetry.addData("heading", poseEstimate.heading);
+                telemetry.addData("X,Y", poseEstimate.position);
+                telemetry.update();
                 CurrentState(State.S5_READY_TO_HANG);
                 break;
 
@@ -207,6 +228,9 @@ public class Auto_OZ_Zone extends LinearOpMode {
                         )
                 );
                 System.out.println("S5_READY_TO_HANG");
+                telemetry.addData("heading", poseEstimate.heading);
+                telemetry.addData("X,Y", poseEstimate.position);
+                telemetry.update();
                 CurrentState(State.S6_PARK);
                 break;
 
@@ -224,18 +248,22 @@ public class Auto_OZ_Zone extends LinearOpMode {
                                 )
                 );
                 System.out.println("S6_PARKING");
+                telemetry.addData("heading", poseEstimate.heading);
+                telemetry.addData("X,Y", poseEstimate.position);
+                telemetry.update();
                 break;
 
             default:
                 System.out.println("Unknown state!");
+                telemetry.addData("heading", poseEstimate.heading);
+                telemetry.addData("X,Y", poseEstimate.position);
+                telemetry.update();
+                break;
         }
-
-
     }
 
     // Update state function
     private void CurrentState(State state) {
         CurrentState = state;
     }
-
  }
