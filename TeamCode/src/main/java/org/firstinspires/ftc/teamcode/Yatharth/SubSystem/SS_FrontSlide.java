@@ -106,7 +106,7 @@ public class SS_FrontSlide {
         }
 
     //Action 3. Implement Rest Action for Front slide
-    public static class RestTransferSlide implements Action {
+    public static class RestFrontSlide implements Action {
         private boolean initialized = false;
 
         @Override

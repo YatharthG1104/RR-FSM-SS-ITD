@@ -218,7 +218,7 @@ public class Tele extends LinearOpMode {
 
             double d = gamepad2.left_stick_y;
 
-            p = Range.clip(d, -0.5, 0.5) ;
+            p = Range.clip(d, -1, 1) ;
             MRightckMisumi.setPower(p);
             MLeftBackMisumi.setPower(-p);
 

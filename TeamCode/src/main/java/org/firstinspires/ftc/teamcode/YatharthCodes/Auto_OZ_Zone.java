@@ -47,10 +47,10 @@ public class Auto_OZ_Zone extends LinearOpMode {
 
         //Define all Poses here
         Pose2d InitialPose = new Pose2d(0,0,0);     //Beginning pose
-        Pose2d Pose1 = new Pose2d(30,0,0);          //Ready for 1st hang
-        Pose2d Pose2 = new Pose2d(25,0,0);// After 1st Hang
-        Pose2d Pose3  = new Pose2d(44, -70,0 );// Ready for Intake
-        Pose2d Pose4  = new Pose2d(30, 0,0); // Ready for next hang
+        Pose2d Pose1 = new Pose2d(28,0,0);          //Ready for 1st hang
+        Pose2d Pose2 = new Pose2d(15,0,0);          // After 1st Hang
+        Pose2d Pose3  = new Pose2d(3, -30,0 );      // Ready for Intake
+        Pose2d Pose4  = new Pose2d(28, 0,0);        // Ready for next hang
 
 
         //Importing the hardware maps for all drive motors and setting the robot position
@@ -69,34 +69,39 @@ public class Auto_OZ_Zone extends LinearOpMode {
 
         //Build all Trajectories
         TrajectoryActionBuilder Path1 = drive.actionBuilder(InitialPose)
-                .lineToX(30)
-                .waitSeconds(1);
+                .lineToX(28)
+                .waitSeconds(0.5);
 
        TrajectoryActionBuilder Path2 = drive.actionBuilder(Pose1)
-               .lineToXLinearHeading(25, Math.toRadians(0));
+               .setReversed(true)
+               .setTangent(Math.toRadians(0))
+               .lineToX(15);
 
         TrajectoryActionBuilder Path3 = drive.actionBuilder(Pose2)
                 //need to update all coordinates
-                .splineTo(new Vector2d(43,-10),Math.toRadians(90))
-                .strafeTo(new Vector2d(46, -10))
-                .strafeTo(new Vector2d(46,-65))
-                .strafeTo(new Vector2d(46, -10))
-                .strafeTo(new Vector2d(57, -10))
-                .strafeTo(new Vector2d(57, -65))
-                .strafeTo(new Vector2d(57, -10))
-                .strafeTo(new Vector2d(68, -10))
-                .strafeTo(new Vector2d(68, -65))
-                .strafeTo(new Vector2d(44, -70));
+                .strafeTo(new Vector2d(15, -25))
+                .strafeTo(new Vector2d(50, -40))
+                .setReversed(true)
+                .setTangent(0)
+                .lineToX(5)
+                .strafeTo(new Vector2d(50,-50))
+                .setReversed(true)
+                .setTangent(0)
+                .lineToX(5)
+                .strafeTo(new Vector2d(50,-56))
+                .setReversed(true)
+                .setTangent(0)
+                .lineToX(5)
+                .strafeToLinearHeading(new Vector2d(3,-30), 0);
 
         TrajectoryActionBuilder Path4 = drive.actionBuilder(Pose3)
-         .strafeTo(new Vector2d(30, 0));
-
+                .strafeToLinearHeading(new Vector2d(28, 0),0);
 
         TrajectoryActionBuilder Path5 = drive.actionBuilder(Pose4)
-                .strafeTo(new Vector2d(44, -70));
+                .strafeToLinearHeading(new Vector2d(3, -30),0);
 
         TrajectoryActionBuilder Path6 = drive.actionBuilder(Pose4)
-                .strafeTo(new Vector2d(5, -65));
+                .strafeTo(new Vector2d(3, -55));
 
 
         Action trajectorychosen;       // Define Action to choose the trajectory in the FSM code
@@ -110,6 +115,9 @@ public class Auto_OZ_Zone extends LinearOpMode {
             case S0_RESTING:
                 Actions.runBlocking(
                         new ParallelAction(
+                                new SS_FrontSlide.RestFrontSlide(),
+                                new SS_Twist.TwistLeftRest(),
+                                new SS_Twist.TwistRightRest(),
                                 new SS_Elbow.ElbowLeftHang(),
                                 new SS_Elbow.ElbowRightHang(),
                                 new SS_Wrist.WristHang()
