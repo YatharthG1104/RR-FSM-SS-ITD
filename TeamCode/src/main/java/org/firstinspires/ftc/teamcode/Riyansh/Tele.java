@@ -120,11 +120,11 @@ public class Tele extends LinearOpMode {
         MRightckMisumi.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         MRightckMisumi.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        LeftLinkage.setDirection(DcMotorSimple.Direction.REVERSE);
+      //  LeftLinkage.setDirection(DcMotorSimple.Direction.REVERSE);
         LeftLinkage.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         LeftLinkage.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        RightLinkage.setDirection(DcMotorSimple.Direction.REVERSE);
+      //  RightLinkage.setDirection(DcMotorSimple.Direction.REVERSE);
         RightLinkage.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         RightLinkage.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -175,10 +175,10 @@ public class Tele extends LinearOpMode {
 
 
             if(gamepad2.x){
-                backClaw.setPosition(0.35);
+                backClaw.setPosition(-1);
             }
             if(gamepad2.b){
-                backClaw.setPosition(0.5);
+                backClaw.setPosition(1);
             }
 
             double dd = gamepad2.right_stick_x;

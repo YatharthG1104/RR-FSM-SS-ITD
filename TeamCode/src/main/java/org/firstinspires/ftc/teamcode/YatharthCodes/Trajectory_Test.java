@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.YatharthCodes;
 
+import static org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_Wrist.Wrist;
+
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -7,6 +9,7 @@ import com.acmerobotics.roadrunner.AccelConstraint;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.AngularVelConstraint;
 import com.acmerobotics.roadrunner.MinVelConstraint;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.Trajectory;
@@ -20,6 +23,12 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_CLAW;
+import org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_Elbow;
+import org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_FrontSlide;
+import org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_ServoAction;
+import org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_Twist;
+import org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_Wrist;
 
 import java.util.Arrays;
 
@@ -29,7 +38,7 @@ import java.util.Arrays;
 public class Trajectory_Test extends LinearOpMode{
     @Override
     public void runOpMode() throws InterruptedException {
-        Pose2d beginPose = new Pose2d(0, 0, 0);
+   Pose2d beginPose = new Pose2d(0, 0, 0);
 
         //this takes care of drive motors in MecanumDrive class.
         // Define other non drive motors before you move forward
@@ -57,11 +66,11 @@ public class Trajectory_Test extends LinearOpMode{
         ));
         AccelConstraint baseAccelConstraint = new ProfileAccelConstraint(-10.0, 100.0);*/
 
-        Actions.runBlocking(
+    Actions.runBlocking(
                 drivetrain.actionBuilder(new Pose2d(0,0, Math.toRadians(0)))
-
+                        .stopAndAdd(new SS_ServoAction(Wrist, 0.3, 1))
                         // .lineToX(50, new TranslationalVelConstraint(50))
-                        .lineToX(28)
+                       /* .lineToX(28)
                         .waitSeconds(1.0)
                         .setReversed(true)
                         .setTangent(Math.toRadians(0))
@@ -70,7 +79,7 @@ public class Trajectory_Test extends LinearOpMode{
                         .strafeTo(new Vector2d(50, -40))
                         .setReversed(true)
                         .setTangent(0)
-                        .lineToX(5)
+                        .lineToX(5)*/
                         /*.setReversed(true)
                         .setTangent(0)
                         .lineToX(50)
@@ -106,12 +115,20 @@ public class Trajectory_Test extends LinearOpMode{
                          .strafeTo(new Vector2d(55, -63))
                          .strafeTo(new Vector2d(5, -63))
                          .strafeTo(new Vector2d(5, -39))*/
-                        .build());
+                      .build());
 
-        Pose2d poseEstimate = drivetrain.localizer.getPose();
-        telemetry.addData("heading", poseEstimate.heading);
-        telemetry.addData("X,Y", poseEstimate.position);
-        telemetry.update();
+      /*  Actions.runBlocking(
+                new ParallelAction(
+                        // new SS_FrontSlide.RestFrontSlide(),
+                        new SS_Wrist.WristIntake(),
+                        new SS_CLAW.ClawOpen()
+                )
+        );
+*/
+        //Pose2d poseEstimate = drivetrain.localizer.getPose();
+//telemetry.addData("heading", poseEstimate.heading);
+       // telemetry.addData("X,Y", poseEstimate.position);
+       // telemetry.update();
 
     }
 

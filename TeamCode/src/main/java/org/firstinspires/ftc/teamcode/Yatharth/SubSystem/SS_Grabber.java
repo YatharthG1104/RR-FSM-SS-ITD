@@ -20,7 +20,7 @@ public class SS_Grabber {
     //Define all Grab speed
     public static double GrabL_Speed = -0.9;
     public static double GrabR_Speed = 0.9;
-    public static int RunTime = 2;
+    public static int RunTime = 1;
     
     // Define hardware properties
     public SS_Grabber(HardwareMap hardwareMap) {

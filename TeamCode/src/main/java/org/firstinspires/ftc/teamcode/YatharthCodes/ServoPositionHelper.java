@@ -2,13 +2,15 @@ package org.firstinspires.ftc.teamcode.YatharthCodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+
 
 @TeleOp(name = "Servo Position Helper", group = "Concept")
 public class ServoPositionHelper extends OpMode {
 
-    //private Servo axon = null;
-    private Servo el = null;
+    private Servo axon = null;
+    //private Servo el = null;
     private double servoPosition = 0.5;
     private double positionAdjustment = 0.1;
     private final double STEP_ADJUSTMENT = 0.01;
@@ -22,10 +24,12 @@ public class ServoPositionHelper extends OpMode {
 
     @Override
     public void init() {
-       // axon = hardwareMap.get(Servo.class, "Elbow Right");
-        el = hardwareMap.get(Servo.class, "Elbow Left");
-     //   axon.setPosition(servoPosition);
-        el.setPosition(servoPosition);
+        axon = hardwareMap.get(Servo.class, "Claw");
+        //el = hardwareMap.get(Servo.class, "Twist Right");
+        //axon.setDirection(Servo.Direction.REVERSE);
+        //el.setDirection(Servo.Direction.FORWARD);
+        axon.setPosition(servoPosition);
+       // el.setPosition(servoPosition);
         telemetry.addData("Status", "Initialized");
     }
 
@@ -60,8 +64,8 @@ public class ServoPositionHelper extends OpMode {
             servoPosition = MIN_POSITION;
         }
 
-      //  axon.setPosition(servoPosition);
-        el.setPosition(servoPosition);
+        axon.setPosition(servoPosition);
+       // el.setPosition(servoPosition);
 
         previousGamepadY = currentGamepadY;
         previousGamePadA = currentGamepadA;
