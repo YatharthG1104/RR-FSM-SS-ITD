@@ -11,7 +11,7 @@ public class SS_ServoAction implements Action{
     Servo servo;
     double position_tgt;
     double direction;
-    ElapsedTime timer;
+    ElapsedTime timer = null;
 
     public SS_ServoAction(Servo s, double p, double d) {
         this.servo = s;
@@ -23,7 +23,7 @@ public class SS_ServoAction implements Action{
     public boolean run(@NonNull TelemetryPacket telemetryPacket) {
         if (timer == null) {
             timer = new ElapsedTime();
-            servo.setPosition(position_tgt * direction);
+            servo.setPosition(position_tgt);
         }
         return false;
     }

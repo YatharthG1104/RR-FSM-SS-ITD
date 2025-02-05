@@ -12,7 +12,7 @@ public class SS_CRServoAction implements Action {
     CRServo crServo;
     double power;
     int seconds;
-    ElapsedTime timer;
+    ElapsedTime timer= null;
 
     public SS_CRServoAction(CRServo c, double p, int s) {
         this.crServo = c;

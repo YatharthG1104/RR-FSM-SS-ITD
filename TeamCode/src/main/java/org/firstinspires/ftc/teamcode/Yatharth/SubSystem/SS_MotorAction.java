@@ -11,7 +11,7 @@ public class SS_MotorAction implements Action {
     DcMotor motor;
     double position_tgt;
     double power;
-    ElapsedTime timer;
+    ElapsedTime timer = null;
 
     public SS_MotorAction(DcMotor m, double p, double pw) {
         this.motor = m;
@@ -29,8 +29,13 @@ public class SS_MotorAction implements Action {
         }
         return false;
     }
-    /*
+}
+
+
+
+
+
+ /*
     public Action SS_MotorAction(DcMotor m, double p, double pw) {
         return new SS_MotorAction(m,p,pw);
     }*/
-}

@@ -65,23 +65,3 @@ public class SS_CLAW {
     }
     }
 
-
-
-//private boolean initialized = false;
-/*  if (!initialized) {
-                Claw.setPosition(Claw_Open);
-                initialized = true;
-            }
-
-            double pos = Claw.getPosition();
-            packet.put("Claw pos", pos);
-
-
-            if (pos > Claw_Close) {
-                Claw.setPosition(Claw_Close);
-                return true; // Continue running
-            } else {
-                //Claw.setPosition(0.0);
-                packet.put("Claw pos", pos);
-                return false; // Stop action
-            }*/

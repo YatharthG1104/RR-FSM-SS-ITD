@@ -11,8 +11,11 @@ import com.acmerobotics.roadrunner.VelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
@@ -29,7 +32,7 @@ import org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_FrontSlide;
 public class Auto_OZ_Zone extends LinearOpMode {
 
     // Define the states of the FSM
-    private enum State {
+    public enum State {
         S0_RESTING,
         S1_GET_READY_TO_HANG,
         S2_HANG_ONE_COMPLETE,
@@ -40,13 +43,28 @@ public class Auto_OZ_Zone extends LinearOpMode {
     }
 
     public ElapsedTime mRuntime = new ElapsedTime();   // Time into the Autonomous round.
-
     public static State CurrentState;    // Current State Machine State.
 
+    //Initialize Non drive motors and servos
+    DcMotor deliveryArmLeft = null;
+    DcMotor deliveryArmRight = null;
+    DcMotor FrontSlideLeft = null;
+    DcMotor FrontSlideRight = null;
+
+    Servo Claw = null;
+    Servo Wrist = null;
+    Servo TwistLeft = null;
+    Servo TwistRight = null;
+    CRServo GrabLeft = null;
+    CRServo GrabRight = null;
+    Servo ElbowLeft = null;
+    Servo ElbowRight = null;
+
+    // Color Sensor Hardware Map
+    ColorSensor sensorColor = null;
 
     @Override
     public void runOpMode() throws InterruptedException {
-
 
         //Define all Poses here
         Pose2d InitialPose = new Pose2d(0,0,0);     //Beginning pose
@@ -55,18 +73,12 @@ public class Auto_OZ_Zone extends LinearOpMode {
         Pose2d Pose3  = new Pose2d(3, -30,0 );      // Ready for Intake
         Pose2d Pose4  = new Pose2d(28, 0,0);        // Ready for next hang
 
-
         //Importing the hardware maps for all drive motors and setting the robot position
         MecanumDrive drive = new MecanumDrive(hardwareMap, InitialPose);
 
-        // Color Sensor Hardware Map
-        ColorSensor sensorColor;
         sensorColor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
 
-        // Add all other non drive motors to respective subsystems
-        //Add all servos to subsystems as well
-
-        // set initial state and start game clock
+        //set initial state and start game clock
         mRuntime.reset();                               // Zero game clock
         CurrentState(State.S0_RESTING);   // Initial state
 
@@ -263,7 +275,7 @@ public class Auto_OZ_Zone extends LinearOpMode {
     }
 
     // Update state function
-    private void CurrentState(State state) {
+    public void CurrentState(State state) {
         CurrentState = state;
     }
  }
