@@ -57,7 +57,7 @@ public class Trajectory_Test extends LinearOpMode{
 
         waitForStart();
 
-        Pose2d poseEstimate = drive.localizer.getPose();
+
 
 // Velocity and Acceleration Constraints
  /*
@@ -69,14 +69,32 @@ public class Trajectory_Test extends LinearOpMode{
 */
 
 //Method 1: Roadrunner Action Builder
-        /*
+
         Actions.runBlocking(
                 drive.actionBuilder(new Pose2d(0, 0, Math.toRadians(0)))
+                        //.lineToX(10)
+                        .lineToX(28)
+                        .waitSeconds(1.0)
+                        .setReversed(true)
+                        .setTangent(Math.toRadians(0))
+                        .lineToX(15)
+                        .strafeTo(new Vector2d(15, -25))
+                        .strafeTo(new Vector2d(55, -35))
+                        .setReversed(true)
+                        .setTangent(0)
                         .lineToX(5)
-                        .splineTo(new Vector2d(20,-20), Math.toRadians(90))
+                        .strafeTo(new Vector2d(55,-45))
+                        .setReversed(true)
+                        .setTangent(0)
+                        .lineToX(5)
+                       /* .strafeTo(new Vector2d(50,-56))
+                        .setReversed(true)
+                        .setTangent(0)
+                        .lineToX(5)*/
+                        .strafeToLinearHeading(new Vector2d(3,-30), 0)
                         .build());
 
-         */
+
 
 //Method 2: Trajectory Action Builder
 /*
@@ -94,6 +112,7 @@ public class Trajectory_Test extends LinearOpMode{
 */
 
 //Method 3: Action Runblocking
+        /*
       Actions.runBlocking(
               new ParallelAction(
                         //trajectorychosen,
@@ -101,8 +120,9 @@ public class Trajectory_Test extends LinearOpMode{
                         new ServoAction(C, 0.3)
 
                 )
-        );
+        );*/
 
+        Pose2d poseEstimate = drive.localizer.getPose();
         telemetry.addData("heading", poseEstimate.heading);
         telemetry.addData("X,Y", poseEstimate.position);
         telemetry.update();
