@@ -25,7 +25,10 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
+
+import java.util.Locale;
 
 @TeleOp(name="color")
 public class ColorSensorTest extends OpMode {
@@ -60,8 +63,8 @@ public class ColorSensorTest extends OpMode {
     // color of the Robot Controller app to match the hue detected by the RGB sensor.
 
     public void init() {
-            GecoWheelsR = hardwareMap.get(CRServo.class, "Grab Right");
-            GecoWheelsL = hardwareMap.get(CRServo.class, "Grab Left");
+        GecoWheelsR = hardwareMap.get(CRServo.class, "Grab Right");
+        GecoWheelsL = hardwareMap.get(CRServo.class, "Grab Left");
 
         // hardware initialization code goes here
         // this needs to correspond with the configuration used
@@ -69,7 +72,11 @@ public class ColorSensorTest extends OpMode {
 
 
         sensorColor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
+        sensorDistance = hardwareMap.get(DistanceSensor.class, "sensor_color_distance");
         int relativeLayoutId = hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id", hardwareMap.appContext.getPackageName());
+        telemetry.addData("Left Distance (cm)",
+                String.format(Locale.US, "%.02f", sensorDistance.getDistance(DistanceUnit.CM)));
+
         final View relativeLayout = ((Activity) hardwareMap.appContext).findViewById(relativeLayoutId);
 
 
@@ -85,11 +92,25 @@ public class ColorSensorTest extends OpMode {
                 (int) (sensorColor.blue() * SCALE_FACTOR),
                 hsvValues);
         double hue = hsvValues[0];
-        if (hue >= 0 && hue < 60 || hue > 360 || hue >= 60 && hue < 120) {//If we missed or got wrong color we dont click it so we dont get a penelty
+        telemetry.addData("hue...",hue);
+        if (hue >= 0 && hue < 60  ) {//If we missed or got wrong color we dont click it so we dont get a penelty
 
-            GecoWheelsR.setPower(1);
-            GecoWheelsL.setPower(-1);
+            telemetry.addLine("Color detected red");
         }
+        if (hue >= 60 && hue < 100 ) {//If we missed or got wrong color we dont click it so we dont get a penelty
+
+            telemetry.addLine("Color detected yellow");
+        }
+        if(sensorDistance.getDistance(DistanceUnit.CM)>2){
+            telemetry.addLine("nothing here missed");
+        }
+        if(hue >= 200 && hue < 250){
+            telemetry.addLine("Color detected blue ");
+        }
+        telemetry.addData("Left Distance (cm)",
+                String.format(Locale.US, "%.02f", sensorDistance.getDistance(DistanceUnit.CM)));
+
+        telemetry.update();
 
     }
 }
