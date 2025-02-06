@@ -1,38 +1,20 @@
 package org.firstinspires.ftc.teamcode.YatharthCodes;
 
-import static org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_Wrist.Wrist;
-
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.AccelConstraint;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.AngularVelConstraint;
-import com.acmerobotics.roadrunner.MinVelConstraint;
-import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.ProfileAccelConstraint;
-import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.Trajectory;
-import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
-import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.VelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
-import org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_CLAW;
-import org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_Elbow;
-import org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_FrontSlide;
-import org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_ServoAction;
-import org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_Twist;
-import org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_Wrist;
-
-import java.util.Arrays;
 
 
 @Autonomous(name = "First trajectory test")
@@ -134,11 +116,11 @@ public class Trajectory_Test extends LinearOpMode{
     public static class ServoAction implements Action {
         Servo servo;
         double position;
-        ElapsedTime timer;
+        ElapsedTime timer= null;
 
-        public ServoAction(Servo s, double p) {
-            this.servo= s;
-            this.position = p;
+        public ServoAction(Servo srv, double pow) {
+            this.servo= srv;
+            this.position = pow;
         }
 
         @Override
@@ -152,7 +134,49 @@ public class Trajectory_Test extends LinearOpMode{
         }
     }
 
-    // Motor Action build
+    // Motor Action build for roadrunner to use
+    public static class MotorAction implements Action {
+        DcMotor motor;
+        double position_tgt;
+        double power;
+        ElapsedTime timer = null;
 
-    //CRServo Action build
+        public MotorAction (DcMotor mot, double pos, double pow) {
+            this.motor = mot;
+            this.position_tgt = pos;
+            this.power = pow;
+        }
+
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (timer == null) {
+                timer = new ElapsedTime();
+                motor.setPower(power);
+                motor.setTargetPosition((int) (position_tgt));
+                motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
+            return false;
+    }
+    }
+
+    //CRServo Action build for roadrunner to use
+    public static class CRServoAction implements Action {
+        CRServo crServo;
+        double power;
+        int seconds;
+        ElapsedTime timer= null;
+
+        public CRServoAction(CRServo crsrv, int sec, double pow ) {
+            this.crServo = crsrv;
+            this.seconds = sec;
+            this.power = pow;
+        }
+
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (timer.seconds() < seconds) {
+                timer = new ElapsedTime();
+                crServo.setPower(power);
+            }
+            return false;
+        }
+    }
 }
