@@ -21,9 +21,9 @@ public class SS_FrontSlide {
     public static DcMotor FrontSlideRight;
 
     //Define all Delivery Arm Encoder positions and power
-    public static int Front_Slide_Resting_Enc = 10;
+    public static int Front_Slide_Resting_Enc = 70;
     public static int Front_Slide_Intake_Enc = 400;
-    public static int Front_Slide_Transfer_Enc = 100;
+    public static int Front_Slide_Transfer_Enc = 160;
     public static double Front_Slide_Extend_Power = 0.3;
     public static double Front_Slide_Retract_Power = -0.3;
 

@@ -136,10 +136,10 @@ public class Find_encoder extends LinearOpMode {
 
 
 
-            telemetry.addData("Back left Slides Position: ", a.getCurrentPosition());
-            telemetry.addData("Intake left Slides Position: ", b.getCurrentPosition());
-            telemetry.addData("Back right Slides Position: ", c.getCurrentPosition());
-            telemetry.addData("Intake right Slides Position: ", d.getCurrentPosition());
+            telemetry.addData("Delivery ArmL Position: ", a.getCurrentPosition());
+            telemetry.addData("Delivery ArmR Position: ", b.getCurrentPosition());
+            telemetry.addData("Front Slide Left Position: ", c.getCurrentPosition());
+            telemetry.addData("Front Slide Right Position: ", d.getCurrentPosition());
             // Show the elapsed game time and wheel power.
             telemetry.update();
         }

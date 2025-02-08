@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.YatharthCodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 
@@ -10,9 +9,10 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class ServoPositionHelper extends OpMode {
 
     private Servo axon = null;
-    //private Servo el = null;
-    private double servoPosition = 0.5;
-    private double positionAdjustment = 0.1;
+    private Servo el = null;
+    private double servoPositionaxon = 0;
+    private double servoPositionel = 0;
+    private double positionAdjustment = 0.05;
     private final double STEP_ADJUSTMENT = 0.05;
     private final double MIN_POSITION = 0.0;
     private final double MAX_POSITION = 1.0;
@@ -24,12 +24,12 @@ public class ServoPositionHelper extends OpMode {
 
     @Override
     public void init() {
-        axon = hardwareMap.get(Servo.class, "Claw");
-        //el = hardwareMap.get(Servo.class, "Twist Right");
+        axon = hardwareMap.get(Servo.class, "Elbow Right");
+        el = hardwareMap.get(Servo.class, "Elbow Left");
         //axon.setDirection(Servo.Direction.REVERSE);
-        //el.setDirection(Servo.Direction.FORWARD);
-        axon.setPosition(servoPosition);
-       // el.setPosition(servoPosition);
+        el.setDirection(Servo.Direction.REVERSE);
+        axon.setPosition(servoPositionaxon);
+        el.setPosition(servoPositionaxon);
         telemetry.addData("Status", "Initialized");
     }
 
@@ -41,9 +41,9 @@ public class ServoPositionHelper extends OpMode {
         boolean currentGamepadDown = gamepad1.dpad_down;
 
         if (currentGamepadY && !previousGamepadY) {
-            servoPosition += positionAdjustment;
+            servoPositionaxon += positionAdjustment;
         } else if (currentGamepadA && !previousGamePadA) {
-            servoPosition -= positionAdjustment;
+            servoPositionaxon -= positionAdjustment;
         }
 
         if (currentGamepadUp && !previousGamePadUp) {
@@ -58,21 +58,22 @@ public class ServoPositionHelper extends OpMode {
             positionAdjustment = 0.1;
         }
 
-        if (servoPosition > MAX_POSITION) {
-            servoPosition = MAX_POSITION;
-        } else if (servoPosition < MIN_POSITION) {
-            servoPosition = MIN_POSITION;
+        if (servoPositionaxon > MAX_POSITION) {
+            servoPositionaxon = MAX_POSITION;
+        } else if (servoPositionaxon < MIN_POSITION) {
+            servoPositionaxon = MIN_POSITION;
         }
 
-        axon.setPosition(servoPosition);
-       // el.setPosition(servoPosition);
+        axon.setPosition(servoPositionaxon);
+        el.setPosition(servoPositionaxon);
 
         previousGamepadY = currentGamepadY;
         previousGamePadA = currentGamepadA;
         previousGamePadUp = currentGamepadUp;
         previousGamePadDown = currentGamepadDown;
 
-        telemetry.addData("Servo Position", servoPosition);
+        telemetry.addData("Axon Servo Position", servoPositionaxon);
+        telemetry.addData("el Servo Position", servoPositionel);
         telemetry.addData("Servo Step Size", positionAdjustment);
         telemetry.update();
     }
