@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 
@@ -33,7 +34,7 @@ public class SS_FrontSlide {
         FrontSlideRight = hardwareMap.get(DcMotor.class, "Front Slide Right");
 
         FrontSlideLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);  //Front Slide Left zero power behavior
-        FrontSlideLeft.setDirection(DcMotor.Direction.FORWARD);          //Front Slide left motor set forward
+        FrontSlideLeft.setDirection(DcMotor.Direction.REVERSE);          //Front Slide left motor set forward
         FrontSlideLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);  //Front Slide Left motor reset
         FrontSlideLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);       //Front Slide Left run using encoders
 

@@ -14,7 +14,7 @@ public class ServoPositionHelper extends OpMode {
     private double servoPositionel = 0;
     private double positionAdjustment = 0.05;
     private final double STEP_ADJUSTMENT = 0.05;
-    private final double MIN_POSITION = 0.0;
+    private final double MIN_POSITION = -1.0;
     private final double MAX_POSITION = 1.0;
 
     private boolean previousGamepadY = false;

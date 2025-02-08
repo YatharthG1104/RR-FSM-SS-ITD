@@ -151,26 +151,34 @@ public class Tele extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            // Setup a variable for each drive wheel to save power level for telemetry
-            double leftPower;
-            double rightPower;
+            // Defining variable for the motor's power
+            double lfPower;
+            double rfPower;
+            double rbPower;
+            double lbPower;
 
-            // Choose to drive using either Tank Mode, or POV Mode
-            // Comment out the method that's not used.  The default below is POV.
 
             // POV Mode uses left stick to go forward, and right stick to turn.
             // - This uses basic math to combine motions and is easier to drive straight.
-            double drive = gamepad1.right_stick_x ;//* 0.68
-            double strafe = gamepad1.left_stick_x; //* 0.60;
-            double turn = -gamepad1.left_stick_y; //* 0.63;
-            double lfPower = Range.clip(turn + strafe + drive, -1.0, 1.0);
-            double rfPower = Range.clip(turn - strafe - drive, -1.0, 1.0);
-            double lbPower = Range.clip(turn - strafe + drive, -1.0, 1.0);
-            double rbPower = Range.clip(turn + strafe - drive, -1.0, 1.0);
+            double y = -gamepad1.left_stick_y;
+            double x = gamepad1.left_stick_x;
+            double rx = gamepad1.right_stick_x;
 
+            // Denominator is the largest motor power (absolute value) or 1
+            // This ensures all the powers maintain the same ratio,
+            // but only if at least one is out of the range [-1, 1]
+
+            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+
+            lfPower = (y + x + rx) / denominator;
+            lbPower = (y - x + rx) / denominator;
+            rfPower = (y - x - rx) / denominator;
+            rbPower = (y + x - rx) / denominator;
+
+            // Setting all the drive motors to their power
             leftFront.setPower(lfPower);
-            leftRear.setPower(rfPower);
-            rightFront.setPower(lbPower);
+            leftRear.setPower(lbPower);
+            rightFront.setPower(rfPower);
             rightRear.setPower(rbPower);
 
 

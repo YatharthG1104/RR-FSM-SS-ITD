@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
@@ -107,22 +108,22 @@ public class RRAction_Auto_OZ extends LinearOpMode {
 
         deliveryArmRight = hardwareMap.get(DcMotor.class, "Delivery ArmR");
         deliveryArmRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);  //Delivery arm zero power behavior
-        deliveryArmRight.setDirection(DcMotor.Direction.REVERSE);          //Delivery arm right motor set reversed
+        deliveryArmRight.setDirection(DcMotor.Direction.FORWARD);          //Delivery arm right motor set reversed
         deliveryArmRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);  //Delivery arm motor reset
         deliveryArmRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);       //Delivery arm run using encoders
 
         ElbowLeft = hardwareMap.get(Servo.class, "Elbow Left");
-        ElbowLeft.scaleRange(0,1);
+        ElbowLeft.scaleRange(-1,1);
         ElbowLeft.setDirection(Servo.Direction.REVERSE);
 
 
         ElbowRight = hardwareMap.get(Servo.class, "Elbow Right");
-        ElbowRight.scaleRange(-1,0);
+        ElbowRight.scaleRange(-1,1);
         ElbowRight.setDirection(Servo.Direction.FORWARD);
 
         FrontSlideLeft = hardwareMap.get(DcMotor.class, "Front Slide Left");
         FrontSlideLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);  //Front Slide Left zero power behavior
-        FrontSlideLeft.setDirection(DcMotor.Direction.FORWARD);          //Front Slide left motor set forward
+        FrontSlideLeft.setDirection(DcMotor.Direction.REVERSE);          //Front Slide left motor set forward
         FrontSlideLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);  //Front Slide Left motor reset
         FrontSlideLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);       //Front Slide Left run using encoders
 
@@ -136,15 +137,15 @@ public class RRAction_Auto_OZ extends LinearOpMode {
         GrabRight = hardwareMap.get(CRServo.class, "Grab Right");
 
         TwistLeft = hardwareMap.get(Servo.class, "Twist Left");
-        TwistLeft.scaleRange(0,1);
+        TwistLeft.scaleRange(-1,1);
         TwistLeft.setDirection(Servo.Direction.REVERSE);
 
         TwistRight = hardwareMap.get(Servo.class, "Twist Right");
-        TwistRight.scaleRange(-1,0);
+        TwistRight.scaleRange(-1,1);
         TwistRight.setDirection(Servo.Direction.FORWARD);
 
         Wrist = hardwareMap.get(Servo.class, "Wrist");
-        Wrist.scaleRange(0,1);
+        Wrist.scaleRange(-1,1);
         Wrist.setDirection(Servo.Direction.FORWARD);
 
         sensorColor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
