@@ -48,7 +48,7 @@ public class RRAction_Auto_OZ extends LinearOpMode {
 
     //Define all Wrist positions and mode
     public static double Wrist_Intake_Pos = 0.3;
-    public static double Wrist_Hang_Pos = 0.95;
+    public static double Wrist_Hang_Pos = 0.8;
     public static double Wrist_Rest_Pos = 0.3;
 
 
@@ -67,19 +67,19 @@ public class RRAction_Auto_OZ extends LinearOpMode {
     public static double Delivery_Arm_Retract_Power = 0.9;
 
     //Define all Elbow positions
-    public static double ElbowL_Intake_Pos = -0.8;
+    public static double ElbowL_Intake_Pos = 0.8;
     public static double ElbowR_Intake_Pos = 0.8;
-    public static double ElbowL_Hang_Pos = -0.5;
+    public static double ElbowL_Hang_Pos = 0.5;
     public static double ElbowR_Hang_Pos = 0.5;
     public static double ElbowL_Rest_Pos = 0.0;
     public static double ElbowR_Rest_Pos = 0.0;
 
     //Define all Front Slide Arm Encoder positions and power
     public static int Front_Slide_Resting_Enc = 10;
-    public static int Front_Slide_Intake_Enc = 400;
+    public static int Front_Slide_Intake_Enc = 2000;
     public static int Front_Slide_Transfer_Enc = 100;
-    public static double Front_Slide_Extend_Power = 0.3;
-    public static double Front_Slide_Retract_Power = -0.3;
+    public static double Front_Slide_Extend_Power = 0.7;
+    public static double Front_Slide_Retract_Power = -0.7;
 
 
     @Override
@@ -191,6 +191,24 @@ public class RRAction_Auto_OZ extends LinearOpMode {
 
         waitForStart();
 
+        //extra- PLEASE DELETE LATER
+        trajectorychosen = Path1.build();
+        Actions.runBlocking(
+                new SequentialAction(
+                      //  trajectorychosen,
+                       // new MotorAction(deliveryArmLeft, Delivery_Arm_HangReady_Enc, Delivery_Arm_Extend_Power),
+                        //new MotorAction(deliveryArmRight, Delivery_Arm_HangReady_Enc, Delivery_Arm_Extend_Power),
+                      //  new MotorAction(FrontSlideLeft, Front_Slide_Intake_Enc, Front_Slide_Extend_Power),
+                        //new MotorAction(FrontSlideRight, Front_Slide_Intake_Enc, Front_Slide_Extend_Power),
+                       // new ServoAction(ElbowLeft, ElbowL_Hang_Pos),
+                      //  new ServoAction(ElbowRight, ElbowR_Hang_Pos),
+                        new ServoAction(Wrist, Wrist_Hang_Pos))
+        );
+        Pose2d poseEstimate = drive.localizer.getPose();            //Get current pose
+        telemetry.addData("heading", poseEstimate.heading);
+        telemetry.addData("X,Y", poseEstimate.position);
+        telemetry.update();
+/*
         trajectorychosen = Path1.build();
         Actions.runBlocking(
                 new ParallelAction(
@@ -303,6 +321,7 @@ public class RRAction_Auto_OZ extends LinearOpMode {
         telemetry.addData("heading", poseEstimate5.heading);
         telemetry.addData("X,Y", poseEstimate5.position);
         telemetry.update();
+        */
     }
 
 

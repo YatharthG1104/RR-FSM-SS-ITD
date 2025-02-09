@@ -216,8 +216,8 @@ public class Tele extends LinearOpMode {
             }
 
             if(gamepad2.dpad_left){
-                rightmisumi.setPosition(0.9);
-                leftmisumi.setPosition(-0.9);
+                rightmisumi.setPosition(0.85);
+                leftmisumi.setPosition(-0.85);
             }
             if(gamepad2.dpad_right){
                 rightmisumi.setPosition(-0.85);//0.5

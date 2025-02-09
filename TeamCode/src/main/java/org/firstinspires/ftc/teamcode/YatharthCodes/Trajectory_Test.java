@@ -54,9 +54,8 @@ public class Trajectory_Test extends LinearOpMode{
 
 //Method 1: Roadrunner Action Builder
 
-       /* Actions.runBlocking(
+        /*Actions.runBlocking(
                 drive.actionBuilder(new Pose2d(0, 0, Math.toRadians(0)))
-                        //.lineToX(10)
                         .lineToX(28)
                         .waitSeconds(0.5)
                         .setReversed(true)
@@ -73,24 +72,50 @@ public class Trajectory_Test extends LinearOpMode{
                         .setReversed(true)
                         .setTangent(0)
                         .lineToX(5)
-                       /* .strafeTo(new Vector2d(50,-56))
-                        .setReversed(true)
-                        .setTangent(0)
-                        .lineToX(5)*/
-                       /* .strafeToLinearHeading(new Vector2d(3,-30), 0)
+                        .strafeToLinearHeading(new Vector2d(3,-30), 0)
                         .strafeToLinearHeading(new Vector2d(28,5), 0)
                         .strafeToLinearHeading(new Vector2d(3,-30), 0)
                         .strafeToLinearHeading(new Vector2d(28,5), 0)
-                       // .strafeToLinearHeading(new Vector2d(3,-30), 0)
-                       // .strafeToLinearHeading(new Vector2d(28,5), 0)
                         .strafeToLinearHeading(new Vector2d(3,-45), 0)
                         .build());*/
 
         Actions.runBlocking(
                 drive.actionBuilder(new Pose2d(0, 0, Math.toRadians(0)))
+                        .lineToX(28)
+                        .waitSeconds(0.5)
+                        .setReversed(true)
+                        .setTangent(Math.toRadians(0))
+                        .lineToX(10)
+                        .setTangent(-Math.PI/2)
+                        .splineToConstantHeading(new Vector2d(55,-33), Math.PI/2)
+                        .setTangent(Math.PI/2)
+                        .splineToConstantHeading(new Vector2d(55,-40), Math.PI/2)
+                       // .strafeTo(new Vector2d(15, -25))
+                        //.strafeTo(new Vector2d(55, -35))
+                        //.strafeTo(new Vector2d(55, -40))
+                        .setReversed(true)
+                        .setTangent(0)
+                        .lineToX(8)
+                        .strafeTo(new Vector2d(55,-42))
+                        .strafeTo(new Vector2d(55,-50))
+                        .setReversed(true)
+                        .setTangent(0)
+                        .lineToX(8)
+                        .strafeToLinearHeading(new Vector2d(5,-30), 0)
+                        .strafeToLinearHeading(new Vector2d(28,5), 0)
+                        .strafeToLinearHeading(new Vector2d(5,-30), 0)
+                        .strafeToLinearHeading(new Vector2d(28,5), 0)
+                        .strafeToLinearHeading(new Vector2d(5,-30), 0)
+                        .strafeToLinearHeading(new Vector2d(28,5), 0)
+                        .strafeToLinearHeading(new Vector2d(5,-40), 0)
+                        .build());
+
+
+      /*  Actions.runBlocking(
+                drive.actionBuilder(new Pose2d(0, 0, Math.toRadians(0)))
                          .setTangent(-PI/2)
                         .splineTo(new Vector2d(15,-15), 0)
-                        .build());
+                        .build());*/
 
 
 
