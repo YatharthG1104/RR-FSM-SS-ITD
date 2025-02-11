@@ -1,6 +1,13 @@
 package org.firstinspires.ftc.teamcode.YatharthCodes;
 
+/*
+ * Some declarations that are boilerplate are
+ * skipped for the sake of brevity.
+ * Since there are no real values to use, named constants will be used.
+ */
+
 import android.app.Activity;
+import android.graphics.Color;
 import android.view.View;
 
 import com.acmerobotics.roadrunner.Action;
@@ -12,15 +19,17 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
-@TeleOp(name="TeleOps FSM")
+@TeleOp(name="TeleOps FSM YG")
 
 public class FSM_TeleOps extends OpMode {
     // An Enum is used to represent lift states.
@@ -34,30 +43,30 @@ public class FSM_TeleOps extends OpMode {
         SampleDrop,
         SpecimenPicked,
         SpecimenHanged,
-
-        LIFT_START, FINAL
+        LIFT_START,
+        FINAL
     };
 
     LiftState liftState = LiftState.LIFT_START;
 
-    Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(90));//set a inistal pose but will need to change this
+    Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(90));//set a initial pose but will need to change this
     MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
     TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)//this is our goal pose with our goal heading
             .lineToX(25)
-            .splineTo(new Vector2d(52, -52), Math.PI /2)
+            .splineTo(new Vector2d(52, -52), Math.PI / 2)
             .waitSeconds(3);
 
-    Pose2d initialPose2 = new Pose2d(50, -60, Math.toRadians(90));//set a inistal pose but will need to change this
+    Pose2d initialPose2 = new Pose2d(50, -60, Math.toRadians(90));//set a initial pose but will need to change this
 
     TrajectoryActionBuilder tab2 = drive.actionBuilder(initialPose2)//this is our goal pose with our goal heading
             .lineToX(25)
-            .splineTo(new Vector2d(52, -52), Math.PI /2)
+            .splineTo(new Vector2d(52, -52), Math.PI / 2)
             .waitSeconds(3);
 
 
-    Action trajectoryActionChosen = tab1.build();//seting our movment path to a varibale
-    Action trajectoryActionChosen2 = tab2.build();//seting our movment path to a varibale
+    Action trajectoryActionChosen = tab1.build();//setting our movement path to a variable
+    Action trajectoryActionChosen2 = tab2.build();//setting our movement path to a variable
     public DcMotorEx SlideFrontR;
     public DcMotorEx SlideFrontL;
     public DcMotorEx SlideBackR;
@@ -92,12 +101,7 @@ public class FSM_TeleOps extends OpMode {
     double Claw_Arm_Reset = -0.3;
 
     double wrist_Specimen_Pick;
-    double getWrist_Specimen_Drop;
-
-
-
-
-
+    double Wrist_Specimen_Drop;
 
 
     int Back_SLide_Up_Specimen; // the low encoder position for the lift
@@ -106,18 +110,21 @@ public class FSM_TeleOps extends OpMode {
     int Front_SLide_in;
     double FrontSLidePower;
     double LeftStick = -gamepad2.left_stick_x;
+    double lfPower;
+    double rfPower;
+    double rbPower;
+    double lbPower;
 
+    ColorSensor sensorColor;
+    DistanceSensor sensorDistance;
+    float hsvValues[] = {0F, 0F, 0F};
 
-//    ColorSensor sensorColor;
-//    DistanceSensor sensorDistance;
-//    float hsvValues[] = {0F, 0F, 0F};
-//
-//    // values is a reference to the hsvValues array.
-//    final float values[] = hsvValues;
-//
-//    // sometimes it helps to multiply the raw RGB values with a scale factor
-//    // to amplify/attentuate the measured values.
-//    final float SCALE_FACTOR = 255;
+    // values is a reference to the hsvValues array.
+    final float values[] = hsvValues;
+
+    // sometimes it helps to multiply the raw RGB values with a scale factor
+    // to amplify/attentuate the measured values.
+    final float SCALE_FACTOR = 255;
 
     // get a reference to the RelativeLayout so we can change the background
     // color of the Robot Controller app to match the hue detected by the RGB sensor.
@@ -140,8 +147,6 @@ public class FSM_TeleOps extends OpMode {
         Claw = hardwareMap.get(Servo.class, "Claw");
         ClawArmR = hardwareMap.get(Servo.class, "BRM");
         ClawArmL = hardwareMap.get(Servo.class, "BLM");
-
-
 
 
 //        sensorColor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
@@ -173,16 +178,15 @@ public class FSM_TeleOps extends OpMode {
     }
 
     public void loop() {
-//        Color.RGBToHSV((int) (sensorColor.red() * SCALE_FACTOR),
-//                (int) (sensorColor.green() * SCALE_FACTOR),
-//                (int) (sensorColor.blue() * SCALE_FACTOR),
-//                hsvValues);
-//        double hue = hsvValues[0];
-        FrontSLidePower    = Range.clip(LeftStick, -1.0, 1.0) ;
+        Color.RGBToHSV((int) (sensorColor.red() * SCALE_FACTOR),
+                (int) (sensorColor.green() * SCALE_FACTOR),
+                (int) (sensorColor.blue() * SCALE_FACTOR),
+                hsvValues);
+        double hue = hsvValues[0];
+        FrontSLidePower = Range.clip(LeftStick, -1.0, 1.0);
 
 
-        switch (liftState)
-        {
+        switch (liftState) {
             case RetractAll:
                 if (SlideBackL.getCurrentPosition() - Back_SLide_Up_Specimen < 30) {//set to what color it sees when sample is out of geco wheels
 //                    ClawElbow.setPosition(Claw_Arm_Reset);
@@ -205,8 +209,16 @@ public class FSM_TeleOps extends OpMode {
                 }
                 break;
             case SubmersibleReady:
-                // otherwise do nothing.
+                // otherwise let the driver drive
+                drive.leftFront.setPower(lfPower);
+                drive.rightFront.setPower(rfPower);
+                drive.leftBack.setPower(lbPower);
+                drive.rightBack.setPower(rbPower);
                 if (Math.abs(SlideBackL.getCurrentPosition() - Back_slide_Reset) < 30 && gamepad2.x) {
+                    drive.leftFront.setPower(lfPower);
+                    drive.rightFront.setPower(rfPower);
+                    drive.leftBack.setPower(lbPower);
+                    drive.rightBack.setPower(rbPower);
                     // x is pressed, start extending
                     double dd = gamepad2.right_stick_x;
 
@@ -222,6 +234,11 @@ public class FSM_TeleOps extends OpMode {
             case SamplePicked:
                 if (gamepad2.b) {//its set b so that it only goes down when the driver and oporater have aligned with the sampele
                     // set the lift dump to dump
+                    drive.leftFront.setPower(lfPower);
+                    drive.rightFront.setPower(rfPower);
+                    drive.leftBack.setPower(lbPower);
+                    drive.rightBack.setPower(rbPower);
+
                     GecoWristL.setPosition(-Geco_Wrist_Down);
                     GecoWristR.setPosition(Geco_Wrist_Down);
 
@@ -237,7 +254,7 @@ public class FSM_TeleOps extends OpMode {
 
             case ClawReadyForSample:
 //                hue >= 0 && hue < 60 || hue > 360 || hue >= 60 && hue < 120
-                if (gamepad2.dpad_left) {//If we missed or got wrong color we dont click it so we dont get a penelty
+                if (hue >= 0 && hue < 60 || hue > 360 || hue >= 60 && hue < 120) {//If we missed or got wrong color we dont click it so we dont get a penelty
                     GecoWristL.setPosition(-Geco_Wrist_Claw_Deposit);
                     GecoWristR.setPosition(Geco_Wrist_Claw_Deposit);
 
@@ -278,7 +295,12 @@ public class FSM_TeleOps extends OpMode {
                         Claw.setPosition(Claw_Open);
                         liftState = LiftState.SpecimenHanged;
                         //drops sample in obsevatrey zone
-                    } if (gamepad2.right_bumper) {//click right bumber if we are doing basket
+                    }
+                    if (gamepad2.right_bumper) {//click right bumber if we are doing basket
+                        drive.leftFront.setPower(lfPower);
+                        drive.rightFront.setPower(rfPower);
+                        drive.leftBack.setPower(lbPower);
+                        drive.rightBack.setPower(rbPower);
                         SlideBackL.setTargetPosition(-Back_slide_Bucket);
                         SlideBackL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                         SlideBackR.setTargetPosition(Back_slide_Bucket);
@@ -293,19 +315,21 @@ public class FSM_TeleOps extends OpMode {
 
                 }
                 break;
-            case FinishedBasket://add if the back slide is at basket hight
-                Claw.setPosition(Claw_Open);
-                SlideBackL.setTargetPosition(-Back_slide_Reset);
-                SlideBackL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            case FinishedBasket:
+                if (Math.abs(SlideBackL.getCurrentPosition() - Back_slide_Bucket) < 30) {
+                    Claw.setPosition(Claw_Open);
+                    SlideBackL.setTargetPosition(-Back_slide_Reset);
+                    SlideBackL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-                SlideBackL.setTargetPosition(Back_slide_Reset);
-                SlideBackL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                liftState = LiftState.RetractAll;
-                //drops sample in basket and retracts evreything
+                    SlideBackL.setTargetPosition(Back_slide_Reset);
+                    SlideBackL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    liftState = LiftState.RetractAll;
+                    //drops sample in basket and retracts evreything
+                }
                 break;
 
             case SpecimenPicked:
-                if ( gamepad2.dpad_up) {//waiting for humen can change to an if statment
+                if (gamepad2.dpad_up) {//waiting for humen can change to an if statment
                     Claw.setPosition(Claw_Close);
                     SlideBackL.setTargetPosition(Back_SLide_Up_Specimen);
                     SlideBackL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -317,26 +341,21 @@ public class FSM_TeleOps extends OpMode {
                 }
                 break;
             case SpecimenHanged:
-                if(Math.abs(SlideBackR.getCurrentPosition() - Back_SLide_Up_Specimen) < 30 && gamepad2.dpad_down){//waiting to ensure no ones in the way
+                if (Math.abs(SlideBackR.getCurrentPosition() - Back_SLide_Up_Specimen) < 30 && gamepad2.dpad_down) {//waiting to ensure no ones in the way
                     Actions.runBlocking(new SequentialAction(trajectoryActionChosen2));//moving to hang specimen
                     SlideBackL.setTargetPosition(Back_slide_Reset);
                     SlideBackL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    SlideBackR.setTargetPosition(Back_slide_Reset);
-                    SlideBackR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    Claw.setPosition(Claw_Open);
-                    liftState = LiftState.RetractAll;
-                    //drops specimen
+                    double drive = gamepad1.right_stick_x * 0.68;
+                    double strafe = gamepad1.left_stick_x * 0.60;
+                    double turn = -gamepad1.left_stick_y * 0.63;
+                    lfPower = Range.clip(turn + strafe + drive, -1.0, 1.0);
+                    rfPower = Range.clip(turn - strafe - drive, -1.0, 1.0);
+                    lbPower = Range.clip(turn - strafe + drive, -1.0, 1.0);
+                    rbPower = Range.clip(turn + strafe - drive, -1.0, 1.0);
+
+
                 }
-                break;
-            default:
-                // should never be reached, as liftState should never be null
-                liftState = LiftState.RetractAll;
         }
 
-
-
-
     }
-
-
 }

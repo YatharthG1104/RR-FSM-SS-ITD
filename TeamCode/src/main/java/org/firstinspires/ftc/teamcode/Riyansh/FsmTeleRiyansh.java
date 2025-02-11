@@ -40,7 +40,6 @@ public class FsmTeleRiyansh extends OpMode {
         SampleDrop,
         SpecimenPicked,
         SpecimenHanged,
-
         LIFT_START, FINAL
     }
 

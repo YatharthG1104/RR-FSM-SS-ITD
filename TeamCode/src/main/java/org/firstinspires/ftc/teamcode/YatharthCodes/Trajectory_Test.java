@@ -6,7 +6,9 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -90,9 +92,6 @@ public class Trajectory_Test extends LinearOpMode{
                         .splineToConstantHeading(new Vector2d(55,-33), Math.PI/2)
                         .setTangent(Math.PI/2)
                         .splineToConstantHeading(new Vector2d(55,-40), Math.PI/2)
-                       // .strafeTo(new Vector2d(15, -25))
-                        //.strafeTo(new Vector2d(55, -35))
-                        //.strafeTo(new Vector2d(55, -40))
                         .setReversed(true)
                         .setTangent(0)
                         .lineToX(8)
@@ -111,38 +110,40 @@ public class Trajectory_Test extends LinearOpMode{
                         .build());
 
 
-      /*  Actions.runBlocking(
+/*     Actions.runBlocking(
                 drive.actionBuilder(new Pose2d(0, 0, Math.toRadians(0)))
-                         .setTangent(-PI/2)
-                        .splineTo(new Vector2d(15,-15), 0)
-                        .build());*/
+                        .stopAndAdd(new ServoAction(W,0.3))
+                        .afterTime(1, new ServoAction(W,0))
+                        .afterTime(1, new ServoAction(C, 0.8))
+                        .build());
 
-
+*/
 
 
 
 //Method 2: Trajectory Action Builder
-/*
-        TrajectoryActionBuilder Path1 = drive.actionBuilder(InitialPose)
-                .lineToX(28)
+
+
+  /*      TrajectoryActionBuilder Path1 = drive.actionBuilder(InitialPose)
+                //.lineToX(28)
                 .waitSeconds(0.5)
-                .afterTime(0.5,new ServoAction(W,0.1))
+                .afterTime(0.5,new ServoAction(W,0.3))
                 .afterTime(0.5, new ParallelAction(
                         new ServoAction(W, 0),
-                        new ServoAction(C, 0.5)
+                        new ServoAction(C, 0.8)
                 ));
         Action trajectorychosen;
         trajectorychosen= Path1.build();
-
 */
 
+
 //Method 3: Action Runblocking
-        /*
+  /*
       Actions.runBlocking(
               new ParallelAction(
                         //trajectorychosen,
-                        new ServoAction(W, 0.05),
-                        new ServoAction(C, 0.3)
+                        new ServoAction(W, 0.3),
+                        new ServoAction(C, 0.8)
 
                 )
         );*/
@@ -161,9 +162,9 @@ public class Trajectory_Test extends LinearOpMode{
         double position;
         ElapsedTime timer= null;
 
-        public ServoAction(Servo srv, double pow) {
+        public ServoAction(Servo srv, double pos) {
             this.servo= srv;
-            this.position = pow;
+            this.position = pos;
         }
 
         @Override
@@ -173,7 +174,7 @@ public class Trajectory_Test extends LinearOpMode{
                 servo.setPosition(position);
             }
 
-            return false;
+            return timer.seconds() < 2;
         }
     }
 

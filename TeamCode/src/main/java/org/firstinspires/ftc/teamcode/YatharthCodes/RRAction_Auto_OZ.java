@@ -76,7 +76,7 @@ public class RRAction_Auto_OZ extends LinearOpMode {
 
     //Define all Front Slide Arm Encoder positions and power
     public static int Front_Slide_Resting_Enc = 10;
-    public static int Front_Slide_Intake_Enc = 2000;
+    public static int Front_Slide_Intake_Enc = 400;
     public static int Front_Slide_Transfer_Enc = 100;
     public static double Front_Slide_Extend_Power = 0.7;
     public static double Front_Slide_Retract_Power = -0.7;
@@ -208,7 +208,8 @@ public class RRAction_Auto_OZ extends LinearOpMode {
         telemetry.addData("heading", poseEstimate.heading);
         telemetry.addData("X,Y", poseEstimate.position);
         telemetry.update();
-/*
+
+/*  // Actual code commented
         trajectorychosen = Path1.build();
         Actions.runBlocking(
                 new ParallelAction(
