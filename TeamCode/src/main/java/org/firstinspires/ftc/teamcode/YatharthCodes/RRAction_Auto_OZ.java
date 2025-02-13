@@ -393,4 +393,39 @@ public class RRAction_Auto_OZ extends LinearOpMode {
             return false;
         }
     }
+
+    // Double Motor Action build for roadrunner to use
+    public static class DoubleMotorAction implements Action {
+        DcMotor motor1;
+        DcMotor motor2;
+        double position_tgt1;
+        double position_tgt2;
+        double power1;
+        double power2;
+        ElapsedTime timer = null;
+
+        public DoubleMotorAction (DcMotor mot1, DcMotor mot2, double pos1, double pos2, double pow1, double pow2) {
+            this.motor1 = mot1;
+            this.position_tgt1 = pos1;
+            this.power1 = pow1;
+            this.motor2 = mot2;
+            this.position_tgt2 = pos2;
+            this.power2 = pow2;
+        }
+
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (timer == null) {
+                timer = new ElapsedTime();
+                motor1.setPower(power1);
+                motor2.setPower(power2);
+                motor1.setTargetPosition((int) (position_tgt1));
+                motor2.setTargetPosition((int) (position_tgt2));
+                motor1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                motor2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            }
+            return false;
+        }
+    }
 }
+
+
