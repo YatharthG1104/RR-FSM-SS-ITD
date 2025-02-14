@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -16,7 +15,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
@@ -201,7 +199,7 @@ public class RRAction_Auto_OZ extends LinearOpMode {
                       //  new MotorAction(FrontSlideLeft, Front_Slide_Intake_Enc, Front_Slide_Extend_Power),
                         //new MotorAction(FrontSlideRight, Front_Slide_Intake_Enc, Front_Slide_Extend_Power),
                        // new ServoAction(ElbowLeft, ElbowL_Hang_Pos),
-                      //  new ServoAction(ElbowRight, ElbowR_Hang_Pos),
+                       // new ServoAction(ElbowRight, ElbowR_Hang_Pos),
                         new ServoAction(Wrist, Wrist_Hang_Pos))
         );
         Pose2d poseEstimate = drive.localizer.getPose();            //Get current pose
@@ -422,6 +420,62 @@ public class RRAction_Auto_OZ extends LinearOpMode {
                 motor2.setTargetPosition((int) (position_tgt2));
                 motor1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 motor2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            }
+            return false;
+        }
+    }
+
+    // Double Servo action build for roadrunner to use
+    public static class DoubleServoAction implements Action {
+        Servo servo1;
+        double position1;
+        Servo servo2;
+        double position2;
+        ElapsedTime timer= null;
+
+        public DoubleServoAction(Servo srv1, Servo srv2,double pos1,double pos2) {
+            this.servo1 = srv1;
+            this.servo2 = srv2;
+            this.position1 = pos1;
+            this.position2 = pos2;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if(timer == null) {
+                timer = new ElapsedTime();
+                servo1.setPosition(position1);
+                servo2.setPosition(position2);
+            }
+
+            return false;
+        }
+    }
+
+    //Double CRServo Action build for roadrunner to use
+    public static class DoubleCRServoAction implements Action {
+        CRServo crServo1;
+        CRServo crServo2;
+        double power1;
+        double power2;
+        int seconds1;
+        int seconds2;
+        ElapsedTime timer= null;
+
+        public DoubleCRServoAction(CRServo crsrv1, CRServo crsrv2,  int sec1, int sec2, double pow1, double pow2) {
+            this.crServo1 = crsrv1;
+            this.crServo2 = crsrv2;
+            this.seconds1 = sec1;
+            this.seconds2 = sec2;
+            this.power1 = pow1;
+            this.power2 = pow2;
+        }
+
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (timer.seconds() < seconds1) {
+                timer = new ElapsedTime();
+                crServo1.setPower(power1);
+                crServo2.setPower(power2);
             }
             return false;
         }

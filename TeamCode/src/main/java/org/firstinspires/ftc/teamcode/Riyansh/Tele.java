@@ -191,14 +191,14 @@ public class Tele extends LinearOpMode {
 
             double dd = gamepad2.right_stick_x;
 
-            cp    = Range.clip(dd, -0.3, 0.3) ;
+            cp    = Range.clip(dd, -0.8, 0.8) ;
 
-            LeftLinkage.setPower(-cp);
-            RightLinkage.setPower(cp);
+            LeftLinkage.setPower(cp);
+            RightLinkage.setPower(-cp);
 
             while(gamepad2.y){
-                LeftGeko.setPower(1);
-                RightGeko.setPower(-1);
+                LeftGeko.setPower(0.5);
+                RightGeko.setPower(-0.5);
             }
             while(gamepad2.a){
                 LeftGeko.setPower(-1);
@@ -216,12 +216,26 @@ public class Tele extends LinearOpMode {
             }
 
             if(gamepad2.dpad_left){
-                rightmisumi.setPosition(0.85);
-                leftmisumi.setPosition(-0.85);
+                MRightckMisumi.setPower(1);
+                MLeftBackMisumi.setPower(1);
             }
             if(gamepad2.dpad_right){
+                MRightckMisumi.setPower(-1);
+                MLeftBackMisumi.setPower(-1);
+            }
+            if(gamepad2.left_bumper){
+                rightmisumi.setPosition(0.87);
+                leftmisumi.setPosition(-0.87);
+            }
+            if(gamepad2.right_bumper){
                 rightmisumi.setPosition(-0.85);//0.5
                 leftmisumi.setPosition(0.85);
+            }
+            if(gamepad2.right_stick_button){
+                wrist.setPosition(0.8);
+            }
+            if(gamepad2.left_stick_button){
+                wrist.setPosition(0);
             }
 
             double d = gamepad2.left_stick_y;
