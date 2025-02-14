@@ -103,14 +103,13 @@ public class FsmTeleRiyansh extends OpMode {
 
 
     double Claw_Arm_Specimen_Pick = 0.5;
+    double Claw_Arm_Specimen_Drop;
     double Claw_Arm_Transfer = -0.5;
     double Claw_Arm_Reset = -0.3;
 
     double wrist_Specimen_Pick;
     double getWrist_Specimen_Drop;
 
-
-    int Back_SLide_Up_Specimen; // the low encoder position for the lift
     int Back_Slide_Hang; // the high encoder position for the lift
     int Back_slide_Reset; // the high encoder position for the lift
     int Back_slide_Bucket; // the high encoder position for the lift
@@ -141,19 +140,20 @@ public class FsmTeleRiyansh extends OpMode {
 
         // hardware initialization code goes here
         // this needs to correspond with the configuration used
-        SlideFrontR = hardwareMap.get(DcMotorEx.class, "Rli");
-        SlideFrontL = hardwareMap.get(DcMotorEx.class, "Lli");
-        SlideBackR = hardwareMap.get(DcMotorEx.class, "rback");
-        SlideBackL = hardwareMap.get(DcMotorEx.class, "lback");//defining the names for all motors and servos in driver hub
+        SlideFrontR = hardwareMap.get(DcMotorEx.class, "Front Slide Right");
+        SlideFrontL = hardwareMap.get(DcMotorEx.class, "Front Slide Left");
+        SlideBackR = hardwareMap.get(DcMotorEx.class, "Delivery ArmR");
+        SlideBackL = hardwareMap.get(DcMotorEx.class, "Delivery ArmL ");//defining the names for all motors and servos in driver hub
 
 
-        GecoWristL = hardwareMap.get(Servo.class, "lm");
-        GecoWristR = hardwareMap.get(Servo.class, "rm");
-        GecoWheelsR = hardwareMap.get(CRServo.class, "fr");
-        GecoWheelsL = hardwareMap.get(CRServo.class, "fl");
+        GecoWristL = hardwareMap.get(Servo.class, "Twist Left");
+        GecoWristR = hardwareMap.get(Servo.class, "Twist RIght");
+        GecoWheelsR = hardwareMap.get(CRServo.class, "Grab Right");
+        GecoWheelsL = hardwareMap.get(CRServo.class, "Grab Left");
         Claw = hardwareMap.get(Servo.class, "Claw");
-        ClawArmR = hardwareMap.get(Servo.class, "BRM");
-        ClawArmL = hardwareMap.get(Servo.class, "BLM");
+        Wrist = hardwareMap.get(Servo.class, "Wrist");
+        ClawArmR = hardwareMap.get(Servo.class, "Elbow Right");
+        ClawArmL = hardwareMap.get(Servo.class, "Elbow Left");
         sensorColor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
         sensorDistance = hardwareMap.get(DistanceSensor.class, "sensor_color_distance");
         int relativeLayoutId = hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id", hardwareMap.appContext.getPackageName());
@@ -196,7 +196,7 @@ public class FsmTeleRiyansh extends OpMode {
 
         switch (liftState) {
             case RetractAll:
-                if (SlideBackL.getCurrentPosition() - Back_SLide_Up_Specimen < 30) {//set to what color it sees when sample is out of geco wheels
+                if (gamepad2.y) {//set to what color it sees when sample is out of geco wheels
 //                    ClawElbow.setPosition(Claw_Arm_Reset);
                     Actions.runBlocking(new ParallelAction(
                             new ServoAction(Claw,Claw_Open),
@@ -215,7 +215,7 @@ public class FsmTeleRiyansh extends OpMode {
             case SubmersibleReady:
                 // otherwise let the driver drive
 
-                if (Math.abs(SlideBackL.getCurrentPosition() - Back_slide_Reset) < 30 && gamepad2.x) {
+                if (gamepad2.x) {
 
 
 
@@ -286,7 +286,7 @@ public class FsmTeleRiyansh extends OpMode {
 
 
             case SampleDrop:
-                if (Math.abs(SlideFrontR.getCurrentPosition() - Front_SLide_in) < 30 && gamepad2.a) {
+                if (gamepad2.a) {
                     Actions.runBlocking(new ParallelAction(
                             new ServoAction(Claw,Claw_Close),
                             new CRServoAction(GecoWheelsL,1,-Geco_OUT),
@@ -337,11 +337,19 @@ public class FsmTeleRiyansh extends OpMode {
 
             case SpecimenPicked:
                 if (gamepad2.dpad_up) {//waiting for humen can change to an if statment
-                    //add meep meep move
+                    move();
+                    drive.leftFront.setPower(lfPower);
+                    drive.rightFront.setPower(rfPower);
+                    drive.leftBack.setPower(lbPower);
+                    drive.rightBack.setPower(rbPower);
                     Actions.runBlocking(new ParallelAction(
                             new ServoAction(Claw,Claw_Close),
-                            new MotorAction(SlideBackL,-Back_SLide_Up_Specimen,0.4),
-                            new MotorAction(SlideBackR,-Back_SLide_Up_Specimen,0.4)
+                            new MotorAction(SlideBackL,-Back_Slide_Hang,0.4),
+                            new MotorAction(SlideBackR,Back_Slide_Hang,0.4),
+                            new ServoAction(ClawArmL,-Claw_Arm_Specimen_Drop),
+                            new ServoAction(ClawArmR,Claw_Arm_Specimen_Drop),
+                            new ServoAction(Wrist,getWrist_Specimen_Drop)
+
                     ));
 
 
@@ -351,27 +359,26 @@ public class FsmTeleRiyansh extends OpMode {
                 }
                 break;
             case SpecimenHanged:
-                if (Math.abs(SlideBackR.getCurrentPosition() - Back_SLide_Up_Specimen) < 30 && gamepad2.dpad_down) {//waiting to ensure no ones in the way
-                    Actions.runBlocking(new SequentialAction(
+                if (gamepad1.a) {//waiting to ensure no ones in the way
+                    Actions.runBlocking(
+                            new ParallelAction(
                                     trajectoryActionChosen2,
-                                    new MotorAction(SlideBackL, -Back_Slide_Hang,0.4),
-                                    new MotorAction(SlideBackR, Back_Slide_Hang,0.4)
+                                    new ParallelAction(
+                                            new ServoAction(Claw,Claw_Open),
+                                            new MotorAction(SlideBackL, -Back_slide_Reset,0.4),
+                                            new MotorAction(SlideBackR, Back_slide_Reset,0.4)
+                                    )
                             )
-                    );//moving to hang specimen
-//                    double y = -gamepad1. left_stick_y;
-//                    double x = gamepad1.left_stick_x;
-//                    double rx = gamepad1.right_stick_x;
-//
-//                    // Denominator is the largest motor power (absolute value) or 1
-//                    // This ensures all the powers maintain the same ratio,
-//                    // but only if at least one is out of the range [-1, 1]
-//
-//                    double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-//
-//                    lfPower = (y + x + rx) / denominator;
-//                    lbPower = (y - x + rx) / denominator;
-//                    rfPower = (y - x - rx) / denominator;
-//                    rbPower = (y + x - rx) / denominator;
+                    );
+                    if(gamepad2.dpad_down){
+                        Actions.runBlocking(new ParallelAction(
+                                new ServoAction(Wrist,wrist_Specimen_Pick),
+                                new ServoAction(ClawArmL,-Claw_Arm_Specimen_Drop),
+                                new ServoAction(ClawArmR,Claw_Arm_Specimen_Drop)
+
+                        ));
+                        liftState = LiftState.SamplePicked;
+                    }
 
 
                 }
