@@ -35,6 +35,7 @@ public class Trajectory_Test extends LinearOpMode{
         Pose2d InitialPose = new Pose2d(0, 0, 0);
         Servo W = null;
         Servo C = null;
+        DcMotor F = null;
 
 
         //this takes care of drive motors in MecanumDrive class.
@@ -45,6 +46,7 @@ public class Trajectory_Test extends LinearOpMode{
         // Servo servo= hardwareMap.servo.get("servo");
         W = hardwareMap.get(Servo.class, "Wrist");
         C = hardwareMap.get(Servo.class, "Claw");
+        F = hardwareMap.get(DcMotor.class, "Front Slide");
 
         waitForStart();
 
@@ -149,7 +151,7 @@ public class Trajectory_Test extends LinearOpMode{
                         .build());*/
 
 
-    Actions.runBlocking(
+ /*   Actions.runBlocking(
                 drive.actionBuilder(new Pose2d(0, 0, Math.toRadians(0)))
                         .stopAndAdd(new ServoAction(W,0.5))
                        .afterTime(0.5, new SequentialAction(
@@ -157,7 +159,7 @@ public class Trajectory_Test extends LinearOpMode{
                                new ServoAction(C, 0.5)
                        ))
                         .build());
-
+*/
 
 
 
@@ -181,15 +183,16 @@ public class Trajectory_Test extends LinearOpMode{
 
 //Method 3: Action Runblocking - works
 
-     /* Actions.runBlocking(
-              new SequentialAction(
+      Actions.runBlocking(
+              new ParallelAction(
                         //trajectorychosen,
                         new ServoAction(W, 0.3),
-                        new ServoAction(C, 0.8)
+                        new ServoAction(C, 0.8),
+                        new MotorAction(F, -500, 0.5)
 
                 )
         );
-*/
+
         Pose2d poseEstimate = drive.localizer.getPose();
         telemetry.addData("heading", poseEstimate.heading);
         telemetry.addData("X,Y", poseEstimate.position);
@@ -216,7 +219,7 @@ public class Trajectory_Test extends LinearOpMode{
                 servo.setPosition(position);
             }
 
-            return timer.seconds() < 2;
+            return timer.seconds() < 0.5;
         }
     }
 

@@ -186,17 +186,42 @@ public class Tele extends LinearOpMode {
 
             double dd = gamepad2.right_stick_x;
 
-            cp    = Range.clip(dd, -0.8, 0.8) ;
+            cp    = Range.clip(dd, -0.3, 0.3) ;
 
             Linkage.setPower(-cp);
 
             while(gamepad2.y){
+                 denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+
+                lfPower = (y + x + rx) / denominator;
+                lbPower = (y - x + rx) / denominator;
+                rfPower = (y - x - rx) / denominator;
+                rbPower = (y + x - rx) / denominator;
+
+                // Setting all the drive motors to their power
+                leftFront.setPower(lfPower);
+                leftRear.setPower(lbPower);
+                rightFront.setPower(rfPower);
+                rightRear.setPower(rbPower);
                 LeftGeko.setPower(0.5);
                 RightGeko.setPower(-0.5);
             }
             while(gamepad2.a){
+                 denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+
+                lfPower = (y + x + rx) / denominator;
+                lbPower = (y - x + rx) / denominator;
+                rfPower = (y - x - rx) / denominator;
+                rbPower = (y + x - rx) / denominator;
+
+                // Setting all the drive motors to their power
+                leftFront.setPower(lfPower);
+                leftRear.setPower(lbPower);
+                rightFront.setPower(rfPower);
+                rightRear.setPower(rbPower);
                 LeftGeko.setPower(-1);
                 RightGeko.setPower(1);
+
             }
             LeftGeko.setPower(0);
             RightGeko.setPower(0);

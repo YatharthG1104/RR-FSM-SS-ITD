@@ -59,7 +59,7 @@ public class Find_encoder extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor a = null;
     private DcMotor b = null;
-    private DcMotor c = null;
+   // private DcMotor c = null;
     private DcMotor d = null;
 
     @Override
@@ -72,8 +72,8 @@ public class Find_encoder extends LinearOpMode {
         // step (using the FTC Robot Controller app on the phone).
         DcMotor a = hardwareMap.get(DcMotor.class, "Delivery ArmL");//left back misumi motor
         DcMotor b = hardwareMap.get(DcMotor.class,"Delivery ArmR");//right back misumi motor
-        DcMotor c = hardwareMap.get(DcMotor.class, "Front Slide Left");//lef linkage
-        DcMotor d = hardwareMap.get(DcMotor.class,"Front Slide Right");//right linkage
+    //    DcMotor c = hardwareMap.get(DcMotor.class, "Front Slide Left");//lef linkage
+        DcMotor d = hardwareMap.get(DcMotor.class,"Front Slide");// linkage
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
@@ -86,10 +86,6 @@ public class Find_encoder extends LinearOpMode {
 
         b.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         b.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-
-        c.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        c.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
         d.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -126,14 +122,13 @@ public class Find_encoder extends LinearOpMode {
 
             a.setPower(leftPower);//1028,-1028
             b.setPower(-leftPower);
-            c.setPower(cp);
             d.setPower(-cp);
 
 
             telemetry.addData("Delivery ArmL Position: ", a.getCurrentPosition());
             telemetry.addData("Delivery ArmR Position: ", b.getCurrentPosition());
-            telemetry.addData("Front Slide Left Position: ", c.getCurrentPosition());
-            telemetry.addData("Front Slide Right Position: ", d.getCurrentPosition());
+          //  telemetry.addData("Front Slide Left Position: ", c.getCurrentPosition());
+            telemetry.addData("Front Slide Position: ", d.getCurrentPosition());
             // Show the elapsed game time and wheel power.
             telemetry.update();
         }
