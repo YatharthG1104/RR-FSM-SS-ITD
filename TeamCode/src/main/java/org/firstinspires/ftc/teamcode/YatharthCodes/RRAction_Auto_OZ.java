@@ -29,8 +29,7 @@ public class RRAction_Auto_OZ extends LinearOpMode {
     //Initialize Non drive motors and servos
     DcMotor deliveryArmLeft = null;
     DcMotor deliveryArmRight = null;
-    DcMotor FrontSlideLeft = null;
-    DcMotor FrontSlideRight = null;
+    DcMotor FrontSlide = null;
 
     Servo Claw = null;
     Servo Wrist = null;
@@ -119,17 +118,12 @@ public class RRAction_Auto_OZ extends LinearOpMode {
         ElbowRight.scaleRange(-1,1);
         ElbowRight.setDirection(Servo.Direction.FORWARD);
 
-        FrontSlideLeft = hardwareMap.get(DcMotor.class, "Front Slide Left");
-        FrontSlideLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);  //Front Slide Left zero power behavior
-        FrontSlideLeft.setDirection(DcMotor.Direction.REVERSE);          //Front Slide left motor set forward
-        FrontSlideLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);  //Front Slide Left motor reset
-        FrontSlideLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);       //Front Slide Left run using encoders
 
-        FrontSlideRight = hardwareMap.get(DcMotor.class, "Front Slide Right");
-        FrontSlideRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);  //Front Slide Right zero power behavior
-        FrontSlideRight.setDirection(DcMotor.Direction.FORWARD);          //Front Slide  right motor set forward
-        FrontSlideRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);  //Front Slide Right motor reset
-        FrontSlideRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);       //Front Slide Right run using encoders
+        FrontSlide = hardwareMap.get(DcMotor.class, "Front Slide");
+        FrontSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);  //Front Slide zero power behavior
+        FrontSlide.setDirection(DcMotor.Direction.FORWARD);          //Front Slide motor set forward
+        FrontSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);  //Front Slide motor reset
+        FrontSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);       //Front Slide run using encoders
 
         GrabLeft = hardwareMap.get(CRServo.class, "Grab Left");
         GrabRight = hardwareMap.get(CRServo.class, "Grab Right");
