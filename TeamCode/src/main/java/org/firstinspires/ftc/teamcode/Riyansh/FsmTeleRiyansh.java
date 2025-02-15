@@ -140,7 +140,7 @@ public class FsmTeleRiyansh extends OpMode {
 
         // hardware initialization code goes here
         // this needs to correspond with the configuration used
-        SlideFrontR = hardwareMap.get(DcMotorEx.class, "Front Slide Right");
+        SlideFrontR = hardwareMap.get(DcMotorEx.class, "Front Slide");
 
         SlideBackR = hardwareMap.get(DcMotorEx.class, "Delivery ArmR");
         SlideBackL = hardwareMap.get(DcMotorEx.class, "Delivery ArmL ");//defining the names for all motors and servos in driver hub

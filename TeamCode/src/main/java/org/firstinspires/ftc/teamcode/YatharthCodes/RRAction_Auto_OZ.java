@@ -126,6 +126,7 @@ public class RRAction_Auto_OZ extends LinearOpMode {
         FrontSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);       //Front Slide run using encoders
 
         GrabLeft = hardwareMap.get(CRServo.class, "Grab Left");
+
         GrabRight = hardwareMap.get(CRServo.class, "Grab Right");
 
         TwistLeft = hardwareMap.get(Servo.class, "Twist Left");

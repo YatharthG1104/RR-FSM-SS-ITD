@@ -95,8 +95,7 @@ public class Tele extends LinearOpMode {
 
         DcMotor MLeftBackMisumi = hardwareMap.get(DcMotor.class, "Delivery ArmL");//left back misumi motor
         DcMotor MRightckMisumi = hardwareMap.get(DcMotor.class,"Delivery ArmR");//right back misumi motor
-        DcMotor LeftLinkage = hardwareMap.get(DcMotor.class, "Front Slide Left");//lef linkage
-        DcMotor RightLinkage = hardwareMap.get(DcMotor.class,"Front Slide Right");//right linkage
+        DcMotor Linkage = hardwareMap.get(DcMotor.class,"Front Slide");// linkage
         // Init servos
         backClaw = hardwareMap.get(Servo.class, "Claw");
 
@@ -120,13 +119,10 @@ public class Tele extends LinearOpMode {
         MRightckMisumi.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         MRightckMisumi.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-      //  LeftLinkage.setDirection(DcMotorSimple.Direction.REVERSE);
-        LeftLinkage.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        LeftLinkage.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
       //  RightLinkage.setDirection(DcMotorSimple.Direction.REVERSE);
-        RightLinkage.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        RightLinkage.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        Linkage.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Linkage.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
@@ -142,8 +138,7 @@ public class Tele extends LinearOpMode {
 
         MLeftBackMisumi.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         MLeftBackMisumi.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        LeftLinkage.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        RightLinkage.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Linkage.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         // Wait for the game to start (driver presses START)
         waitForStart();
         runtime.reset();
@@ -193,8 +188,7 @@ public class Tele extends LinearOpMode {
 
             cp    = Range.clip(dd, -0.8, 0.8) ;
 
-            LeftLinkage.setPower(cp);
-            RightLinkage.setPower(-cp);
+            Linkage.setPower(-cp);
 
             while(gamepad2.y){
                 LeftGeko.setPower(0.5);
