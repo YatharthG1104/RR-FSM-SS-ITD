@@ -74,7 +74,7 @@ public class FsmTeleRiyansh extends OpMode {
     Action trajectoryActionChosen = tab1.build();//seting our movment path to a varibale
     Action trajectoryActionChosen2 = tab2.build();//seting our movment path to a varibale
     public DcMotorEx SlideFrontR;
-    public DcMotorEx SlideFrontL;
+
     public DcMotorEx SlideBackR;
     public DcMotorEx SlideBackL;
 
@@ -141,7 +141,7 @@ public class FsmTeleRiyansh extends OpMode {
         // hardware initialization code goes here
         // this needs to correspond with the configuration used
         SlideFrontR = hardwareMap.get(DcMotorEx.class, "Front Slide Right");
-        SlideFrontL = hardwareMap.get(DcMotorEx.class, "Front Slide Left");
+
         SlideBackR = hardwareMap.get(DcMotorEx.class, "Delivery ArmR");
         SlideBackL = hardwareMap.get(DcMotorEx.class, "Delivery ArmL ");//defining the names for all motors and servos in driver hub
 
@@ -165,8 +165,6 @@ public class FsmTeleRiyansh extends OpMode {
         SlideFrontR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         SlideFrontR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        SlideFrontL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        SlideFrontL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         SlideBackR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);//reseting the encoders
         SlideBackR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);//ensuring that we are using the encoders
@@ -226,7 +224,6 @@ public class FsmTeleRiyansh extends OpMode {
 
                     //allowing oporater to control the distance of the front slide
                     Actions.runBlocking(new ParallelAction(
-                            new MotorPowerAction(SlideFrontL,-cp),
                             new MotorPowerAction(SlideFrontR,cp)
                     ));
                     liftState = LiftState.SamplePicked;//changing state so we can move to the next task
@@ -262,7 +259,6 @@ public class FsmTeleRiyansh extends OpMode {
                     Actions.runBlocking(new ParallelAction(
                             new ServoAction(GecoWristL,-Geco_Wrist_Claw_Deposit),
                             new ServoAction(GecoWristR,Geco_Wrist_Claw_Deposit),
-                            new MotorAction(SlideFrontL,-Front_SLide_in,0.3),
                             new MotorAction(SlideFrontR,Front_SLide_in,0.3),
                             new ServoAction(Claw,Claw_Open)
                     ));
