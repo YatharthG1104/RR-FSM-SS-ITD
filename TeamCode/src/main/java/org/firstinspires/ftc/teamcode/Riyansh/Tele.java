@@ -178,7 +178,7 @@ public class Tele extends LinearOpMode {
 
 
             if(gamepad2.x){
-                backClaw.setPosition(-1);
+                backClaw.setPosition(-0.5);
             }
             if(gamepad2.b){
                 backClaw.setPosition(1);
@@ -203,7 +203,7 @@ public class Tele extends LinearOpMode {
                 leftRear.setPower(lbPower);
                 rightFront.setPower(rfPower);
                 rightRear.setPower(rbPower);
-                LeftGeko.setPower(0.5);
+                LeftGeko.setPower(0);
                 RightGeko.setPower(-0.5);
             }
             while(gamepad2.a){
@@ -226,14 +226,17 @@ public class Tele extends LinearOpMode {
             LeftGeko.setPower(0);
             RightGeko.setPower(0);
             if(gamepad2.dpad_up){
-                BackLeftMisumi.setPosition(0.69);
-                BackRightMisumi.setPosition(-0.69);
+                BackLeftMisumi.setPosition(-0.05);
+                BackRightMisumi.setPosition(0.05);
             }
             if(gamepad2.dpad_down){
-                BackLeftMisumi.setPosition(-1);
-                BackRightMisumi.setPosition(1);
+                BackLeftMisumi.setPosition(-0.48);
+                BackRightMisumi.setPosition(0.48);
             }
-
+            if(gamepad2.dpad_right){
+                BackLeftMisumi.setPosition(-0.2);
+                BackRightMisumi.setPosition(0.2);
+            }
             if(gamepad2.dpad_left){
                 MRightckMisumi.setPower(1);
                 MLeftBackMisumi.setPower(1);
@@ -251,17 +254,17 @@ public class Tele extends LinearOpMode {
                 leftmisumi.setPosition(0.85);
             }
             if(gamepad2.right_stick_button){
-                wrist.setPosition(0.8);
+                wrist.setPosition(1);
             }
             if(gamepad2.left_stick_button){
-                wrist.setPosition(0);
+                wrist.setPosition(-1);
             }
 
             double d = gamepad2.left_stick_y;
 
-            p = Range.clip(d, -1, 1) ;
-            BackRightMisumi.setPosition(p);//0.5
-            BackLeftMisumi.setPosition(-(p));
+            p = Range.clip(d, -0.6, 0.6) ;
+            MLeftBackMisumi.setPower(p);//0.5
+            MRightckMisumi.setPower(-p);
 
 
         }

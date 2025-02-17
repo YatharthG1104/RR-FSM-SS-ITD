@@ -8,8 +8,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 @TeleOp(name = "Servo Position Helper", group = "Concept")
 public class ServoPositionHelper extends OpMode {
 
-    private Servo axon = null;
-    //private Servo el = null;
+//    private Servo axon = null;
+    private Servo el = null;
+    private Servo er = null;
     private double servoPositionaxon = 0.5  ;
     private double servoPositionel = 0;
     private double positionAdjustment = 0.05;
@@ -24,12 +25,14 @@ public class ServoPositionHelper extends OpMode {
 
     @Override
     public void init() {
-        axon = hardwareMap.get(Servo.class, "Wrist");
-     //   el = hardwareMap.get(Servo.class, "Elbow Left");
-        axon.setDirection(Servo.Direction.FORWARD);
-     //   el.setDirection(Servo.Direction.REVERSE);
-        axon.setPosition(servoPositionaxon);
-      // el.setPosition(servoPositionel);
+//        axon = hardwareMap.get(Servo.class, "Wrist");
+        el = hardwareMap.get(Servo.class, "Elbow Left");
+        er = hardwareMap.get(Servo.class, "Elbow Right");
+//        axon.setDirection(Servo.Direction.FORWARD);
+        el.setDirection(Servo.Direction.REVERSE);
+//        axon.setPosition(servoPositionaxon);
+       el.setPosition(servoPositionel);
+        er.setPosition(servoPositionel);
         telemetry.addData("Status", "Initialized");
     }
 
@@ -64,8 +67,8 @@ public class ServoPositionHelper extends OpMode {
             servoPositionaxon = MIN_POSITION;
         }
 
-        axon.setPosition(servoPositionaxon);
-        //el.setPosition(servoPositionaxon);
+        el.setPosition(servoPositionaxon);
+        er.setPosition(servoPositionaxon);
 
         previousGamepadY = currentGamepadY;
         previousGamePadA = currentGamepadA;
