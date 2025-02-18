@@ -30,10 +30,14 @@
 package org.firstinspires.ftc.teamcode.Riyansh;
 
 
+import com.acmerobotics.roadrunner.ftc.OverflowEncoder;
+import com.acmerobotics.roadrunner.ftc.RawEncoder;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -59,7 +63,6 @@ public class Find_encoder extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor a = null;
     private DcMotor b = null;
-   // private DcMotor c = null;
     private DcMotor d = null;
 
     @Override
@@ -72,14 +75,13 @@ public class Find_encoder extends LinearOpMode {
         // step (using the FTC Robot Controller app on the phone).
         DcMotor a = hardwareMap.get(DcMotor.class, "Delivery ArmL");//left back misumi motor
         DcMotor b = hardwareMap.get(DcMotor.class,"Delivery ArmR");//right back misumi motor
-    //    DcMotor c = hardwareMap.get(DcMotor.class, "Front Slide Left");//lef linkage
         DcMotor d = hardwareMap.get(DcMotor.class,"Front Slide");// linkage
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
-      a.setDirection(DcMotor.Direction.REVERSE);
-       b.setDirection(DcMotor.Direction.REVERSE);
+        a.setDirection(DcMotor.Direction.REVERSE);
+        b.setDirection(DcMotor.Direction.FORWARD);
 
         a.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         a.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -91,8 +93,6 @@ public class Find_encoder extends LinearOpMode {
         d.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         d.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-
-
         // Wait for the game to start (driver presses START)
         waitForStart();
         runtime.reset();
@@ -102,9 +102,7 @@ public class Find_encoder extends LinearOpMode {
 
             // Setup a variable for each drive wheel to save power level for telemetry
             double leftPower;
-            double rightPower;
             double cp;
-            double dp;
 
             // Choose to drive using either Tank Mode, or POV Mode
             // Comment out the method that's not used.  The default below is POV.
@@ -121,13 +119,12 @@ public class Find_encoder extends LinearOpMode {
 
 
             a.setPower(leftPower);//1028,-1028
-            b.setPower(-leftPower);
-            d.setPower(-cp);
+            b.setPower(leftPower);
+            d.setPower(cp);
 
 
             telemetry.addData("Delivery ArmL Position: ", a.getCurrentPosition());
             telemetry.addData("Delivery ArmR Position: ", b.getCurrentPosition());
-          //  telemetry.addData("Front Slide Left Position: ", c.getCurrentPosition());
             telemetry.addData("Front Slide Position: ", d.getCurrentPosition());
             // Show the elapsed game time and wheel power.
             telemetry.update();

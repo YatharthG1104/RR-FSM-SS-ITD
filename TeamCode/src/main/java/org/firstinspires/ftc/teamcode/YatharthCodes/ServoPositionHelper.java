@@ -11,10 +11,10 @@ public class ServoPositionHelper extends OpMode {
 //    private Servo axon = null;
     private Servo el = null;
     private Servo er = null;
-    private double servoPositionaxon = 0.5  ;
-    private double servoPositionel = 0;
+    private double servoPositionaxon = 0.0;
+   // private double servoPositionel = 0;
     private double positionAdjustment = 0.05;
-    private final double STEP_ADJUSTMENT = 0.05;
+   // private final double STEP_ADJUSTMENT = 0.05;
     private final double MIN_POSITION = -1.0;
     private final double MAX_POSITION = 1.0;
 
@@ -26,13 +26,17 @@ public class ServoPositionHelper extends OpMode {
     @Override
     public void init() {
 //        axon = hardwareMap.get(Servo.class, "Wrist");
+        //        axon.setDirection(Servo.Direction.FORWARD);
+        //        axon.setPosition(servoPositionaxon);
+
         el = hardwareMap.get(Servo.class, "Elbow Left");
         er = hardwareMap.get(Servo.class, "Elbow Right");
-//        axon.setDirection(Servo.Direction.FORWARD);
+
         el.setDirection(Servo.Direction.REVERSE);
-//        axon.setPosition(servoPositionaxon);
-       el.setPosition(servoPositionel);
-        er.setPosition(servoPositionel);
+        er.setDirection(Servo.Direction.FORWARD);
+
+       el.setPosition(servoPositionaxon);
+        er.setPosition(servoPositionaxon);
         telemetry.addData("Status", "Initialized");
     }
 
@@ -48,13 +52,13 @@ public class ServoPositionHelper extends OpMode {
         } else if (currentGamepadA && !previousGamePadA) {
             servoPositionaxon -= positionAdjustment;
         }
-
+/*
         if (currentGamepadUp && !previousGamePadUp) {
             positionAdjustment += STEP_ADJUSTMENT;
         } else if (currentGamepadDown && !previousGamePadDown) {
             positionAdjustment -= STEP_ADJUSTMENT;
         }
-
+*/
         if (positionAdjustment < 0.01) {
             positionAdjustment = 0.01;
         } else if (positionAdjustment > 0.1) {
@@ -75,7 +79,9 @@ public class ServoPositionHelper extends OpMode {
         previousGamePadUp = currentGamepadUp;
         previousGamePadDown = currentGamepadDown;
 
-        telemetry.addData("Axon Servo Position", servoPositionaxon);
+        telemetry.addData("El Servo Position", el.getPosition());
+        telemetry.addData("Er Servo Position", er.getPosition());
+        telemetry.addData("Target Servo Position", servoPositionaxon);
        // telemetry.addData("el Servo Position", servoPositionel);
         telemetry.addData("Servo Step Size", positionAdjustment);
         telemetry.update();

@@ -120,7 +120,7 @@ public class Tele extends LinearOpMode {
         MRightckMisumi.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
-      //  RightLinkage.setDirection(DcMotorSimple.Direction.REVERSE);
+        //  RightLinkage.setDirection(DcMotorSimple.Direction.REVERSE);
         Linkage.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Linkage.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -191,7 +191,7 @@ public class Tele extends LinearOpMode {
             Linkage.setPower(-cp);
 
             while(gamepad2.y){
-                 denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+                denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
 
                 lfPower = (y + x + rx) / denominator;
                 lbPower = (y - x + rx) / denominator;
@@ -203,11 +203,11 @@ public class Tele extends LinearOpMode {
                 leftRear.setPower(lbPower);
                 rightFront.setPower(rfPower);
                 rightRear.setPower(rbPower);
-                LeftGeko.setPower(0);
+                LeftGeko.setPower(0.5);
                 RightGeko.setPower(-0.5);
             }
             while(gamepad2.a){
-                 denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+                denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
 
                 lfPower = (y + x + rx) / denominator;
                 lbPower = (y - x + rx) / denominator;
@@ -219,8 +219,8 @@ public class Tele extends LinearOpMode {
                 leftRear.setPower(lbPower);
                 rightFront.setPower(rfPower);
                 rightRear.setPower(rbPower);
-                LeftGeko.setPower(-1);
-                RightGeko.setPower(1);
+                LeftGeko.setPower(-0.5);
+                RightGeko.setPower(0.5);
 
             }
             LeftGeko.setPower(0);
