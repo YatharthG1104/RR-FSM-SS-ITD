@@ -80,8 +80,9 @@ public class Find_encoder extends LinearOpMode {
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
-        a.setDirection(DcMotor.Direction.REVERSE);
-        b.setDirection(DcMotor.Direction.FORWARD);
+        a.setDirection(DcMotor.Direction.FORWARD);
+        b.setDirection(DcMotor.Direction.REVERSE);
+        d.setDirection(DcMotor.Direction.REVERSE);
 
         a.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         a.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -118,8 +119,8 @@ public class Find_encoder extends LinearOpMode {
             cp    = Range.clip(dd, -1, 1) ;
 
 
-            a.setPower(leftPower);//1028,-1028
-            b.setPower(leftPower);
+            a.setPower(-leftPower);//1028,-1028
+            b.setPower(-leftPower);
             d.setPower(cp);
 
 

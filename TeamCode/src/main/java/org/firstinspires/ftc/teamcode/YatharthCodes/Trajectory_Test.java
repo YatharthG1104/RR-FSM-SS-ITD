@@ -30,7 +30,7 @@ public class Trajectory_Test extends LinearOpMode{
 
         //this takes care of drive motors in MecanumDrive class.
         // Define other non drive motors before you move forward
-        MecanumDrive drive = new MecanumDrive(hardwareMap, InitialPose);
+    //    MecanumDrive drive = new MecanumDrive(hardwareMap, InitialPose);
 
         // Define all servos here or put all hardware initialization separately
         // Servo servo= hardwareMap.servo.get("servo");
@@ -41,19 +41,29 @@ public class Trajectory_Test extends LinearOpMode{
         DcMotor DAR = hardwareMap.get(DcMotor.class, "Delivery ArmR");
         Servo EL = hardwareMap.get(Servo.class, "Elbow Left");
         Servo ER = hardwareMap.get(Servo.class, "Elbow Right");
+        CRServo GL = hardwareMap.get(CRServo.class, "Grab Left");
+        CRServo GR = hardwareMap.get(CRServo.class, "Grab Right");
+       // Servo MC = hardwareMap.get(Servo.class, "Mini Claw");
+       // Servo TW = hardwareMap.get(Servo.class, "Twist");
 
-        EL.setDirection(Servo.Direction.REVERSE);
-        ER.setDirection(Servo.Direction.FORWARD);
+        EL.setDirection(Servo.Direction.FORWARD);
+        ER.setDirection(Servo.Direction.REVERSE);
 
         DAR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);  //Delivery arm zero power behavior
-       // DAR.setDirection(DcMotor.Direction.REVERSE);          //Delivery arm left motor set reversed
+        DAR.setDirection(DcMotor.Direction.REVERSE);          //Delivery arm left motor set reversed
         DAR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);  //Delivery arm motor reset
         DAR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);       //Delivery arm run using encoders
 
         DAL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);  //Delivery arm zero power behavior
-     //   DAL.setDirection(DcMotor.Direction.REVERSE);          //Delivery arm left motor set reversed
+        DAL.setDirection(DcMotor.Direction.FORWARD);          //Delivery arm left motor set reversed
         DAL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);  //Delivery arm motor reset
         DAL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);       //Delivery arm run using encoders
+
+        FS.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);  //Delivery arm zero power behavior
+        FS.setDirection(DcMotor.Direction.REVERSE);          //Delivery arm left motor set reversed
+        FS.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);  //Delivery arm motor reset
+        FS.setMode(DcMotor.RunMode.RUN_USING_ENCODER);       //Delivery arm run using encoders
+
 
         waitForStart();
 
@@ -193,21 +203,30 @@ public class Trajectory_Test extends LinearOpMode{
      Actions.runBlocking(
               new SequentialAction(
                       //trajectorychosen,
-                      new ServoAction(W, 0.8),
-                      new ServoAction(C, 0.8),
-                   //   new MotorAction(FS, -500, 0.5),
-                    new DoubleMotorAction(DAL,DAR,1000, 1000, 0.6,-0.6),
-                    new DoubleServoAction(EL,ER,0.5,0.5)
+                      // new ServoAction(W, 1.0),
+                       new ServoAction(C, 0.1),
+                     // new MotorAction(FS, 500, 0.5),
+                      //new CRServoAction(GL, -0.5),
+                      //new CRServoAction(GR, 0.5),
+                      //new DoubleMotorAction(DAL,DAR,1000, 1000, 0.3,0.3)
+                      new DoubleServoAction(EL,ER, 0.3,0.3),
+                      new ServoAction(W, 1.0),
+                      new DoubleServoAction(EL,ER, 0.7,0.7)
+                      //new ServoAction(EL,0.95),
+                      //new ServoAction(ER, 0.95)
 
 
               )
      );
-             telemetry.addData("Delivery ArmL Position: ", DAL.getCurrentPosition());
-             telemetry.addData("Delivery ArmR Position: ", DAR.getCurrentPosition());
-             telemetry.addData("Wrist Position: ", W.getPosition());
+            // telemetry.addData("Delivery ArmL Position: ", DAL.getCurrentPosition());
+            // telemetry.addData("Delivery ArmR Position: ", DAR.getCurrentPosition());
+         //    telemetry.addData("Wrist Position: ", W.getPosition());
              telemetry.addData("Claw Position: ", C.getPosition());
              telemetry.addData("Elbowleft Position: ", EL.getPosition());
              telemetry.addData("ElbowRight Position: ", ER.getPosition());
+            // telemetry.addData("Frontslide Position: ", FS.getCurrentPosition());
+       // telemetry.addData("Mini Claw Position:", MC.getPosition());
+           //  telemetry.addData("Twist Position: ", TW.getPosition());
              telemetry.update();
 
 
@@ -242,7 +261,7 @@ public class Trajectory_Test extends LinearOpMode{
                 servo.setPosition(position);
             }
 
-            return false;
+            return timer.seconds()< 1;
         }
     }
 
@@ -261,12 +280,12 @@ public class Trajectory_Test extends LinearOpMode{
 
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (motor.getCurrentPosition() < position_tgt) {
-              //  timer = new ElapsedTime();
+                timer = new ElapsedTime();
                 motor.setPower(power);
                 motor.setTargetPosition((int) (position_tgt));
                 motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
-            return false;
+            return timer.seconds() < 0.5;
     }
     }
 
@@ -274,17 +293,16 @@ public class Trajectory_Test extends LinearOpMode{
     public static class CRServoAction implements Action {
         CRServo crServo;
         double power;
-        int seconds;
         ElapsedTime timer= null;
 
-        public CRServoAction(CRServo crsrv, int sec, double pow ) {
+        public CRServoAction(CRServo crsrv, double pow ) {
             this.crServo = crsrv;
-            this.seconds = sec;
+           // this.seconds = sec;
             this.power = pow;
         }
 
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if (timer.seconds() < seconds) {
+            if (timer == null) {
                 timer = new ElapsedTime();
                 crServo.setPower(power);
             }
@@ -313,7 +331,7 @@ public class Trajectory_Test extends LinearOpMode{
 
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (motor1.getCurrentPosition() < position_tgt1) {
-               // timer = new ElapsedTime();
+               timer = new ElapsedTime();
                 motor1.setPower(power1);
                 motor2.setPower(power2);
                 motor1.setTargetPosition((int) (position_tgt1));
@@ -321,7 +339,7 @@ public class Trajectory_Test extends LinearOpMode{
                 motor1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
-            return false;
+            return timer.seconds() < 1;
         }
     }
 

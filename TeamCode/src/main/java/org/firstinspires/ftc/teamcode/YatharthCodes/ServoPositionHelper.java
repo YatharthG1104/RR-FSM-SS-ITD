@@ -82,7 +82,7 @@ public class ServoPositionHelper extends OpMode {
         telemetry.addData("El Servo Position", el.getPosition());
         telemetry.addData("Er Servo Position", er.getPosition());
         telemetry.addData("Target Servo Position", servoPositionaxon);
-       // telemetry.addData("el Servo Position", servoPositionel);
+        //telemetry.addData("el Servo Position", servoPositionel);
         telemetry.addData("Servo Step Size", positionAdjustment);
         telemetry.update();
     }
