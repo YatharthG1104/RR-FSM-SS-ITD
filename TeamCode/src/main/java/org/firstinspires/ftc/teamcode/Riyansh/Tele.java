@@ -63,8 +63,8 @@ public class Tele extends LinearOpMode {
 
 
     Servo backClaw; // back claw
-    CRServo LeftGeko; // front left gecko
-    CRServo RightGeko; // front right gecko
+    Servo LeftGeko; // front left gecko
+    Servo RightGeko; // front right gecko
     Servo wrist; // wrist pivot point
     Servo leftmisumi    ; // left misumi slide
     Servo rightmisumi; // right misumi slide
@@ -74,9 +74,11 @@ public class Tele extends LinearOpMode {
     Servo BackRightMisumi;//back right misumi
     double cp;
     double p;
+    private double servoPosition = 0.0;
+    private final double MIN_POSITION = 0.0;
+    private final double MAX_POSITION = 1.0;
+    private double positionAdjustment = 0.1;
 
-//    double cp;
-//    double dd = gamepad2.right_stick_y;
 
     @Override
     public void runOpMode() {
@@ -101,8 +103,8 @@ public class Tele extends LinearOpMode {
 
         wrist = hardwareMap.get(Servo.class, "Wrist");
 
-        RightGeko = hardwareMap.get(CRServo.class, "Grab Right");
-        LeftGeko = hardwareMap.get(CRServo.class, "Grab Left");
+        RightGeko = hardwareMap.get(Servo.class, "Grab Right");
+        LeftGeko = hardwareMap.get(Servo.class, "Grab Left");
 
         leftmisumi = hardwareMap.get(Servo.class, "Twist Left");//front slide
         rightmisumi = hardwareMap.get(Servo.class, "Twist Right");
@@ -190,7 +192,7 @@ public class Tele extends LinearOpMode {
 
             Linkage.setPower(-cp);
 
-            while(gamepad2.y){
+           /* while(gamepad2.y){
                 denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
 
                 lfPower = (y + x + rx) / denominator;
@@ -203,8 +205,8 @@ public class Tele extends LinearOpMode {
                 leftRear.setPower(lbPower);
                 rightFront.setPower(rfPower);
                 rightRear.setPower(rbPower);
-                LeftGeko.setPower(0.5);
-                RightGeko.setPower(-0.5);
+              //  LeftGeko.setPosition(0.5);
+                // RightGeko.setPower(-0.5);
             }
             while(gamepad2.a){
                 denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
@@ -219,12 +221,13 @@ public class Tele extends LinearOpMode {
                 leftRear.setPower(lbPower);
                 rightFront.setPower(rfPower);
                 rightRear.setPower(rbPower);
-                LeftGeko.setPower(-0.5);
-                RightGeko.setPower(0.5);
+               // LeftGeko.setPower(-0.5);
+               // RightGeko.setPower(0.5);
 
             }
-            LeftGeko.setPower(0);
-            RightGeko.setPower(0);
+           // LeftGeko.setPower(0);
+           // RightGeko.setPower(0);*/
+
             if(gamepad2.dpad_up){
                 BackLeftMisumi.setPosition(-0.05);
                 BackRightMisumi.setPosition(0.05);
@@ -233,17 +236,15 @@ public class Tele extends LinearOpMode {
                 BackLeftMisumi.setPosition(-0.48);
                 BackRightMisumi.setPosition(0.48);
             }
-            if(gamepad2.dpad_right){
+         /*   if(gamepad2.dpad_right){
                 BackLeftMisumi.setPosition(-0.2);
                 BackRightMisumi.setPosition(0.2);
-            }
+            }*/
             if(gamepad2.dpad_left){
-                MRightckMisumi.setPower(1);
-                MLeftBackMisumi.setPower(1);
+                wrist.setPosition(1);
             }
             if(gamepad2.dpad_right){
-                MRightckMisumi.setPower(-1);
-                MLeftBackMisumi.setPower(-1);
+                wrist.setPosition(-1);
             }
             if(gamepad2.left_bumper){
                 rightmisumi.setPosition(0.87);
@@ -253,12 +254,30 @@ public class Tele extends LinearOpMode {
                 rightmisumi.setPosition(-0.85);//0.5
                 leftmisumi.setPosition(0.85);
             }
+
+            /****Front claw uses RightGeko***/
             if(gamepad2.right_stick_button){
-                wrist.setPosition(1);
+                RightGeko.setPosition(1);
             }
             if(gamepad2.left_stick_button){
-                wrist.setPosition(-1);
+                RightGeko.setPosition(-1);
             }
+
+            /**Front wrist uses LeftGeko****/
+            LeftGeko.setPosition(servoPosition);
+            if(gamepad2.y) {
+                LeftGeko.setPosition(servoPosition += positionAdjustment);
+            }
+            if(gamepad2.a) {
+                LeftGeko.setPosition(servoPosition -= positionAdjustment);
+            }
+
+            if (servoPosition > MAX_POSITION) {
+                servoPosition = MAX_POSITION;
+            } else if (servoPosition < MIN_POSITION) {
+                servoPosition = MIN_POSITION;
+            }
+
 
             double d = gamepad2.left_stick_y;
 
