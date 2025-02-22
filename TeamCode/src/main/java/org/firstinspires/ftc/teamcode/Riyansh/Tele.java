@@ -247,7 +247,7 @@ public class Tele extends LinearOpMode {
                 wrist.setPosition(-1);
             }
             if(gamepad2.left_bumper){
-                rightmisumi.setPosition(1);
+                rightmisumi.setPosition(1); 
                 leftmisumi.setPosition(-1);
             }
             if(gamepad2.right_bumper){
