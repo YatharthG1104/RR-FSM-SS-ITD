@@ -9,9 +9,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class ServoPositionHelper extends OpMode {
 
 //    private Servo axon = null;
-    private Servo el = null;
+    //private Servo el = null;
     private Servo er = null;
-    private double servoPositionaxon = 0.0;
+    private double servoPositionaxon = 0.5;
    // private double servoPositionel = 0;
     private double positionAdjustment = 0.05;
    // private final double STEP_ADJUSTMENT = 0.05;
@@ -29,13 +29,13 @@ public class ServoPositionHelper extends OpMode {
         //        axon.setDirection(Servo.Direction.FORWARD);
         //        axon.setPosition(servoPositionaxon);
 
-        el = hardwareMap.get(Servo.class, "Elbow Left");
-        er = hardwareMap.get(Servo.class, "Elbow Right");
+      //  el = hardwareMap.get(Servo.class, "Twist Left");
+        er = hardwareMap.get(Servo.class, "Grab Left");
 
-        el.setDirection(Servo.Direction.REVERSE);
+      //  el.setDirection(Servo.Direction.REVERSE);
         er.setDirection(Servo.Direction.FORWARD);
 
-       el.setPosition(servoPositionaxon);
+       //el.setPosition(servoPositionaxon);
         er.setPosition(servoPositionaxon);
         telemetry.addData("Status", "Initialized");
     }
@@ -71,7 +71,7 @@ public class ServoPositionHelper extends OpMode {
             servoPositionaxon = MIN_POSITION;
         }
 
-        el.setPosition(servoPositionaxon);
+       // el.setPosition(servoPositionaxon);
         er.setPosition(servoPositionaxon);
 
         previousGamepadY = currentGamepadY;
@@ -79,7 +79,7 @@ public class ServoPositionHelper extends OpMode {
         previousGamePadUp = currentGamepadUp;
         previousGamePadDown = currentGamepadDown;
 
-        telemetry.addData("El Servo Position", el.getPosition());
+      //  telemetry.addData("El Servo Position", el.getPosition());
         telemetry.addData("Er Servo Position", er.getPosition());
         telemetry.addData("Target Servo Position", servoPositionaxon);
         //telemetry.addData("el Servo Position", servoPositionel);

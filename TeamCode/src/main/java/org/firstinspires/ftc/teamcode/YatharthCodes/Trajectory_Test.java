@@ -6,12 +6,12 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -30,7 +30,7 @@ public class Trajectory_Test extends LinearOpMode{
 
         //this takes care of drive motors in MecanumDrive class.
         // Define other non drive motors before you move forward
-    //    MecanumDrive drive = new MecanumDrive(hardwareMap, InitialPose);
+         MecanumDrive drive = new MecanumDrive(hardwareMap, InitialPose);
 
         // Define all servos here or put all hardware initialization separately
         // Servo servo= hardwareMap.servo.get("servo");
@@ -41,13 +41,16 @@ public class Trajectory_Test extends LinearOpMode{
         DcMotor DAR = hardwareMap.get(DcMotor.class, "Delivery ArmR");
         Servo EL = hardwareMap.get(Servo.class, "Elbow Left");
         Servo ER = hardwareMap.get(Servo.class, "Elbow Right");
-        CRServo GL = hardwareMap.get(CRServo.class, "Grab Left");
-        CRServo GR = hardwareMap.get(CRServo.class, "Grab Right");
-       // Servo MC = hardwareMap.get(Servo.class, "Mini Claw");
-       // Servo TW = hardwareMap.get(Servo.class, "Twist");
+        Servo GL = hardwareMap.get(Servo.class, "Grab Left");
+        Servo GR = hardwareMap.get(Servo.class, "Grab Right");
+        Servo TWL = hardwareMap.get(Servo.class, "Twist Left");
+        Servo TWR = hardwareMap.get(Servo.class, "Twist Right");
 
-        EL.setDirection(Servo.Direction.FORWARD);
-        ER.setDirection(Servo.Direction.REVERSE);
+        EL.setDirection(Servo.Direction.REVERSE);
+        ER.setDirection(Servo.Direction.FORWARD);
+
+        TWL.setDirection(Servo.Direction.REVERSE);
+        TWR.setDirection(Servo.Direction.FORWARD);
 
         DAR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);  //Delivery arm zero power behavior
         DAR.setDirection(DcMotor.Direction.REVERSE);          //Delivery arm left motor set reversed
@@ -133,7 +136,7 @@ public class Trajectory_Test extends LinearOpMode{
                         .strafeToLinearHeading(new Vector2d(5,-40), 0)
                         .build());*/
 
-       /* Actions.runBlocking(
+        Actions.runBlocking(
                 drive.actionBuilder(new Pose2d(0, 0, Math.toRadians(0)))
                         .lineToX(28)
                         .waitSeconds(0.5)
@@ -165,7 +168,7 @@ public class Trajectory_Test extends LinearOpMode{
                         .strafeToLinearHeading(new Vector2d(5,-30), 0)
                         .strafeToLinearHeading(new Vector2d(28,5), 0)
                         .strafeToLinearHeading(new Vector2d(5,-40), 0)
-                        .build());*/
+                        .build());
 
 
  /*   Actions.runBlocking(
@@ -200,33 +203,34 @@ public class Trajectory_Test extends LinearOpMode{
 
 //Method 3: Action Runblocking - works
 
-     Actions.runBlocking(
+   /*  Actions.runBlocking(
               new SequentialAction(
                       //trajectorychosen,
+                    //   new MotorAction(FS, 500, 0.5),
                       // new ServoAction(W, 1.0),
-                       new ServoAction(C, 0.1),
-                     // new MotorAction(FS, 500, 0.5),
-                      //new CRServoAction(GL, -0.5),
-                      //new CRServoAction(GR, 0.5),
-                      //new DoubleMotorAction(DAL,DAR,1000, 1000, 0.3,0.3)
-                      new DoubleServoAction(EL,ER, 0.3,0.3),
-                      new ServoAction(W, 1.0),
-                      new DoubleServoAction(EL,ER, 0.7,0.7)
-                      //new ServoAction(EL,0.95),
-                      //new ServoAction(ER, 0.95)
-
-
-              )
-     );
-            // telemetry.addData("Delivery ArmL Position: ", DAL.getCurrentPosition());
-            // telemetry.addData("Delivery ArmR Position: ", DAR.getCurrentPosition());
-         //    telemetry.addData("Wrist Position: ", W.getPosition());
+                       //new ServoAction(C, 0.0),
+                       //new DoubleServoAction(TWL,TWR, 0.95,0.95),
+                       //new ServoAction(GL, 0.5),
+                       //new ServoAction(GR,0.8),
+                       new DoubleServoAction(EL,ER, 0.0,0.0),
+                      new ServoAction(W, 1.0)
+                       //new DoubleMotorAction(DAL,DAR,1000, 1000, 0.3,0.3)
+                  //     new ServoAction(GL, 1),
+                     //  new ServoAction(GR, 1),
+                      // new DoubleServoAction(EL,ER, 0.7,0.7)
+             )
+     );*/
+             telemetry.addData("Delivery ArmL Position: ", DAL.getCurrentPosition());
+             telemetry.addData("Delivery ArmR Position: ", DAR.getCurrentPosition());
+             telemetry.addData("Wrist Position: ", W.getPosition());
              telemetry.addData("Claw Position: ", C.getPosition());
              telemetry.addData("Elbowleft Position: ", EL.getPosition());
              telemetry.addData("ElbowRight Position: ", ER.getPosition());
-            // telemetry.addData("Frontslide Position: ", FS.getCurrentPosition());
-       // telemetry.addData("Mini Claw Position:", MC.getPosition());
-           //  telemetry.addData("Twist Position: ", TW.getPosition());
+             telemetry.addData("Frontslide Position: ", FS.getCurrentPosition());
+             telemetry.addData("Front Claw Position:", GR.getPosition());
+             telemetry.addData("Front Wrist Position:", GL.getPosition());
+             telemetry.addData("Twist Left Position: ", TWL.getPosition());
+             telemetry.addData("Twist Right Position: ", TWR.getPosition());
              telemetry.update();
 
 
