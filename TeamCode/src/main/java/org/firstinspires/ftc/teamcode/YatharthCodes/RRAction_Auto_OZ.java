@@ -239,7 +239,7 @@ public class RRAction_Auto_OZ extends LinearOpMode {
         telemetry.addData("X,Y", poseEstimate2.position);
         telemetry.update();
 
-        trajectorychosen = Path4.build();
+     /*   trajectorychosen = Path4.build();
         Actions.runBlocking(
                 new SequentialAction(
                         new ServoAction(Claw, Claw_Close_Pos),
@@ -288,7 +288,7 @@ public class RRAction_Auto_OZ extends LinearOpMode {
         Pose2d poseEstimate5 = drive.localizer.getPose();            //Get current pose
         telemetry.addData("heading", poseEstimate5.heading);
         telemetry.addData("X,Y", poseEstimate5.position);
-        telemetry.update();
+        telemetry.update();*/
 
     }
 

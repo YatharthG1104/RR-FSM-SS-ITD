@@ -102,8 +102,8 @@ public class tt extends LinearOpMode {
 
         wrist = hardwareMap.get(Servo.class, "Wrist");
 
-        Front_Claw = hardwareMap.get(Servo.class, "Grab Right");
-        Front_Rotate = hardwareMap.get(CRServo.class, "Grab Left");
+        Front_Claw = hardwareMap.get(Servo.class, "Front Claw");
+        Front_Rotate = hardwareMap.get(CRServo.class, "Front Wrist");
 
         leftslide = hardwareMap.get(Servo.class, "Twist Left");//front slide
         rightslide = hardwareMap.get(Servo.class, "Twist Right");
