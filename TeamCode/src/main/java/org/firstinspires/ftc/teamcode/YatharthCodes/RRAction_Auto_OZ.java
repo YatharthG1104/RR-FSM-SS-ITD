@@ -16,7 +16,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
@@ -130,8 +129,10 @@ public class RRAction_Auto_OZ extends LinearOpMode {
         FrontSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);       //Front Slide run using encoders
 
         FrontWrist = hardwareMap.get(Servo.class, "Front Wrist");
+        FrontWrist.setDirection(Servo.Direction.FORWARD);
 
         FrontClaw = hardwareMap.get(Servo.class, "Front Claw");
+        FrontClaw.setDirection(Servo.Direction.FORWARD);
 
         TwistLeft = hardwareMap.get(Servo.class, "Twist Left");
         TwistLeft.scaleRange(-1,1);
@@ -192,33 +193,34 @@ public class RRAction_Auto_OZ extends LinearOpMode {
 
         PoseVelocity2d velEstimate = drive.updatePoseEstimate();    //Get current velocity
 
-        Action trajectorychosen;       // Define Action to choose the trajectory in the Action Builder
+        Action trajectorychosen1;       // Define Action to choose the trajectory in the Action Builder
 
         waitForStart();
 
 
-  // Actual code commented
-        trajectorychosen = Path1.build();
+  // Actual code
+        //trajectorychosen1 = Path1.build();
         Actions.runBlocking(
                 new ParallelAction(
-                        trajectorychosen,
+                        Path1.build(),
                         new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_HangReady_Enc,Delivery_Arm_HangReady_Enc,Delivery_Arm_Extend_Power,Delivery_Arm_Extend_Power),
                         new MotorAction(FrontSlide, Front_Slide_Resting_Enc, Front_Slide_Retract_Power),
                         new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Hang_Pos,ElbowR_Hang_Pos),
-                        new DoubleServoAction(Wrist,Claw,Wrist_Hang_Pos,Claw_Close_Pos)
+                        new ServoAction(Wrist, Wrist_Hang_Pos),
+                        new ServoAction(Claw, Claw_Close_Pos)
                 ));
         Pose2d poseEstimate = drive.localizer.getPose();            //Get current pose
         telemetry.addData("heading", poseEstimate.heading);
         telemetry.addData("X,Y", poseEstimate.position);
         telemetry.update();
 
-        trajectorychosen = Path2.build();
+        //trajectorychosen1 = Path2.build();
         Actions.runBlocking(
                 new SequentialAction(
-                        new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_HangDone_Enc,Delivery_Arm_HangDone_Enc,Delivery_Arm_Extend_Power,Delivery_Arm_Extend_Power),
+                        new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_HangDone_Enc,Delivery_Arm_HangDone_Enc,Delivery_Arm_Retract_Power,Delivery_Arm_Retract_Power),
                         new ServoAction(Claw, Claw_Open_Pos),
                         new ParallelAction(
-                                trajectorychosen,
+                                Path2.build(),
                                 new DoubleServoAction(ElbowLeft,ElbowRight, ElbowL_Intake_Pos,ElbowR_Intake_Pos),
                                 new ServoAction(Wrist,Wrist_Intake_Pos),
                                 new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_HangIntake_Enc,Delivery_Arm_HangIntake_Enc,Delivery_Arm_Retract_Power,Delivery_Arm_Retract_Power)
@@ -230,9 +232,9 @@ public class RRAction_Auto_OZ extends LinearOpMode {
         telemetry.addData("X,Y", poseEstimate1.position);
         telemetry.update();
 
-       trajectorychosen = Path3.build();
+      // trajectorychosen1 = Path3.build();
         Actions.runBlocking(
-                trajectorychosen
+                Path3.build()
         );
         Pose2d poseEstimate2 = drive.localizer.getPose();            //Get current pose
         telemetry.addData("heading", poseEstimate2.heading);
@@ -311,7 +313,7 @@ public class RRAction_Auto_OZ extends LinearOpMode {
                 servo.setPosition(position);
             }
 
-            return timer.seconds()< 1;
+            return timer.seconds()< 0.5;
         }
     }
 
@@ -389,7 +391,7 @@ public class RRAction_Auto_OZ extends LinearOpMode {
                 motor1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
-            return timer.seconds() < 1;
+            return timer.seconds() < 0.5;
         }
     }
 
@@ -419,7 +421,6 @@ public class RRAction_Auto_OZ extends LinearOpMode {
             return timer.seconds() < 0.5;
         }
     }
-
 
 }
 
