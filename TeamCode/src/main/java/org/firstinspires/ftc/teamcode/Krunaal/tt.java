@@ -51,7 +51,7 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Tele op test", group="Linear OpMode")
+@TeleOp(name="Tele op test krunnal/Riyansh", group="Linear OpMode")
 
 public class tt extends LinearOpMode {
 
@@ -179,7 +179,7 @@ public class tt extends LinearOpMode {
 
 
             if(gamepad2.x){
-                backClaw.setPosition(-0.5);
+                backClaw.setPosition(-1);
             }
             if(gamepad2.b){
                 backClaw.setPosition(1);
@@ -189,7 +189,7 @@ public class tt extends LinearOpMode {
 
             cp    = Range.clip(dd, -0.5, 0.5) ;
 
-            FS.setPower(-cp);
+            FS.setPower(cp);
 
            /* while(gamepad2.y){
                 denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
@@ -227,18 +227,18 @@ public class tt extends LinearOpMode {
            // Front_Rotate.setPower(0);
            // Front_Claw.setPower(0);*/
 
-            if(gamepad2.dpad_up){
-                BackLeftSlide.setPosition(-0.05);
-                BackRightSlide.setPosition(0.05);
-            }
             if(gamepad2.dpad_down){
-                BackLeftSlide.setPosition(-0.48);
-                BackRightSlide.setPosition(0.48);
+                BackLeftSlide.setPosition(-0.53);
+                BackRightSlide.setPosition(0.53);
             }
-         /*   if(gamepad2.dpad_right){
-                BackLeftSlide.setPosition(-0.2);
-                BackRightSlide.setPosition(0.2);
-            }*/
+            if(gamepad2.dpad_up){
+                BackLeftSlide.setPosition(0.42);//L 436 - 444 R
+                BackRightSlide.setPosition(-0.42);
+            }
+            if(gamepad1.a){
+                BackLeftSlide.setPosition(-0.1);
+                BackRightSlide.setPosition(0.1);
+            }
             if(gamepad2.dpad_left){
                 wrist.setPosition(1);
             }

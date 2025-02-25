@@ -34,7 +34,7 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 import java.util.Locale;
 
-@TeleOp(name="FSM tele")
+@TeleOp(name="FSM tele Riyansh")
 public class FsmTeleRiyansh extends OpMode {
     // An Enum is used to represent lift states.
     // (This is one thing enums are designed to do)
@@ -80,9 +80,9 @@ public class FsmTeleRiyansh extends OpMode {
 
     public Servo GecoWristL;
     public Servo GecoWristR;
-    public CRServo GecoWheelsR;
-    public CRServo GecoWheelsL;
-    public Servo Claw;
+    public CRServo Front_Rotate;
+    public Servo Front_Claw;
+    public Servo BackClaw;
     public Servo ClawArmR;
     public Servo ClawArmL;
     public Servo Wrist;
@@ -94,12 +94,12 @@ public class FsmTeleRiyansh extends OpMode {
     double Geco_Wrist_Claw_Deposit;
 
 
-    double Geco_IN;
-    double Geco_OUT;
+    double FrontClawOpen;
+    double FrontClawClose;
 
 
-    double Claw_Open;
-    double Claw_Close;
+    double BackClaw_Open;
+    double BackClaw_Close;
 
 
     double Claw_Arm_Specimen_Pick = 0.5;
@@ -120,6 +120,7 @@ public class FsmTeleRiyansh extends OpMode {
     double rfPower;
     double rbPower;
     double lbPower;
+    double Tp;
 
     ColorSensor sensorColor;
     DistanceSensor sensorDistance;
@@ -147,10 +148,14 @@ public class FsmTeleRiyansh extends OpMode {
 
 
         GecoWristL = hardwareMap.get(Servo.class, "Twist Left");
-        GecoWristR = hardwareMap.get(Servo.class, "Twist RIght");
-        GecoWheelsR = hardwareMap.get(CRServo.class, "Grab Right");
-        GecoWheelsL = hardwareMap.get(CRServo.class, "Grab Left");
-        Claw = hardwareMap.get(Servo.class, "Claw");
+        GecoWristR = hardwareMap.get(Servo.class, "Twist Right");
+
+        Front_Rotate = hardwareMap.get(CRServo.class, "Front Wrist");
+
+        Front_Claw = hardwareMap.get(Servo.class, "Front Claw");
+
+        BackClaw = hardwareMap.get(Servo.class, "Claw");
+
         Wrist = hardwareMap.get(Servo.class, "Wrist");
         ClawArmR = hardwareMap.get(Servo.class, "Elbow Right");
         ClawArmL = hardwareMap.get(Servo.class, "Elbow Left");
@@ -175,7 +180,7 @@ public class FsmTeleRiyansh extends OpMode {
 
         GecoWristL.setPosition(-Geco_Wrist_Reset);
         GecoWristR.setPosition(Geco_Wrist_Reset);
-        Claw.setPosition(Claw_Close);
+        BackClaw.setPosition(BackClaw_Close);
         ClawArmL.setPosition(-Claw_Arm_Reset);
         ClawArmR.setPosition(Claw_Arm_Reset);
         //in the init we are making sure evreything is reset
@@ -197,7 +202,7 @@ public class FsmTeleRiyansh extends OpMode {
                 if (gamepad2.y) {//set to what color it sees when sample is out of geco wheels
 //                    ClawElbow.setPosition(Claw_Arm_Reset);
                     Actions.runBlocking(new ParallelAction(
-                            new ServoAction(Claw,Claw_Open),
+                            new ServoAction(BackClaw,BackClaw_Open),
                             new MotorAction(SlideBackL,-Back_slide_Reset,0.4),
                             new MotorAction(SlideBackR,Back_slide_Reset,0.4),
                             new ServoAction(ClawArmL,-Claw_Arm_Reset),
@@ -212,18 +217,14 @@ public class FsmTeleRiyansh extends OpMode {
                 break;
             case SubmersibleReady:
                 // otherwise let the driver drive
-
                 if (gamepad2.x) {
-
-
-
                     // x is pressed, start extending
                     double dd = gamepad2.right_stick_x;
-
                     double cp = Range.clip(dd, -0.5, 0.5);
 
                     //allowing oporater to control the distance of the front slide
                     Actions.runBlocking(new ParallelAction(
+
                             new MotorPowerAction(SlideFrontR,cp)
                     ));
                     liftState = LiftState.SamplePicked;//changing state so we can move to the next task
@@ -234,15 +235,16 @@ public class FsmTeleRiyansh extends OpMode {
                 drive.leftFront.setPower(lfPower);
                 drive.rightFront.setPower(rfPower);
                 drive.leftBack.setPower(lbPower);
-                drive.rightBack.setPower(rbPower);
+                drive.rightBack.setPower(rbPower);//big fix think
+                TwistControl();
+                Front_Rotate.setPower(Tp);
 
                 if (gamepad2.b) {//its set b so that it only goes down when the driver and oporater have aligned with the sampele
                     // set the lift dump to dump
                     Actions.runBlocking(new ParallelAction(
                             new ServoAction(GecoWristL,-Geco_Wrist_Down),
                             new ServoAction(GecoWristR,Geco_Wrist_Down),
-                            new CRServoAction(GecoWheelsL,1,-Geco_IN),
-                            new CRServoAction(GecoWheelsR,1,Geco_IN)
+                            new ServoAction(Front_Claw,FrontClawClose)
 
                     ));
 
@@ -260,33 +262,38 @@ public class FsmTeleRiyansh extends OpMode {
                             new ServoAction(GecoWristL,-Geco_Wrist_Claw_Deposit),
                             new ServoAction(GecoWristR,Geco_Wrist_Claw_Deposit),
                             new MotorAction(SlideFrontR,Front_SLide_in,0.3),
-                            new ServoAction(Claw,Claw_Open)
+                            new ServoAction(BackClaw,BackClaw_Open)
                     ));
                     liftState = LiftState.SampleDrop;
 
                     //We have captured the sample and now we are ready to do the transfer from geco wheels to claw
 
-                } if(sensorDistance.getDistance(DistanceUnit.CM)>2) {//if we missed the sample or got the oponets color we dont click anything
-                Actions.runBlocking(new ParallelAction(
-                        new ServoAction(GecoWristL,-Geco_Wrist_Reset),
-                        new ServoAction(GecoWristR,Geco_Wrist_Reset),
-                        new CRServoAction(GecoWheelsL,1,-Geco_OUT),
-                        new CRServoAction(GecoWheelsR,1,Geco_OUT)
-                ));
+                }
+                if(sensorDistance.getDistance(DistanceUnit.CM)>2) {//if we missed the sample or got the oponets color we dont click anything
+                    Actions.runBlocking(new ParallelAction(
+                            new ServoAction(GecoWristL, -Geco_Wrist_Reset),
+                            new ServoAction(GecoWristR, Geco_Wrist_Reset),
+                            new ServoAction(Front_Claw, FrontClawClose)
 
-                liftState = LiftState.SubmersibleReady;
+                    ));
 
+                    liftState = LiftState.SubmersibleReady;
+
+
+
+
+                break;
                 //resets all movment things to get ready to attempt to grab a diffrent sample
             }
-                break;
+
 
 
             case SampleDrop:
                 if (gamepad2.a) {
                     Actions.runBlocking(new ParallelAction(
-                            new ServoAction(Claw,Claw_Close),
-                            new CRServoAction(GecoWheelsL,1,-Geco_OUT),
-                            new CRServoAction(GecoWheelsR,1,Geco_OUT),
+                            new ServoAction(BackClaw,BackClaw_Close),
+                            new ServoAction(Front_Claw,FrontClawOpen),
+
                             new ServoAction(ClawArmL,-Claw_Arm_Specimen_Pick),
                             new ServoAction(ClawArmR,Claw_Arm_Specimen_Pick)
                     ));
@@ -295,7 +302,7 @@ public class FsmTeleRiyansh extends OpMode {
                     if (gamepad2.left_bumper) {//click left bumber if we are doing specimen
                         Actions.runBlocking(new ParallelAction(
                                 new ParallelAction(trajectoryActionChosen),//might need to change to sequncal
-                                new ServoAction(Claw,Claw_Open)
+                                new ServoAction(BackClaw,BackClaw_Open)
                         ));
 
                         liftState = LiftState.SpecimenHanged;
@@ -324,7 +331,7 @@ public class FsmTeleRiyansh extends OpMode {
             case FinishedBasket:
                 if (Math.abs(SlideBackL.getCurrentPosition() - Back_slide_Bucket) < 30) {
                     Actions.runBlocking(new ParallelAction(
-                            new ServoAction(Claw,Claw_Open)
+                            new ServoAction(BackClaw,BackClaw_Open)
                     ));
                     liftState = LiftState.RetractAll;
                     //drops sample in basket and retracts evreything
@@ -339,7 +346,7 @@ public class FsmTeleRiyansh extends OpMode {
                     drive.leftBack.setPower(lbPower);
                     drive.rightBack.setPower(rbPower);
                     Actions.runBlocking(new ParallelAction(
-                            new ServoAction(Claw,Claw_Close),
+                            new ServoAction(BackClaw,BackClaw_Close),
                             new MotorAction(SlideBackL,-Back_Slide_Hang,0.4),
                             new MotorAction(SlideBackR,Back_Slide_Hang,0.4),
                             new ServoAction(ClawArmL,-Claw_Arm_Specimen_Drop),
@@ -360,7 +367,7 @@ public class FsmTeleRiyansh extends OpMode {
                             new ParallelAction(
                                     trajectoryActionChosen2,
                                     new ParallelAction(
-                                            new ServoAction(Claw,Claw_Open),
+                                            new ServoAction(BackClaw,BackClaw_Open),
                                             new MotorAction(SlideBackL, -Back_slide_Reset,0.4),
                                             new MotorAction(SlideBackR, Back_slide_Reset,0.4)
                                     )
@@ -480,5 +487,10 @@ public class FsmTeleRiyansh extends OpMode {
             }
             return false;
         }
+    }
+    public void TwistControl(){
+        double Gs = gamepad2.left_stick_x;//Gs - Gamepad stick
+        Tp = Range.clip(Gs, -0.5, 0.5);
+
     }
 }
