@@ -124,6 +124,7 @@ public class Find_encoder extends LinearOpMode {
             d.setPower(cp);
 
 
+
             telemetry.addData("Delivery ArmL Position: ", a.getCurrentPosition());
             telemetry.addData("Delivery ArmR Position: ", b.getCurrentPosition());
             telemetry.addData("Front Slide Position: ", d.getCurrentPosition());

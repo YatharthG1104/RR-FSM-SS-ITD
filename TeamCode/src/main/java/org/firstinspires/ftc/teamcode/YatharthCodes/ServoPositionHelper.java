@@ -8,9 +8,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 @TeleOp(name = "Servo Position Helper", group = "Concept")
 public class ServoPositionHelper extends OpMode {
 
-//    private Servo axon = null;
-    //private Servo el = null;
-    private Servo er = null;
+    private Servo axon = null;
+    private Servo el = null;
+    //private Servo er = null;
     private double servoPositionaxon = 0.5;
    // private double servoPositionel = 0;
     private double positionAdjustment = 0.05;
@@ -29,14 +29,14 @@ public class ServoPositionHelper extends OpMode {
         //        axon.setDirection(Servo.Direction.FORWARD);
         //        axon.setPosition(servoPositionaxon);
 
-      //  el = hardwareMap.get(Servo.class, "Twist Left");
-        er = hardwareMap.get(Servo.class, "Grab Left");
+        el = hardwareMap.get(Servo.class, "Claw");
+       // er = hardwareMap.get(Servo.class, "Elbow Right");
 
-      //  el.setDirection(Servo.Direction.REVERSE);
-        er.setDirection(Servo.Direction.FORWARD);
+        el.setDirection(Servo.Direction.REVERSE);
+       // er.setDirection(Servo.Direction.FORWARD);
 
-       //el.setPosition(servoPositionaxon);
-        er.setPosition(servoPositionaxon);
+       el.setPosition(servoPositionaxon);
+      //  er.setPosition(servoPositionaxon);
         telemetry.addData("Status", "Initialized");
     }
 
@@ -71,8 +71,8 @@ public class ServoPositionHelper extends OpMode {
             servoPositionaxon = MIN_POSITION;
         }
 
-       // el.setPosition(servoPositionaxon);
-        er.setPosition(servoPositionaxon);
+        el.setPosition(servoPositionaxon);
+      //  er.setPosition(servoPositionaxon);
 
         previousGamepadY = currentGamepadY;
         previousGamePadA = currentGamepadA;
@@ -80,7 +80,7 @@ public class ServoPositionHelper extends OpMode {
         previousGamePadDown = currentGamepadDown;
 
       //  telemetry.addData("El Servo Position", el.getPosition());
-        telemetry.addData("Er Servo Position", er.getPosition());
+      //  telemetry.addData("Er Servo Position", er.getPosition());
         telemetry.addData("Target Servo Position", servoPositionaxon);
         //telemetry.addData("el Servo Position", servoPositionel);
         telemetry.addData("Servo Step Size", positionAdjustment);

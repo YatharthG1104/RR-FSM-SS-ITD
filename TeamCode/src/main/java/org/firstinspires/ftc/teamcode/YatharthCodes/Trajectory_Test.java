@@ -41,8 +41,8 @@ public class Trajectory_Test extends LinearOpMode{
         DcMotor DAR = hardwareMap.get(DcMotor.class, "Delivery ArmR");
         Servo EL = hardwareMap.get(Servo.class, "Elbow Left");
         Servo ER = hardwareMap.get(Servo.class, "Elbow Right");
-        Servo GL = hardwareMap.get(Servo.class, "Grab Left");
-        Servo GR = hardwareMap.get(Servo.class, "Grab Right");
+      //  Servo GL = hardwareMap.get(Servo.class, "Grab Left");
+      //  Servo GR = hardwareMap.get(Servo.class, "Grab Right");
         Servo TWL = hardwareMap.get(Servo.class, "Twist Left");
         Servo TWR = hardwareMap.get(Servo.class, "Twist Right");
 
@@ -136,7 +136,7 @@ public class Trajectory_Test extends LinearOpMode{
                         .strafeToLinearHeading(new Vector2d(5,-40), 0)
                         .build());*/
 
-        Actions.runBlocking(
+      /*  Actions.runBlocking(
                 drive.actionBuilder(new Pose2d(0, 0, Math.toRadians(0)))
                         .lineToX(28)
                         .waitSeconds(0.5)
@@ -168,7 +168,7 @@ public class Trajectory_Test extends LinearOpMode{
                         .strafeToLinearHeading(new Vector2d(5,-30), 0)
                         .strafeToLinearHeading(new Vector2d(28,5), 0)
                         .strafeToLinearHeading(new Vector2d(5,-40), 0)
-                        .build());
+                        .build());*/
 
 
  /*   Actions.runBlocking(
@@ -203,23 +203,23 @@ public class Trajectory_Test extends LinearOpMode{
 
 //Method 3: Action Runblocking - works
 
-   /*  Actions.runBlocking(
+     Actions.runBlocking(
               new SequentialAction(
                       //trajectorychosen,
-                    //   new MotorAction(FS, 500, 0.5),
-                      // new ServoAction(W, 1.0),
-                       //new ServoAction(C, 0.0),
+                     //  new MotorAction(FS, 500, 0.5),
+                       new DoubleMotorAction(DAL,DAR,1200, 1200, 0.6,0.6),
+                       new DoubleServoAction(EL,ER, 0.25,0.25),
+                       new ServoAction(W, 0.8),
+                       new ServoAction(C, 1.0)
                        //new DoubleServoAction(TWL,TWR, 0.95,0.95),
                        //new ServoAction(GL, 0.5),
                        //new ServoAction(GR,0.8),
-                       new DoubleServoAction(EL,ER, 0.0,0.0),
-                      new ServoAction(W, 1.0)
-                       //new DoubleMotorAction(DAL,DAR,1000, 1000, 0.3,0.3)
-                  //     new ServoAction(GL, 1),
+         //             new ServoAction(W, 1.0),
+                  //    //     new ServoAction(GL, 1),
                      //  new ServoAction(GR, 1),
                       // new DoubleServoAction(EL,ER, 0.7,0.7)
              )
-     );*/
+     );
              telemetry.addData("Delivery ArmL Position: ", DAL.getCurrentPosition());
              telemetry.addData("Delivery ArmR Position: ", DAR.getCurrentPosition());
              telemetry.addData("Wrist Position: ", W.getPosition());
@@ -227,8 +227,8 @@ public class Trajectory_Test extends LinearOpMode{
              telemetry.addData("Elbowleft Position: ", EL.getPosition());
              telemetry.addData("ElbowRight Position: ", ER.getPosition());
              telemetry.addData("Frontslide Position: ", FS.getCurrentPosition());
-             telemetry.addData("Front Claw Position:", GR.getPosition());
-             telemetry.addData("Front Wrist Position:", GL.getPosition());
+         //    telemetry.addData("Front Claw Position:", GR.getPosition());
+         //    telemetry.addData("Front Wrist Position:", GL.getPosition());
              telemetry.addData("Twist Left Position: ", TWL.getPosition());
              telemetry.addData("Twist Right Position: ", TWR.getPosition());
              telemetry.update();
