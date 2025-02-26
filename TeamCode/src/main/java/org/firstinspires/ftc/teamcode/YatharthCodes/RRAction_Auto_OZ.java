@@ -8,7 +8,9 @@ import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.Trajectory;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
+import com.acmerobotics.roadrunner.TrajectoryBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -19,6 +21,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.firstinspires.ftc.teamcode.TankDrive;
 
 
 @Autonomous(name = "RRAction Auto_OZ_ZONE")
@@ -36,7 +39,7 @@ public class RRAction_Auto_OZ extends LinearOpMode {
     Servo Wrist = null;
     Servo TwistLeft = null;
     Servo TwistRight = null;
-    Servo FrontWrist = null;
+    CRServo FrontWrist = null;
     Servo FrontClaw = null;
     Servo ElbowLeft = null;
     Servo ElbowRight = null;
@@ -62,17 +65,17 @@ public class RRAction_Auto_OZ extends LinearOpMode {
     public static int Delivery_Arm_HangDone_Enc = 1000;
     public static int Delivery_Arm_IntakeDone_Enc = 300;
     public static int Delivery_Arm_HangIntake_Enc = 100;
-    public static double Delivery_Arm_Extend_Power = 0.5;
-    public static double Delivery_Arm_Retract_Power = -0.5;
+    public static double Delivery_Arm_Extend_Power = 0.6;
+    public static double Delivery_Arm_Retract_Power = -0.6;
 
     //Define all Elbow positions
     // These numbers need to be changed
-    public static double ElbowL_Intake_Pos = 0.8;
-    public static double ElbowR_Intake_Pos = 0.8;
+    public static double ElbowL_Intake_Pos = 0.0;
+    public static double ElbowR_Intake_Pos = 0.0;
     public static double ElbowL_Hang_Pos = 0.5;
     public static double ElbowR_Hang_Pos = 0.5;
-    public static double ElbowL_Rest_Pos = 0.0;
-    public static double ElbowR_Rest_Pos = 0.0;
+    public static double ElbowL_Rest_Pos = 0.2;
+    public static double ElbowR_Rest_Pos = 0.2;
 
     //Define all Front Slide Arm Encoder positions and power
     public static int Front_Slide_Resting_Enc = 10;
@@ -87,7 +90,7 @@ public class RRAction_Auto_OZ extends LinearOpMode {
 
         //Define all Poses here
         Pose2d InitialPose = new Pose2d(0,0,0);     //Beginning pose
-        Pose2d Pose1 = new Pose2d(28,0,0);          //Ready for 1st hang
+        Pose2d Pose1 = new Pose2d(30,0,0);          //Ready for 1st hang
         Pose2d Pose2 = new Pose2d(10,0,0);          // After 1st Hang
         Pose2d Pose3  = new Pose2d(5, -30,0 );      // Ready for Intake
         Pose2d Pose4  = new Pose2d(28, 5,0);        // Ready for next hang
@@ -128,8 +131,8 @@ public class RRAction_Auto_OZ extends LinearOpMode {
         FrontSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);  //Front Slide motor reset
         FrontSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);       //Front Slide run using encoders
 
-        FrontWrist = hardwareMap.get(Servo.class, "Front Wrist");
-        FrontWrist.setDirection(Servo.Direction.FORWARD);
+        FrontWrist = hardwareMap.get(CRServo.class, "Front Wrist");
+      //  FrontWrist.setDirection(Servo.Direction.FORWARD);
 
         FrontClaw = hardwareMap.get(Servo.class, "Front Claw");
         FrontClaw.setDirection(Servo.Direction.FORWARD);
@@ -153,15 +156,28 @@ public class RRAction_Auto_OZ extends LinearOpMode {
         mRuntime.reset();                               // Zero game clock
 
         //Build all Trajectories
-        TrajectoryActionBuilder Path1 = drive.actionBuilder(InitialPose)
-                .lineToX(28)
-                .waitSeconds(0.5);
+       /* TrajectoryActionBuilder Path1 = drive.actionBuilder(InitialPose)
+                .lineToX(30)
+                .waitSeconds(0.5);*/
 
-        TrajectoryActionBuilder Path2 = drive.actionBuilder(Pose1)
+        Action Path1 = drive.actionBuilder(InitialPose)
+                .lineToX(30)
+                .waitSeconds(0.5)
+                .build();
+
+       /* TrajectoryActionBuilder Path2 = drive.actionBuilder(Pose1)
                 .setReversed(true)
                 .setTangent(Math.toRadians(0))
                 .lineToX(10)
-                .setTangent(-Math.PI/2);
+                .setTangent(-Math.PI/2);*/
+
+            Action Path2 = drive.actionBuilder(Pose1)
+                .setReversed(true)
+                .setTangent(Math.toRadians(0))
+                .lineToX(10)
+                .setTangent(-Math.PI/2)
+                .build();
+
 
         TrajectoryActionBuilder Path3 = drive.actionBuilder(Pose2)
                 .splineToConstantHeading(new Vector2d(55,-33), Math.PI/2)
@@ -193,19 +209,69 @@ public class RRAction_Auto_OZ extends LinearOpMode {
 
         PoseVelocity2d velEstimate = drive.updatePoseEstimate();    //Get current velocity
 
-        Action trajectorychosen1;       // Define Action to choose the trajectory in the Action Builder
+      //  Action trajectorychosen1;       // Define Action to choose the trajectory in the Action Builder
+       // Action trajectorychosen2;       // Define Action to choose the trajectory in the Action Builder
+      //  Action trajectorychosen3;       // Define Action to choose the trajectory in the Action Builder
 
+
+       Actions.runBlocking(new ServoAction(Claw, Claw_Close_Pos));
         waitForStart();
+
+        // Dummy Testing Block
+        // Just drive broken down into paths
+        Actions.runBlocking(
+                new SequentialAction(
+                        Path1,
+                        Path2,
+                        drive.actionBuilder(Pose2)
+                                .strafeTo(new Vector2d(10,-5))
+                                .build()
+                )
+        );
+        // Dummy Testing Block
+        //Just drive and actions
+    /*    Actions.runBlocking(
+                new SequentialAction(
+                        new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_HangReady_Enc,Delivery_Arm_HangReady_Enc,Delivery_Arm_Extend_Power,Delivery_Arm_Extend_Power),
+                        new ParallelAction(
+                                Path1,
+                                new MotorAction(FrontSlide, Front_Slide_Resting_Enc, Front_Slide_Retract_Power),
+                                new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Rest_Pos,ElbowR_Rest_Pos),
+                                new ServoAction(Wrist, Wrist_Hang_Pos)
+                        ),
+                        new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Hang_Pos,ElbowR_Hang_Pos),
+                        new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_HangDone_Enc,Delivery_Arm_HangDone_Enc,Delivery_Arm_Retract_Power,Delivery_Arm_Retract_Power),
+                        new ServoAction(Claw, Claw_Open_Pos),
+                        new ParallelAction(
+                                Path2,
+                                new DoubleServoAction(ElbowLeft,ElbowRight, ElbowL_Intake_Pos,ElbowR_Intake_Pos),
+                                new ServoAction(Wrist,Wrist_Intake_Pos),
+                                new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_HangIntake_Enc,Delivery_Arm_HangIntake_Enc,Delivery_Arm_Retract_Power,Delivery_Arm_Retract_Power)
+                        ),
+                        drive.actionBuilder(Pose2)
+                                .strafeTo(new Vector2d(10,-5))
+                                .build()
+        ));*/
+
+      /*  Action sequence = new SequentialAction(
+                new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_HangReady_Enc,Delivery_Arm_HangReady_Enc,Delivery_Arm_Extend_Power,Delivery_Arm_Extend_Power),
+                Path1
+        );*/
+
+        Pose2d poseEstimate = drive.localizer.getPose();            //Get current pose
+        telemetry.addData("heading", poseEstimate.heading);
+        telemetry.addData("X,Y", poseEstimate.position);
+        telemetry.update();
 
 
   // Actual code
-        //trajectorychosen1 = Path1.build();
-        Actions.runBlocking(
+      //  trajectorychosen1 = Path1.build();
+      /*  Actions.runBlocking(
                 new ParallelAction(
                         Path1.build(),
                         new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_HangReady_Enc,Delivery_Arm_HangReady_Enc,Delivery_Arm_Extend_Power,Delivery_Arm_Extend_Power),
                         new MotorAction(FrontSlide, Front_Slide_Resting_Enc, Front_Slide_Retract_Power),
-                        new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Hang_Pos,ElbowR_Hang_Pos),
+                        new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Rest_Pos,ElbowR_Rest_Pos),
                         new ServoAction(Wrist, Wrist_Hang_Pos),
                         new ServoAction(Claw, Claw_Close_Pos)
                 ));
@@ -214,9 +280,10 @@ public class RRAction_Auto_OZ extends LinearOpMode {
         telemetry.addData("X,Y", poseEstimate.position);
         telemetry.update();
 
-        //trajectorychosen1 = Path2.build();
+        //trajectorychosen2 = Path2.build();
         Actions.runBlocking(
                 new SequentialAction(
+                        new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Hang_Pos,ElbowR_Hang_Pos),
                         new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_HangDone_Enc,Delivery_Arm_HangDone_Enc,Delivery_Arm_Retract_Power,Delivery_Arm_Retract_Power),
                         new ServoAction(Claw, Claw_Open_Pos),
                         new ParallelAction(
@@ -232,7 +299,7 @@ public class RRAction_Auto_OZ extends LinearOpMode {
         telemetry.addData("X,Y", poseEstimate1.position);
         telemetry.update();
 
-      // trajectorychosen1 = Path3.build();
+       //trajectorychosen3 = Path3.build();
         Actions.runBlocking(
                 Path3.build()
         );
@@ -241,7 +308,7 @@ public class RRAction_Auto_OZ extends LinearOpMode {
         telemetry.addData("X,Y", poseEstimate2.position);
         telemetry.update();
 
-     /*   trajectorychosen = Path4.build();
+        trajectorychosen = Path4.build();
         Actions.runBlocking(
                 new SequentialAction(
                         new ServoAction(Claw, Claw_Close_Pos),
@@ -313,7 +380,7 @@ public class RRAction_Auto_OZ extends LinearOpMode {
                 servo.setPosition(position);
             }
 
-            return timer.seconds()< 0.5;
+            return timer.seconds() < 1;
         }
     }
 
@@ -337,7 +404,7 @@ public class RRAction_Auto_OZ extends LinearOpMode {
                 motor.setTargetPosition((int) (position_tgt));
                 motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
-            return timer.seconds() < 0.5;
+            return timer.seconds() < 1;
         }
     }
 
@@ -391,7 +458,7 @@ public class RRAction_Auto_OZ extends LinearOpMode {
                 motor1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
-            return timer.seconds() < 0.5;
+            return timer.seconds() < 1;
         }
     }
 
@@ -418,7 +485,7 @@ public class RRAction_Auto_OZ extends LinearOpMode {
                 servo2.setPosition(position2);
             }
 
-            return timer.seconds() < 0.5;
+            return timer.seconds() < 1;
         }
     }
 

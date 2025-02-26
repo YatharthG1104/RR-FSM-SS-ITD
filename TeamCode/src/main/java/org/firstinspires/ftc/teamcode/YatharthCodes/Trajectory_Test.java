@@ -6,6 +6,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -20,17 +21,16 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 @Autonomous(name = "First trajectory test")
 
-public class Trajectory_Test extends LinearOpMode{
+public class Trajectory_Test extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
         Pose2d InitialPose = new Pose2d(0, 0, 0);
 
 
-
         //this takes care of drive motors in MecanumDrive class.
         // Define other non drive motors before you move forward
-         MecanumDrive drive = new MecanumDrive(hardwareMap, InitialPose);
+        MecanumDrive drive = new MecanumDrive(hardwareMap, InitialPose);
 
         // Define all servos here or put all hardware initialization separately
         // Servo servo= hardwareMap.servo.get("servo");
@@ -41,8 +41,8 @@ public class Trajectory_Test extends LinearOpMode{
         DcMotor DAR = hardwareMap.get(DcMotor.class, "Delivery ArmR");
         Servo EL = hardwareMap.get(Servo.class, "Elbow Left");
         Servo ER = hardwareMap.get(Servo.class, "Elbow Right");
-      //  Servo GL = hardwareMap.get(Servo.class, "Grab Left");
-      //  Servo GR = hardwareMap.get(Servo.class, "Grab Right");
+        // Servo GL = hardwareMap.get(Servo.class, "Front Wrist");
+        //Servo GR = hardwareMap.get(Servo.class, "Grab Right");
         Servo TWL = hardwareMap.get(Servo.class, "Twist Left");
         Servo TWR = hardwareMap.get(Servo.class, "Twist Right");
 
@@ -69,7 +69,6 @@ public class Trajectory_Test extends LinearOpMode{
 
 
         waitForStart();
-
 
 
 // Velocity and Acceleration Constraints
@@ -182,56 +181,53 @@ public class Trajectory_Test extends LinearOpMode{
 */
 
 
-
-
 //Method 2: Trajectory Action Builder
 
 
-       // TrajectoryActionBuilder Path1 = drive.actionBuilder(InitialPose);
+    /*   TrajectoryActionBuilder Path1 = drive.actionBuilder(InitialPose)
 
-                //.lineToX(28)
-               // .waitSeconds(0.5)
-                //.afterTime(0,new ServoAction(W,0.3))
-               // .afterTime(0,new ServoAction(C,0.3));
-                //.afterTime(0.5, new ParallelAction(
-                  //      new ServoAction(W, 0.5),
-                 //       new ServoAction(C, 0.8)
-        //Action trajectorychosen;
-       //trajectorychosen= Path1.build();
-
+                .lineToX(28)
+               .waitSeconds(0.5)
+                .afterTime(0,new ServoAction(W,0.3))
+               .afterTime(0,new ServoAction(C,0.3));
+                .afterTime(0.5, new ParallelAction(
+                      new ServoAction(W, 0.5),
+                      new ServoAction(C, 0.8)
+        Action trajectorychosen;
+       trajectorychosen= Path1.build();
+*/
 
 
 //Method 3: Action Runblocking - works
 
-     Actions.runBlocking(
-              new SequentialAction(
-                      //trajectorychosen,
-                     //  new MotorAction(FS, 500, 0.5),
-                       new DoubleMotorAction(DAL,DAR,1200, 1200, 0.6,0.6),
-                       new DoubleServoAction(EL,ER, 0.25,0.25),
-                       new ServoAction(W, 0.8),
-                       new ServoAction(C, 1.0)
-                       //new DoubleServoAction(TWL,TWR, 0.95,0.95),
-                       //new ServoAction(GL, 0.5),
-                       //new ServoAction(GR,0.8),
-         //             new ServoAction(W, 1.0),
-                  //    //     new ServoAction(GL, 1),
-                     //  new ServoAction(GR, 1),
-                      // new DoubleServoAction(EL,ER, 0.7,0.7)
-             )
-     );
-             telemetry.addData("Delivery ArmL Position: ", DAL.getCurrentPosition());
-             telemetry.addData("Delivery ArmR Position: ", DAR.getCurrentPosition());
-             telemetry.addData("Wrist Position: ", W.getPosition());
-             telemetry.addData("Claw Position: ", C.getPosition());
-             telemetry.addData("Elbowleft Position: ", EL.getPosition());
-             telemetry.addData("ElbowRight Position: ", ER.getPosition());
-             telemetry.addData("Frontslide Position: ", FS.getCurrentPosition());
-         //    telemetry.addData("Front Claw Position:", GR.getPosition());
-         //    telemetry.addData("Front Wrist Position:", GL.getPosition());
-             telemetry.addData("Twist Left Position: ", TWL.getPosition());
-             telemetry.addData("Twist Right Position: ", TWR.getPosition());
-             telemetry.update();
+        Actions.runBlocking(
+                new SequentialAction(
+                        //trajectorychosen,
+                        // new DoubleMotorAction(DAL,DAR,1200, 1200, 0.6,0.6),
+                        //   new DoubleServoAction(EL,ER, 0.1,0.1),
+                        new ServoAction(C, -0.9),
+                        new ServoAction(W, 0.8)
+                        //new DoubleServoAction(TWL,TWR, 0.95,0.95)
+                        //new ServoAction(GL, 0.5),
+                        //new ServoAction(GR,0.8),
+                        //             new ServoAction(W, 1.0),
+                        //    //     new ServoAction(GL, 1),
+                        //  new ServoAction(GR, 1),
+                        // new DoubleServoAction(EL,ER, 0.7,0.7)
+                )
+        );
+        telemetry.addData("Delivery ArmL Position: ", DAL.getCurrentPosition());
+        telemetry.addData("Delivery ArmR Position: ", DAR.getCurrentPosition());
+        telemetry.addData("Wrist Position: ", W.getPosition());
+        telemetry.addData("Claw Position: ", C.getPosition());
+        telemetry.addData("Elbowleft Position: ", EL.getPosition());
+        telemetry.addData("ElbowRight Position: ", ER.getPosition());
+        telemetry.addData("Frontslide Position: ", FS.getCurrentPosition());
+        //    telemetry.addData("Front Claw Position:", GR.getPosition());
+        //    telemetry.addData("Front Wrist Position:", GL.getPosition());
+        telemetry.addData("Twist Left Position: ", TWL.getPosition());
+        telemetry.addData("Twist Right Position: ", TWR.getPosition());
+        telemetry.update();
 
 
 
@@ -251,21 +247,21 @@ public class Trajectory_Test extends LinearOpMode{
     public static class ServoAction implements Action {
         Servo servo;
         double position;
-        ElapsedTime timer= null;
+        ElapsedTime timer = null;
 
         public ServoAction(Servo srv, double pos) {
-            this.servo= srv;
+            this.servo = srv;
             this.position = pos;
         }
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if(timer == null) {
+            if (timer == null) {
                 timer = new ElapsedTime();
                 servo.setPosition(position);
             }
 
-            return timer.seconds()< 1;
+            return timer.seconds() < 1;
         }
     }
 
@@ -276,7 +272,7 @@ public class Trajectory_Test extends LinearOpMode{
         double power;
         ElapsedTime timer = null;
 
-        public MotorAction (DcMotor mot, double pos, double pow) {
+        public MotorAction(DcMotor mot, double pos, double pow) {
             this.motor = mot;
             this.position_tgt = pos;
             this.power = pow;
@@ -288,20 +284,20 @@ public class Trajectory_Test extends LinearOpMode{
                 motor.setPower(power);
                 motor.setTargetPosition((int) (position_tgt));
                 motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        }
+            }
             return timer.seconds() < 0.5;
-    }
+        }
     }
 
     //CRServo Action build for roadrunner to use
     public static class CRServoAction implements Action {
         CRServo crServo;
         double power;
-        ElapsedTime timer= null;
+        ElapsedTime timer = null;
 
-        public CRServoAction(CRServo crsrv, double pow ) {
+        public CRServoAction(CRServo crsrv, double pow) {
             this.crServo = crsrv;
-           // this.seconds = sec;
+            // this.seconds = sec;
             this.power = pow;
         }
 
@@ -324,7 +320,7 @@ public class Trajectory_Test extends LinearOpMode{
         double power2;
         ElapsedTime timer = null;
 
-        public DoubleMotorAction (DcMotor mot1, DcMotor mot2, double pos1, double pos2, double pow1, double pow2) {
+        public DoubleMotorAction(DcMotor mot1, DcMotor mot2, double pos1, double pos2, double pow1, double pow2) {
             this.motor1 = mot1;
             this.position_tgt1 = pos1;
             this.power1 = pow1;
@@ -335,11 +331,11 @@ public class Trajectory_Test extends LinearOpMode{
 
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (motor1.getCurrentPosition() < position_tgt1) {
-               timer = new ElapsedTime();
+                timer = new ElapsedTime();
                 motor1.setPower(power1);
                 motor2.setPower(power2);
                 motor1.setTargetPosition((int) (position_tgt1));
-               // motor2.setTargetPosition((int) (position_tgt2));
+                // motor2.setTargetPosition((int) (position_tgt2));
                 motor1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
@@ -353,9 +349,9 @@ public class Trajectory_Test extends LinearOpMode{
         double position1;
         Servo servo2;
         double position2;
-        ElapsedTime timer= null;
+        ElapsedTime timer = null;
 
-        public DoubleServoAction(Servo srv1, Servo srv2,double pos1,double pos2) {
+        public DoubleServoAction(Servo srv1, Servo srv2, double pos1, double pos2) {
             this.servo1 = srv1;
             this.servo2 = srv2;
             this.position1 = pos1;
@@ -364,7 +360,7 @@ public class Trajectory_Test extends LinearOpMode{
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if(timer == null) {
+            if (timer == null) {
                 timer = new ElapsedTime();
                 servo1.setPosition(position1);
                 servo2.setPosition(position2);
@@ -382,9 +378,9 @@ public class Trajectory_Test extends LinearOpMode{
         double power2;
         int seconds1;
         int seconds2;
-        ElapsedTime timer= null;
+        ElapsedTime timer = null;
 
-        public DoubleCRServoAction(CRServo crsrv1, CRServo crsrv2,  int sec1, int sec2, double pow1, double pow2) {
+        public DoubleCRServoAction(CRServo crsrv1, CRServo crsrv2, int sec1, int sec2, double pow1, double pow2) {
             this.crServo1 = crsrv1;
             this.crServo2 = crsrv2;
             this.seconds1 = sec1;
@@ -404,7 +400,7 @@ public class Trajectory_Test extends LinearOpMode{
     }
 
     // Double Motor and Servo Action build for roadrunner to use
-    public static class DoubleServoAndMotorAction implements Action{
+    public static class DoubleServoAndMotorAction implements Action {
 
         DcMotor motor;
         Servo servo;
@@ -413,7 +409,7 @@ public class Trajectory_Test extends LinearOpMode{
         double servPos;
         ElapsedTime timer = null;
 
-        public DoubleServoAndMotorAction (DcMotor mot, Servo serv, double motPos, double motPow, double servoPos) {
+        public DoubleServoAndMotorAction(DcMotor mot, Servo serv, double motPos, double motPow, double servoPos) {
             this.motor = mot;
             this.servo = serv;
             this.Motor_pos_target = motPos;
@@ -426,10 +422,55 @@ public class Trajectory_Test extends LinearOpMode{
                 timer = new ElapsedTime();
                 servo.setPosition(servPos);
                 motor.setPower(motor_power);
-                motor.setTargetPosition((int)(Motor_pos_target));
+                motor.setTargetPosition((int) (Motor_pos_target));
                 motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
             return timer.seconds() < 0.5;
+        }
+    }
+
+    // Servo action-2 build for roadrunner to use
+    public static class ServoAction2 implements Action {
+        Servo servo;
+        double position;
+
+        public ServoAction2(Servo srv, double pos) {
+            this.servo = srv;
+            this.position = pos;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            servo.setPosition(position);
+            return false;
+        }
+
+    }
+
+    // Motor Action-2 build for roadrunner to use
+    public static class MotorAction2 implements Action {
+        DcMotor motor;
+        double position_tgt;
+        double power;
+
+        public MotorAction2(DcMotor mot, double pos, double pow) {
+            this.motor = mot;
+            this.position_tgt = pos;
+            this.power = pow;
+        }
+
+
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+
+            if (motor.getCurrentPosition() < position_tgt) {
+                motor.setPower(power);
+                motor.setTargetPosition((int) (position_tgt));
+                motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                return true;
+            } else {
+                motor.setPower(0);
+                return false;
+            }
         }
     }
 }
