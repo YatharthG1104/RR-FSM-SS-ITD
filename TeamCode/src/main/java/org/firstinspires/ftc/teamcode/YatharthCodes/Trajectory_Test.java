@@ -41,8 +41,8 @@ public class Trajectory_Test extends LinearOpMode {
         DcMotor DAR = hardwareMap.get(DcMotor.class, "Delivery ArmR");
         Servo EL = hardwareMap.get(Servo.class, "Elbow Left");
         Servo ER = hardwareMap.get(Servo.class, "Elbow Right");
-        // Servo GL = hardwareMap.get(Servo.class, "Front Wrist");
-        //Servo GR = hardwareMap.get(Servo.class, "Grab Right");
+        Servo GL = hardwareMap.get(Servo.class, "Front Claw");
+      //  CRServo GR = hardwareMap.get(CRServo.class, "Front Wrist");
         Servo TWL = hardwareMap.get(Servo.class, "Twist Left");
         Servo TWR = hardwareMap.get(Servo.class, "Twist Right");
 
@@ -205,8 +205,9 @@ public class Trajectory_Test extends LinearOpMode {
                         //trajectorychosen,
                         // new DoubleMotorAction(DAL,DAR,1200, 1200, 0.6,0.6),
                         //   new DoubleServoAction(EL,ER, 0.1,0.1),
-                        new ServoAction(C, -0.9),
-                        new ServoAction(W, 0.8)
+                        new ServoAction(C, 0.7),
+                        new ServoAction(GL, 0.1),
+                        new MotorAction2(FS,200, 0.3)
                         //new DoubleServoAction(TWL,TWR, 0.95,0.95)
                         //new ServoAction(GL, 0.5),
                         //new ServoAction(GR,0.8),
@@ -223,14 +224,11 @@ public class Trajectory_Test extends LinearOpMode {
         telemetry.addData("Elbowleft Position: ", EL.getPosition());
         telemetry.addData("ElbowRight Position: ", ER.getPosition());
         telemetry.addData("Frontslide Position: ", FS.getCurrentPosition());
-        //    telemetry.addData("Front Claw Position:", GR.getPosition());
-        //    telemetry.addData("Front Wrist Position:", GL.getPosition());
+      //  telemetry.addData("Front Claw Position:", GR.getPosition());
+        telemetry.addData("Front Claw Position:", GL.getPosition());
         telemetry.addData("Twist Left Position: ", TWL.getPosition());
         telemetry.addData("Twist Right Position: ", TWR.getPosition());
         telemetry.update();
-
-
-
 
 
       /*  Actions.runBlocking(
@@ -459,10 +457,9 @@ public class Trajectory_Test extends LinearOpMode {
             this.power = pow;
         }
 
-
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
 
-            if (motor.getCurrentPosition() < position_tgt) {
+            if (motor.getCurrentPosition() != position_tgt) {
                 motor.setPower(power);
                 motor.setTargetPosition((int) (position_tgt));
                 motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);

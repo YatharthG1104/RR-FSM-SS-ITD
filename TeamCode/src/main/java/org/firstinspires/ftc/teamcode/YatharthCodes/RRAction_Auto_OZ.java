@@ -8,6 +8,7 @@ import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.TimeTurn;
 import com.acmerobotics.roadrunner.Trajectory;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.TrajectoryBuilder;
@@ -86,7 +87,7 @@ public class RRAction_Auto_OZ extends LinearOpMode {
 
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode()  {
 
         //Define all Poses here
         Pose2d InitialPose = new Pose2d(0,0,0);     //Beginning pose
@@ -151,7 +152,6 @@ public class RRAction_Auto_OZ extends LinearOpMode {
 
         sensorColor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
 
-
         //set  start game clock
         mRuntime.reset();                               // Zero game clock
 
@@ -209,22 +209,34 @@ public class RRAction_Auto_OZ extends LinearOpMode {
 
         PoseVelocity2d velEstimate = drive.updatePoseEstimate();    //Get current velocity
 
+
+
       //  Action trajectorychosen1;       // Define Action to choose the trajectory in the Action Builder
        // Action trajectorychosen2;       // Define Action to choose the trajectory in the Action Builder
       //  Action trajectorychosen3;       // Define Action to choose the trajectory in the Action Builder
 
 
-       Actions.runBlocking(new ServoAction(Claw, Claw_Close_Pos));
+      // Actions.runBlocking(new ServoAction(Claw, Claw_Close_Pos));
         waitForStart();
 
         // Dummy Testing Block
         // Just drive broken down into paths
         Actions.runBlocking(
+
                 new SequentialAction(
-                        Path1,
-                        Path2,
-                        drive.actionBuilder(Pose2)
-                                .strafeTo(new Vector2d(10,-5))
+                        new ServoAction(Claw, Claw_Close_Pos),
+                        drive.actionBuilder(new Pose2d(0,0,0))
+                                .lineToX(30)
+                                .build(),
+                        new ParallelAction(
+                                new MotorAction2(FrontSlide, Front_Slide_Resting_Enc, Front_Slide_Retract_Power),
+                                new ServoAction(Claw, Claw_Open_Pos)
+                        ),
+                        drive.actionBuilder(new Pose2d(30,0,0))
+                                .setReversed(true)
+                                .setTangent(Math.toRadians(0))
+                                .lineToX(10)
+                                .setTangent(-Math.PI/2)
                                 .build()
                 )
         );
@@ -486,6 +498,32 @@ public class RRAction_Auto_OZ extends LinearOpMode {
             }
 
             return timer.seconds() < 1;
+        }
+    }
+
+    // Motor Action-2 build for roadrunner to use
+    public static class MotorAction2 implements Action {
+        DcMotor motor;
+        double position_tgt;
+        double power;
+
+        public MotorAction2(DcMotor mot, double pos, double pow) {
+            this.motor = mot;
+            this.position_tgt = pos;
+            this.power = pow;
+        }
+
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+
+            if (motor.getCurrentPosition() != position_tgt) {
+                motor.setPower(power);
+                motor.setTargetPosition((int) (position_tgt));
+                motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                return true;
+            } else {
+                motor.setPower(0);
+                return false;
+            }
         }
     }
 
