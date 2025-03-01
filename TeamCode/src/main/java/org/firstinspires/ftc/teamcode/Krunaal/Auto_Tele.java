@@ -229,13 +229,19 @@ public class Auto_Tele extends LinearOpMode{
                 Front_Rotate.setPower(0);
 
             if(gamepad1.right_bumper){
-                FS.setPower(0.5);
-                wrist.setPosition(0.5);
-                Front_Claw.setPosition(0.9);
+                FS.setPower(-1);
+                FS.setTargetPosition(1000);
+                rightslide.setPosition(1);
+                leftslide.setPosition(-1);
+                // sleep(1000);
+                //Front_Claw.setPosition(-1);
             }
 
             if(gamepad1.left_bumper){
-                FS.setPower(-0.5);
+                FS.setPower(1);
+                FS.setTargetPosition(10);
+                rightslide.setPosition(-0.8);
+                leftslide.setPosition(0.8);
                 wrist.setPosition(0.5);
                 Front_Claw.setPosition(-0.9);
             }
@@ -258,3 +264,4 @@ public class Auto_Tele extends LinearOpMode{
         }
     }
 }
+
