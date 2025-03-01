@@ -65,13 +65,13 @@ public class RR_Basket_Auto extends LinearOpMode {
     public static double ElbowR_Transfer_Pos = 0.6;
     public static double ElbowL_Hang_Pos = 0.5;
     public static double ElbowR_Hang_Pos = 0.5;
-    public static double ElbowL_Basket_Pos = 0.05;
-    public static double ElbowR_Basket_Pos = 0.05;
+    public static double ElbowL_Basket_Pos = 0.1;
+    public static double ElbowR_Basket_Pos = 0.1;
 
     //Define all Front Slide Arm Encoder positions and power
     public static int Front_Slide_Resting_Enc = 0;
     public static int Front_Slide_Intake_Enc = 400;
-    public static int Front_Slide_Transfer_Enc = 50;
+    public static int Front_Slide_Transfer_Enc = 0;
     public static double Front_Slide_Extend_Power = 0.7;
     public static double Front_Slide_Retract_Power = -0.7;
 
@@ -162,7 +162,7 @@ public class RR_Basket_Auto extends LinearOpMode {
                        new MotorAction2(FrontSlide, Front_Slide_Resting_Enc, Front_Slide_Retract_Power),
                       new ParallelAction(
                               drive.actionBuilder(new Pose2d(0,0,0)) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
-                                      .strafeTo(new Vector2d(5,22))
+                                      .strafeTo(new Vector2d(7,24))
                                       .turnTo(Math.toRadians(-50))
                                       .build(),
                               new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Basket_Pos,ElbowR_Basket_Pos),
@@ -170,22 +170,23 @@ public class RR_Basket_Auto extends LinearOpMode {
                       ),
                        new SleepAction(0.5),
                        new ServoAction(Claw, Claw_Open_Pos),
-                       drive.actionBuilder(new Pose2d(5,22,Math.toRadians(-50))) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
-                               .strafeTo(new Vector2d(15,23))
-                               .turnTo(Math.toRadians(-20))
+                       drive.actionBuilder(new Pose2d(7,24,Math.toRadians(-50))) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
+                               .strafeTo(new Vector2d(16,23))
+                               .turnTo(Math.toRadians(-9))
                                .build(),
                        new MotorAction2(FrontSlide, Front_Slide_Intake_Enc, Front_Slide_Extend_Power),
                        new ServoAction(FrontClaw, FrontClaw_Open_Pos),
                        new DoubleServoAction(TwistLeft,TwistRight, TwistL_Intake_Pos, TwistR_Intake_Pos),
                        new ServoAction(FrontClaw, FrontClaw_Close_Pos),
-                       new ParallelAction(
-                               new MotorAction2(FrontSlide, Front_Slide_Transfer_Enc, Front_Slide_Retract_Power),
+                       new SequentialAction(
                                new DoubleServoAction(TwistLeft,TwistRight, TwistL_Transfer_Pos, TwistR_Transfer_Pos),
+                               new MotorAction2(FrontSlide, Front_Slide_Transfer_Enc, Front_Slide_Retract_Power),
                                new ParallelAction(
                                        new MotorAction2(deliveryArmLeft, Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power),
                                        new MotorAction2(deliveryArmRight, Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power)
                                ),
-                               new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Transfer_Pos,ElbowR_Transfer_Pos)
+                               new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Transfer_Pos,ElbowR_Transfer_Pos),
+                               new ServoAction(Claw, Claw_Close_Pos)
                        )
                        /*drive.actionBuilder(new Pose2d(7,17,Math.toRadians(25))) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
                                .turnTo(Math.toRadians(-50))
