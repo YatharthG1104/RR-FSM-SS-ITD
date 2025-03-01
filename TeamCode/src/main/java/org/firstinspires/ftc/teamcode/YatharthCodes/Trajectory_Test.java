@@ -47,7 +47,10 @@ public class Trajectory_Test extends LinearOpMode {
         Servo TWR = hardwareMap.get(Servo.class, "Twist Right");
 
         EL.setDirection(Servo.Direction.REVERSE);
+        EL.scaleRange(-1,1);
+
         ER.setDirection(Servo.Direction.FORWARD);
+        ER.scaleRange(-1,1);
 
         TWL.setDirection(Servo.Direction.REVERSE);
         TWR.setDirection(Servo.Direction.FORWARD);
@@ -202,28 +205,30 @@ public class Trajectory_Test extends LinearOpMode {
 
         Actions.runBlocking(
                 new SequentialAction(
-                        drive.actionBuilder(new Pose2d(0,0,0)) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
+                      /*  drive.actionBuilder(new Pose2d(0,0,0)) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
                                 .lineToX(10)
-                                .build(),
-                        //trajectorychosen,
-                        new DoubleMotorAction(DAL,DAR,1200, 1200, 0.6,0.6),
-                        new DoubleServoAction(EL,ER, 0.1,0.1),
-                        new ServoAction(W, 0.4),
-                        new ServoAction(C, 0.7),
-                        new ServoAction(GL, 0.7),
-                        new MotorAction2(FS,500, 0.3),
-                        new DoubleServoAction(TWL,TWR, 0.95,0.95),
-                        new DoubleServoAction(TWL,TWR, 0.4,0.4),
-                        new MotorAction2(FS,0,-0.3),
-                        new ParallelAction(
-                                new MotorAction2(DAL,500, -0.6),
-                                new MotorAction2(DAR, 500, -0.6)
-                        ),
-                        drive.actionBuilder(new Pose2d(10,0,0)) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
-                                .strafeTo(new Vector2d(10,10))
-                                .build()
-                       // new DoubleMotorAction(DAL,DAR,500, 500, -0.6,-0.6)
+                                .build(),*/
 
+
+                        //trajectorychosen,
+                        //new DoubleMotorAction(DAL,DAR,1200, 1200, 0.6,0.6),
+                         new DoubleServoAction(EL,ER, -1,-1),
+                     //   new ServoAction(W, 0.4),
+                        new ServoAction(C, -1.0),
+                        new ServoAction(C, 1.0)
+                       // new ServoAction(GL, 0.7),
+                    //    new MotorAction2(FS,500, 0.3),
+                      //  new DoubleServoAction(TWL,TWR, 0.95,0.95),
+                        //new DoubleServoAction(TWL,TWR, 0.4,0.4),
+                        //new MotorAction2(FS,0,-0.3),
+                       /* new ParallelAction(
+                                new MotorAction2(DAL,500, -0.6),
+                                new MotorAction2(DAR, 500, -0.6)*/
+                        )
+                      //drive.actionBuilder(new Pose2d(10,0,0)) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
+                            //    .strafeTo(new Vector2d(10,10))
+                              //  .build()(/
+                       // new DoubleMotorAction(DAL,DAR,500, 500, -0.6,-0.6)
 
 
 
@@ -232,7 +237,6 @@ public class Trajectory_Test extends LinearOpMode {
                         //    //     new ServoAction(GL, 1),
                         //  new ServoAction(GR, 1),
                         // new DoubleServoAction(EL,ER, 0.7,0.7)
-                )
         );
         telemetry.addData("Delivery ArmL Position: ", DAL.getCurrentPosition());
         telemetry.addData("Delivery ArmR Position: ", DAR.getCurrentPosition());
