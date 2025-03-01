@@ -19,8 +19,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
-@Autonomous(name = "RRAction Auto_NZ_ZONE")
-public class RRAction_Auto_NZ extends LinearOpMode {
+@Autonomous(name = "Basket Auto")
+public class RR_Basket_Auto extends LinearOpMode {
 
     // Time into the Autonomous round
     public ElapsedTime mRuntime = new ElapsedTime();
@@ -85,12 +85,7 @@ public class RRAction_Auto_NZ extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-
         Pose2d InitialPose = new Pose2d(0,0,0);     // Beginning pose
-        Pose2d Pose1 = new Pose2d(10,0,0);          // First pose
-        Pose2d Pose2 = new Pose2d(10,45,0);         // Bucket pose
-        Pose2d Pose3  = new Pose2d(25, 30,0 );      // Level 1 ascent pose
-
 
         //Importing the hardware maps for all drive motors and setting the robot position
         MecanumDrive drive = new MecanumDrive(hardwareMap, InitialPose);
@@ -152,71 +147,31 @@ public class RRAction_Auto_NZ extends LinearOpMode {
         //set  start game clock
         mRuntime.reset();                               // Zero game clock
 
-        Action Path1 = drive.actionBuilder(InitialPose)
-                .lineToX(10)
-                .build();
-
-        Action Path2 = drive.actionBuilder(Pose1)
-                .strafeTo(new Vector2d(10,50))
-                .turnTo(Math.toRadians(70))
-                .build();
-
-       /* Action Path3 = drive.actionBuilder(Pose2)
-                 new MotorAction(FrontSlide, Front_Slide_Intake_Enc, Front_Slide_Extend_Power)
-                .turnTo(Math.toRadians(100))
-                .waitSeconds(2)
-                .turnTo(Math.toRadians(70))
-                .waitSeconds(1)
-                .turnTo(Math.toRadians(130))
-                .waitSeconds(2)
-                .turnTo(Math.toRadians(70))
-                .build();*/
-
-        Action Path3 = drive.actionBuilder(Pose3)
-                .splineTo(new Vector2d(25,30), 90).build();
-
-
 
         Actions.runBlocking(
-                new ParallelAction(
-                        Path1,
-                        new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_HangReady_Enc,Delivery_Arm_HangReady_Enc,Delivery_Arm_Extend_Power,Delivery_Arm_Extend_Power),
-                        new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Hang_Pos,ElbowR_Hang_Pos)
-                ));
-        Pose2d poseEstimate = drive.localizer.getPose();            //Get current pose
-        telemetry.addData("heading", poseEstimate.heading);
-        telemetry.addData("X,Y", poseEstimate.position);
-        telemetry.update();
+               new SequentialAction(
+                      new ParallelAction(
+                              drive.actionBuilder(new Pose2d(0,0,0)) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
+                                      .lineToX(10)
+                                      .build(),
+                              new RRAction_Auto_NZ.DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_HangReady_Enc,Delivery_Arm_HangReady_Enc,Delivery_Arm_Extend_Power,Delivery_Arm_Extend_Power),
+                              new RRAction_Auto_NZ.DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Hang_Pos,ElbowR_Hang_Pos)
 
-        Actions.runBlocking(
-                Path2
+                      ),
+                       drive.actionBuilder(new Pose2d(10,0,0)) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
+                               .strafeTo(new Vector2d(10,50))
+                               .turnTo(Math.toRadians(100))
+                               .build(),
+                       drive.actionBuilder(new Pose2d(10,50,0)) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
+                               .waitSeconds(2)
+                               .turnTo(Math.toRadians(70))
+                               .waitSeconds(1)
+                               .turnTo(Math.toRadians(130))
+                               .waitSeconds(2)
+                               .turnTo(Math.toRadians(70))
+                               .build()
+               )
         );
-        Pose2d poseEstimate1 = drive.localizer.getPose();            //Get current pose
-        telemetry.addData("heading", poseEstimate1.heading);
-        telemetry.addData("X,Y", poseEstimate1.position);
-        telemetry.update();
-
-
-                new SequentialAction(
-                        new ServoAction(Claw, Claw_Open_Pos),
-                        new MotorAction(FrontSlide, Front_Slide_Intake_Enc, Front_Slide_Extend_Power),
-                        new ServoAction(FrontClaw, FrontClaw_Open_Pos),
-                        new DoubleServoAction(TwistLeft,TwistRight, TwistL_Intake_Pos, TwistR_Intake_Pos),
-                        new ServoAction(FrontClaw, FrontClaw_Close_Pos),
-                        new ParallelAction(
-                                new MotorAction(FrontSlide, Front_Slide_Resting_Enc, Front_Slide_Retract_Power),
-                                new DoubleServoAction(TwistLeft,TwistRight, TwistL_Transfer_Pos, TwistR_Transfer_Pos),
-                                new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_IntakeDone_Enc,Delivery_Arm_IntakeDone_Enc,Delivery_Arm_Retract_Power,Delivery_Arm_Retract_Power),
-                                new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Intake_Pos,ElbowR_Intake_Pos)
-                        ),
-                         new ServoAction(Claw, Claw_Close_Pos),
-                         new ServoAction(FrontClaw, FrontClaw_Open_Pos),
-                         new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_HangReady_Enc,Delivery_Arm_HangReady_Enc,Delivery_Arm_Extend_Power,Delivery_Arm_Extend_Power),
-                         new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Hang_Pos,ElbowR_Hang_Pos)
-
-                );
-
-
     }
 
     // Servo action build for roadrunner to use

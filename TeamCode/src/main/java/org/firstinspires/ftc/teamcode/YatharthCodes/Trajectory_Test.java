@@ -42,7 +42,7 @@ public class Trajectory_Test extends LinearOpMode {
         Servo EL = hardwareMap.get(Servo.class, "Elbow Left");
         Servo ER = hardwareMap.get(Servo.class, "Elbow Right");
         Servo GL = hardwareMap.get(Servo.class, "Front Claw");
-      //  CRServo GR = hardwareMap.get(CRServo.class, "Front Wrist");
+        //CRServo GR = hardwareMap.get(CRServo.class, "Front Wrist");
         Servo TWL = hardwareMap.get(Servo.class, "Twist Left");
         Servo TWR = hardwareMap.get(Servo.class, "Twist Right");
 
@@ -202,15 +202,32 @@ public class Trajectory_Test extends LinearOpMode {
 
         Actions.runBlocking(
                 new SequentialAction(
+                        drive.actionBuilder(new Pose2d(0,0,0)) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
+                                .lineToX(10)
+                                .build(),
                         //trajectorychosen,
-                        // new DoubleMotorAction(DAL,DAR,1200, 1200, 0.6,0.6),
-                        //   new DoubleServoAction(EL,ER, 0.1,0.1),
+                        new DoubleMotorAction(DAL,DAR,1200, 1200, 0.6,0.6),
+                        new DoubleServoAction(EL,ER, 0.1,0.1),
+                        new ServoAction(W, 0.4),
                         new ServoAction(C, 0.7),
-                        new ServoAction(GL, 0.1),
-                        new MotorAction2(FS,200, 0.3)
-                        //new DoubleServoAction(TWL,TWR, 0.95,0.95)
-                        //new ServoAction(GL, 0.5),
-                        //new ServoAction(GR,0.8),
+                        new ServoAction(GL, 0.7),
+                        new MotorAction2(FS,500, 0.3),
+                        new DoubleServoAction(TWL,TWR, 0.95,0.95),
+                        new DoubleServoAction(TWL,TWR, 0.4,0.4),
+                        new MotorAction2(FS,0,-0.3),
+                        new ParallelAction(
+                                new MotorAction2(DAL,500, -0.6),
+                                new MotorAction2(DAR, 500, -0.6)
+                        ),
+                        drive.actionBuilder(new Pose2d(10,0,0)) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
+                                .strafeTo(new Vector2d(10,10))
+                                .build()
+                       // new DoubleMotorAction(DAL,DAR,500, 500, -0.6,-0.6)
+
+
+
+
+        //new ServoAction(GR,0.8),
                         //             new ServoAction(W, 1.0),
                         //    //     new ServoAction(GL, 1),
                         //  new ServoAction(GR, 1),
@@ -318,7 +335,7 @@ public class Trajectory_Test extends LinearOpMode {
         double power2;
         ElapsedTime timer = null;
 
-        public DoubleMotorAction(DcMotor mot1, DcMotor mot2, double pos1, double pos2, double pow1, double pow2) {
+        public DoubleMotorAction (DcMotor mot1, DcMotor mot2, double pos1, double pos2, double pow1, double pow2) {
             this.motor1 = mot1;
             this.position_tgt1 = pos1;
             this.power1 = pow1;
@@ -470,4 +487,6 @@ public class Trajectory_Test extends LinearOpMode {
             }
         }
     }
+
+
 }

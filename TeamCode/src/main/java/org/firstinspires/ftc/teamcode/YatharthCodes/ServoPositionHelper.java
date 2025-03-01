@@ -10,7 +10,7 @@ public class ServoPositionHelper extends OpMode {
 
     private Servo axon = null;
     private Servo el = null;
-    //private Servo er = null;
+    private Servo er = null;
     private double servoPositionaxon = 0.5;
    // private double servoPositionel = 0;
     private double positionAdjustment = 0.05;
@@ -29,15 +29,15 @@ public class ServoPositionHelper extends OpMode {
         //        axon.setDirection(Servo.Direction.FORWARD);
         //        axon.setPosition(servoPositionaxon);
 
-        el = hardwareMap.get(Servo.class, "Claw");
-        el.scaleRange(0,1);
-       // er = hardwareMap.get(Servo.class, "Elbow Right");
+        el = hardwareMap.get(Servo.class, "Elbow Left");
+      //  el.scaleRange(0,1);
+        er = hardwareMap.get(Servo.class, "Elbow Right");
 
         el.setDirection(Servo.Direction.REVERSE);
-       // er.setDirection(Servo.Direction.FORWARD);
+        er.setDirection(Servo.Direction.FORWARD);
 
        el.setPosition(servoPositionaxon);
-      //  er.setPosition(servoPositionaxon);
+        er.setPosition(servoPositionaxon);
         telemetry.addData("Status", "Initialized");
     }
 
@@ -73,7 +73,7 @@ public class ServoPositionHelper extends OpMode {
         }
 
         el.setPosition(servoPositionaxon);
-    //    er.setPosition(servoPositionaxon);
+        er.setPosition(servoPositionaxon);
 
         previousGamepadY = currentGamepadY;
         previousGamePadA = currentGamepadA;
@@ -81,7 +81,7 @@ public class ServoPositionHelper extends OpMode {
         previousGamePadDown = currentGamepadDown;
 
         telemetry.addData("El Servo Position", el.getPosition());
-     //  telemetry.addData("Er Servo Position", er.getPosition());
+       telemetry.addData("Er Servo Position", er.getPosition());
         telemetry.addData("Target Servo Position", servoPositionaxon);
         //telemetry.addData("el Servo Position", servoPositionel);
         telemetry.addData("Servo Step Size", positionAdjustment);
