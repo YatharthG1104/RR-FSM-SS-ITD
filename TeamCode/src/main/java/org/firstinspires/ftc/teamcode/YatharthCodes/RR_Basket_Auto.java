@@ -60,6 +60,8 @@ public class RR_Basket_Auto extends LinearOpMode {
     //Define all Elbow positions
     public static double ElbowL_Intake_Pos = 0.0;
     public static double ElbowR_Intake_Pos = 0.0;
+    public static double ElbowL_Transfer_Pos = 0.5;
+    public static double ElbowR_Transfer_Pos = 0.5;
     public static double ElbowL_Hang_Pos = 0.5;
     public static double ElbowR_Hang_Pos = 0.5;
     public static double ElbowL_Basket_Pos = 0.2;
@@ -68,7 +70,7 @@ public class RR_Basket_Auto extends LinearOpMode {
     //Define all Front Slide Arm Encoder positions and power
     public static int Front_Slide_Resting_Enc = 0;
     public static int Front_Slide_Intake_Enc = 400;
-    public static int Front_Slide_Transfer_Enc = 100;
+    public static int Front_Slide_Transfer_Enc = 50;
     public static double Front_Slide_Extend_Power = 0.3;
     public static double Front_Slide_Retract_Power = -0.3;
 
@@ -168,7 +170,7 @@ public class RR_Basket_Auto extends LinearOpMode {
                        new ServoAction(Claw, Claw_Open_Pos),
                        drive.actionBuilder(new Pose2d(5,22,Math.toRadians(-50))) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
                                .strafeTo(new Vector2d(15,23))
-                               .turnTo(Math.toRadians(10))
+                               .turnTo(Math.toRadians(-35))
                                .build(),
                        new MotorAction2(FrontSlide, Front_Slide_Intake_Enc, Front_Slide_Extend_Power),
                        new ServoAction(FrontClaw, FrontClaw_Open_Pos),
@@ -181,7 +183,7 @@ public class RR_Basket_Auto extends LinearOpMode {
                                        new MotorAction2(deliveryArmLeft, Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power),
                                        new MotorAction2(deliveryArmRight, Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power)
                                ),
-                               new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Intake_Pos,ElbowR_Intake_Pos)
+                               new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Transfer_Pos,ElbowR_Transfer_Pos)
                        )
                        /*drive.actionBuilder(new Pose2d(7,17,Math.toRadians(25))) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
                                .turnTo(Math.toRadians(-50))
