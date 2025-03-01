@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -53,26 +54,26 @@ public class RR_Basket_Auto extends LinearOpMode {
     public static int Delivery_Arm_BasketReady_Enc = 2600;
     public static int Delivery_Arm_HangDone_Enc = 1000;
     public static int Delivery_Arm_IntakeDone_Enc = 300;
-    public static int Delivery_Arm_Transfer_Enc = 500;
+    public static int Delivery_Arm_Transfer_Enc = 520;
     public static double Delivery_Arm_Extend_Power = 0.6;
     public static double Delivery_Arm_Retract_Power = -0.6;
 
     //Define all Elbow positions
     public static double ElbowL_Intake_Pos = 0.0;
     public static double ElbowR_Intake_Pos = 0.0;
-    public static double ElbowL_Transfer_Pos = 0.5;
-    public static double ElbowR_Transfer_Pos = 0.5;
+    public static double ElbowL_Transfer_Pos = 0.6;
+    public static double ElbowR_Transfer_Pos = 0.6;
     public static double ElbowL_Hang_Pos = 0.5;
     public static double ElbowR_Hang_Pos = 0.5;
-    public static double ElbowL_Basket_Pos = 0.2;
-    public static double ElbowR_Basket_Pos = 0.2;
+    public static double ElbowL_Basket_Pos = 0.05;
+    public static double ElbowR_Basket_Pos = 0.05;
 
     //Define all Front Slide Arm Encoder positions and power
     public static int Front_Slide_Resting_Enc = 0;
     public static int Front_Slide_Intake_Enc = 400;
     public static int Front_Slide_Transfer_Enc = 50;
-    public static double Front_Slide_Extend_Power = 0.3;
-    public static double Front_Slide_Retract_Power = -0.3;
+    public static double Front_Slide_Extend_Power = 0.7;
+    public static double Front_Slide_Retract_Power = -0.7;
 
     //Define all Twist positions
     public static double TwistL_Intake_Pos = -1.0;
@@ -164,13 +165,14 @@ public class RR_Basket_Auto extends LinearOpMode {
                                       .strafeTo(new Vector2d(5,22))
                                       .turnTo(Math.toRadians(-50))
                                       .build(),
-                              new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_BasketReady_Enc,Delivery_Arm_BasketReady_Enc,Delivery_Arm_Extend_Power,Delivery_Arm_Extend_Power),
-                              new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Basket_Pos,ElbowR_Basket_Pos)
+                              new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Basket_Pos,ElbowR_Basket_Pos),
+                              new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_BasketReady_Enc,Delivery_Arm_BasketReady_Enc,Delivery_Arm_Extend_Power,Delivery_Arm_Extend_Power)
                       ),
+                       new SleepAction(0.5),
                        new ServoAction(Claw, Claw_Open_Pos),
                        drive.actionBuilder(new Pose2d(5,22,Math.toRadians(-50))) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
                                .strafeTo(new Vector2d(15,23))
-                               .turnTo(Math.toRadians(-35))
+                               .turnTo(Math.toRadians(-20))
                                .build(),
                        new MotorAction2(FrontSlide, Front_Slide_Intake_Enc, Front_Slide_Extend_Power),
                        new ServoAction(FrontClaw, FrontClaw_Open_Pos),
@@ -247,7 +249,7 @@ public class RR_Basket_Auto extends LinearOpMode {
                 servo.setPosition(position);
             }
 
-            return timer.seconds() < 1;
+            return timer.seconds() < 0.5;
         }
     }
 
@@ -352,7 +354,7 @@ public class RR_Basket_Auto extends LinearOpMode {
                 servo2.setPosition(position2);
             }
 
-            return timer.seconds() < 1;
+            return timer.seconds() < 0.5;
         }
     }
 
