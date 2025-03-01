@@ -160,10 +160,10 @@ public class RRAction_Auto_OZ extends LinearOpMode {
                 .lineToX(30)
                 .waitSeconds(0.5);*/
 
-        Action Path1 = drive.actionBuilder(InitialPose)
+      /*  Action Path1 = drive.actionBuilder(InitialPose)
                 .lineToX(30)
                 .waitSeconds(0.5)
-                .build();
+                .build();*/
 
        /* TrajectoryActionBuilder Path2 = drive.actionBuilder(Pose1)
                 .setReversed(true)
@@ -171,15 +171,15 @@ public class RRAction_Auto_OZ extends LinearOpMode {
                 .lineToX(10)
                 .setTangent(-Math.PI/2);*/
 
-            Action Path2 = drive.actionBuilder(Pose1)
+          /*  Action Path2 = drive.actionBuilder(Pose1)
                 .setReversed(true)
                 .setTangent(Math.toRadians(0))
                 .lineToX(10)
                 .setTangent(-Math.PI/2)
-                .build();
+                .build();*/
 
 
-        TrajectoryActionBuilder Path3 = drive.actionBuilder(Pose2)
+      /*  TrajectoryActionBuilder Path3 = drive.actionBuilder(Pose2)
                 .splineToConstantHeading(new Vector2d(55,-33), Math.PI/2)
                 .setTangent(Math.PI/2)
                 .splineToConstantHeading(new Vector2d(55,-40), Math.PI/2)
@@ -196,7 +196,7 @@ public class RRAction_Auto_OZ extends LinearOpMode {
                 .setReversed(true)
                 .setTangent(0)
                 .lineToX(8)
-                .strafeToLinearHeading(new Vector2d(5,-30), 0);
+                .strafeToLinearHeading(new Vector2d(5,-30), 0);*
 
         TrajectoryActionBuilder Path4 = drive.actionBuilder(Pose3)
                 .strafeToLinearHeading(new Vector2d(28, 5),0);
@@ -205,7 +205,7 @@ public class RRAction_Auto_OZ extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d(5, -30),0);
 
         TrajectoryActionBuilder Path6 = drive.actionBuilder(Pose4)
-                .strafeTo(new Vector2d(5, -40));
+                .strafeTo(new Vector2d(5, -40));*/
 
         PoseVelocity2d velEstimate = drive.updatePoseEstimate();    //Get current velocity
 
@@ -226,13 +226,14 @@ public class RRAction_Auto_OZ extends LinearOpMode {
                 new SequentialAction(
                         new ServoAction(Claw, Claw_Close_Pos),
                         drive.actionBuilder(new Pose2d(0,0,0))
-                                .lineToX(30)
+                                .lineToX(20)
                                 .build(),
                         new ParallelAction(
-                                new MotorAction2(FrontSlide, Front_Slide_Resting_Enc, Front_Slide_Retract_Power),
+                                new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_HangReady_Enc,Delivery_Arm_HangReady_Enc,Delivery_Arm_Extend_Power,Delivery_Arm_Extend_Power),
+                               // new MotorAction2(FrontSlide, Front_Slide_Resting_Enc, Front_Slide_Retract_Power),
                                 new ServoAction(Claw, Claw_Open_Pos)
                         ),
-                        drive.actionBuilder(new Pose2d(30,0,0))
+                        drive.actionBuilder(new Pose2d(20,0,0))
                                 .setReversed(true)
                                 .setTangent(Math.toRadians(0))
                                 .lineToX(10)

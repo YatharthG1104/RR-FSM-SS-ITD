@@ -29,11 +29,11 @@ public class ServoPositionHelper extends OpMode {
         //        axon.setDirection(Servo.Direction.FORWARD);
         //        axon.setPosition(servoPositionaxon);
 
-        el = hardwareMap.get(Servo.class, "Claw");
+        el = hardwareMap.get(Servo.class, "Front Claw");
         el.scaleRange(0,1);
        // er = hardwareMap.get(Servo.class, "Elbow Right");
 
-        el.setDirection(Servo.Direction.REVERSE);
+        el.setDirection(Servo.Direction.FORWARD);
        // er.setDirection(Servo.Direction.FORWARD);
 
        el.setPosition(servoPositionaxon);

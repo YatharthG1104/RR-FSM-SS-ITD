@@ -51,7 +51,7 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Tele op test krunnal/Riyansh", group="Linear OpMode")
+@TeleOp(name="Tele-op test krunaal", group="Linear OpMode")
 
 public class tt extends LinearOpMode {
 
@@ -96,7 +96,7 @@ public class tt extends LinearOpMode {
 
         DcMotor DL = hardwareMap.get(DcMotor.class, "Delivery ArmL");//left back misumi motor
         DcMotor DR = hardwareMap.get(DcMotor.class,"Delivery ArmR");//right back misumi motor
-        DcMotor FS = hardwareMap.get(DcMotor.class,"Front Slide");// linkage
+        DcMotor FrontSlide = hardwareMap.get(DcMotor.class,"Front Slide");// linkage
         // Init servos
         backClaw = hardwareMap.get(Servo.class, "Claw");
 
@@ -122,8 +122,8 @@ public class tt extends LinearOpMode {
 
 
         //  RightLinkage.setDirection(DcMotorSimple.Direction.REVERSE);
-        FS.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        FS.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        FrontSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        FrontSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
@@ -139,7 +139,7 @@ public class tt extends LinearOpMode {
 
         DL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         DL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        FS.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        FrontSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         // Wait for the game to start (driver presses START)
         waitForStart();
         runtime.reset();
@@ -189,7 +189,7 @@ public class tt extends LinearOpMode {
 
             cp    = Range.clip(dd, -0.5, 0.5) ;
 
-            FS.setPower(cp);
+            FrontSlide.setPower(cp);
 
            /* while(gamepad2.y){
                 denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
@@ -271,6 +271,22 @@ public class tt extends LinearOpMode {
             }
             else
                 Front_Rotate.setPower(0);
+
+            if(gamepad1.right_bumper){
+                FrontSlide.setPower(-1);
+                FrontSlide.setTargetPosition(1000);
+                rightslide.setPosition(1);
+                leftslide.setPosition(-1);
+               // sleep(1000);
+                //Front_Claw.setPosition(-1);
+            }
+
+            if(gamepad1.left_bumper){
+                FrontSlide.setPower(1);
+                FrontSlide.setTargetPosition(10);
+                rightslide.setPosition(-0.8);//0.5
+                leftslide.setPosition(0.8);
+            }
 
 
 //            if (servoPosition > MAX_POSITION) {
