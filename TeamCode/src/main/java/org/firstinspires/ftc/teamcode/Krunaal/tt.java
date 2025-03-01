@@ -62,10 +62,10 @@ public class tt extends LinearOpMode {
 
 
     Servo backClaw; // back claw
-    CRServo Front_Rotate; // front left gecko
+    CRServo Front_Wrist; // front left gecko
     Servo Front_Claw; // front right gecko
-    Servo wrist; // wrist pivot point
-    Servo leftslide    ; // left misumi slide
+    Servo Back_wrist; // wrist pivot point
+    Servo leftslide; // left misumi slide
     Servo rightslide; // right misumi slide
 
     Servo BackLeftSlide;//left misumi
@@ -81,7 +81,7 @@ public class tt extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        telemetry.addData("Status", "Initialized");
+        telemetry.addData("Status", "Initialized"); ````````QASq    1`          ```````
         telemetry.update();
 
         // Initialize the hardware variables. Note that the strings used here as parameters
@@ -100,10 +100,10 @@ public class tt extends LinearOpMode {
         // Init servos
         backClaw = hardwareMap.get(Servo.class, "Claw");
 
-        wrist = hardwareMap.get(Servo.class, "Wrist");
+        Back_wrist = hardwareMap.get(Servo.class, "Wrist");
 
         Front_Claw = hardwareMap.get(Servo.class, "Front Claw");
-        Front_Rotate = hardwareMap.get(CRServo.class, "Front Wrist");
+        Front_Wrist = hardwareMap.get(CRServo.class, "Front Wrist");
 
         leftslide = hardwareMap.get(Servo.class, "Twist Left");//front slide
         rightslide = hardwareMap.get(Servo.class, "Twist Right");
@@ -227,31 +227,31 @@ public class tt extends LinearOpMode {
            // Front_Rotate.setPower(0);
            // Front_Claw.setPower(0);*/
 
-            if(gamepad2.dpad_down){
-                BackLeftSlide.setPosition(-0.53);
-                BackRightSlide.setPosition(0.53);
+           // if(gamepad2.dpad_down){
+               // BackLeftSlide.setPosition(-0.53);
+                //BackRightSlide.setPosition(0.53);
             }
-            if(gamepad2.dpad_up){
-                BackLeftSlide.setPosition(0.42);//L 436 - 444 R
-                BackRightSlide.setPosition(-0.42);
+          //  if(gamepad2.dpad_up){
+               // BackLeftSlide.setPosition(0.42);//L 436 - 444 R
+               // BackRightSlide.setPosition(-0.42);
             }
             if(gamepad1.a){
                 BackLeftSlide.setPosition(-0.1);
                 BackRightSlide.setPosition(0.1);
             }
             if(gamepad2.dpad_left){
-                wrist.setPosition(1);
+                Back_wrist.setPosition(1);
             }
             if(gamepad2.dpad_right){
-                wrist.setPosition(-1);
+                Back_wrist.setPosition(-1);
             }
-            if(gamepad2.left_bumper){
-                rightslide.setPosition(1);
-                leftslide.setPosition(-1);
+          //  if(gamepad2.left_bumper){
+               // rightslide.setPosition(1);
+                //leftslide.setPosition(-1);
             }
-            if(gamepad2.right_bumper){
-                rightslide.setPosition(-0.8);//0.5
-                leftslide.setPosition(0.8);
+            //if(gamepad2.right_bumper){
+              //  rightslide.setPosition(-0.8);//0.5
+               // leftslide.setPosition(0.8);
             }
 
             /****Front claw uses Front_Claw***/
