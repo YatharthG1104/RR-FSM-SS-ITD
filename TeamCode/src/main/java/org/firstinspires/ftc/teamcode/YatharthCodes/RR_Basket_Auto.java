@@ -80,8 +80,8 @@ public class RR_Basket_Auto extends LinearOpMode {
     public static double TwistR_Intake_Pos = 1.0;
     public static double TwistL_Transfer_Pos = -0.1;
     public static double TwistR_Transfer_Pos = 0.1;
-    public static double TwistL_IntakeReady_Pos = -0.7;
-    public static double TwistR_IntakeReady_Pos = 0.7;
+    public static double TwistL_IntakeReady_Pos = -0.5;
+    public static double TwistR_IntakeReady_Pos = 0.5;
     public static double TwistL_Rest_Pos = 0.0;
     public static double TwistR_Rest_Pos = 0.0;
 
@@ -190,9 +190,10 @@ public class RR_Basket_Auto extends LinearOpMode {
                        new DoubleServoAction(TwistLeft,TwistRight, TwistL_Intake_Pos, TwistR_Intake_Pos),
                        new ServoAction(FrontClaw, FrontClaw_Close_Pos),
                                new ParallelAction(
-                                       new DoubleServoAction(TwistLeft,TwistRight, TwistL_Transfer_Pos, TwistR_Transfer_Pos),
+                                       new DoubleServoAction(TwistLeft,TwistRight, TwistL_IntakeReady_Pos, TwistR_IntakeReady_Pos),
                                        new MotorAction2(FrontSlide, Front_Slide_Transfer_Enc, Front_Slide_Retract_Power)
                                ),
+                       new DoubleServoAction(TwistLeft,TwistRight, TwistL_Transfer_Pos, TwistR_Transfer_Pos),
                        new ServoAction(FrontClaw, FrontClaw_Open_Pos)
                    //    new ServoAction(Claw, Claw_Close_Pos)
 
@@ -363,7 +364,7 @@ public class RR_Basket_Auto extends LinearOpMode {
                 servo2.setPosition(position2);
             }
 
-            return timer.seconds() < 0.2;
+            return timer.seconds() < 0.5;
         }
     }
 

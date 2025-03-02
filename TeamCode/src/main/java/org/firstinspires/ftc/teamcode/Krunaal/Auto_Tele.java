@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.Krunaal;
 
 
-import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -11,13 +10,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.teamcode.MecanumDrive;
-
 @TeleOp(name="Tele Automated", group="Linear OpMode")
 public class Auto_Tele extends LinearOpMode{
     private ElapsedTime runtime = new ElapsedTime();
-
-
+    private DcMotor leftDrive = null;
+    private DcMotor rightDrive = null;
 
 
     Servo backClaw; // back claw
@@ -46,16 +43,10 @@ public class Auto_Tele extends LinearOpMode{
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-
         DcMotor leftFront = hardwareMap.get(DcMotor.class, "leftFront");
         DcMotor leftRear = hardwareMap.get(DcMotor.class, "leftBack");
         DcMotor rightFront = hardwareMap.get(DcMotor.class, "rightFront");
         DcMotor rightRear = hardwareMap.get(DcMotor.class, "rightBack");
-
-        Pose2d InitialPose = new Pose2d(0,0,0);     // Beginning pose
-
-        //Importing the hardware maps for all drive motors and setting the robot position
-//        MecanumDrive drive = new MecanumDrive(hardwareMap, InitialPose);
 
 
 
@@ -215,8 +206,8 @@ public class Auto_Tele extends LinearOpMode{
                 leftslide.setPosition(-1);
             }
             if(gamepad2.right_bumper){
-                rightslide.setPosition(-0.7);//0.5
-                leftslide.setPosition(0.7);
+                rightslide.setPosition(-0.8);//0.5
+                leftslide.setPosition(0.8);
             }
 
             /****Front claw uses Front_Claw***/
@@ -255,6 +246,25 @@ public class Auto_Tele extends LinearOpMode{
                 Front_Claw.setPosition(-0.9);
             }
 
+            if(gamepad2.dpad_up){
+                DL.setPower(1);
+                DR.setPower(-1);
+                BackRightSlide.setPosition(0.6);
+                BackLeftSlide.setPosition(-0.6);
+                DL.setTargetPosition(450);
+                DR.setTargetPosition(-450);
+
+            }
+
+            if(gamepad2.dpad_down){
+                DL.setPower(1);
+                DR.setPower(-1);
+                BackRightSlide.setPosition(0.1);
+                BackLeftSlide.setPosition(-0.1);
+              DL.setTargetPosition(2600);
+              DR.setTargetPosition(-2600);
+            }
+
 
 //            if (servoPosition > MAX_POSITION) {
 //                servoPosition = MAX_POSITION;
@@ -273,3 +283,4 @@ public class Auto_Tele extends LinearOpMode{
         }
     }
 }
+
