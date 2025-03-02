@@ -43,8 +43,8 @@ public class RRAction_Auto_NZ extends LinearOpMode {
     ColorSensor sensorColor = null;
 
     //Define all Claw positions
-    public static double Claw_Open_Pos = 0.0;
-    public static double Claw_Close_Pos = 0.7;
+    public static double Claw_Open_Pos = -1.0;
+    public static double Claw_Close_Pos = 1.0;
     public static double Claw_Initial_Pos = 0.7;
 
     //Define all Delivery Arm Encoder positions and power

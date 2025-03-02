@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Krunaal;
 
 
+import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -10,11 +11,16 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.teamcode.MecanumDrive;
+
 @TeleOp(name="Tele Automated", group="Linear OpMode")
 public class Auto_Tele extends LinearOpMode{
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor leftDrive = null;
-    private DcMotor rightDrive = null;
+    private DcMotor leftFront = null;
+    private DcMotor rightFront = null;
+    private DcMotor leftBack = null;
+    private DcMotor rightBack = null;
+
 
 
     Servo backClaw; // back claw
@@ -43,10 +49,16 @@ public class Auto_Tele extends LinearOpMode{
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        DcMotor leftFront = hardwareMap.get(DcMotor.class, "leftFront");
+
+    /*    DcMotor leftFront = hardwareMap.get(DcMotor.class, "leftFront");
         DcMotor leftRear = hardwareMap.get(DcMotor.class, "leftBack");
         DcMotor rightFront = hardwareMap.get(DcMotor.class, "rightFront");
-        DcMotor rightRear = hardwareMap.get(DcMotor.class, "rightBack");
+        DcMotor rightRear = hardwareMap.get(DcMotor.class, "rightBack");*/
+
+        Pose2d InitialPose = new Pose2d(0,0,0);     // Beginning pose
+
+        //Importing the hardware maps for all drive motors and setting the robot position
+        MecanumDrive drive = new MecanumDrive(hardwareMap, InitialPose);
 
 
 
@@ -85,13 +97,13 @@ public class Auto_Tele extends LinearOpMode{
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
 
-        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+    /*    leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);*/
 
         DL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         DL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -129,9 +141,9 @@ public class Auto_Tele extends LinearOpMode{
 
             // Setting all the drive motors to their power
             leftFront.setPower(lfPower);
-            leftRear.setPower(lbPower);
+            leftBack.setPower(lbPower);
             rightFront.setPower(rfPower);
-            rightRear.setPower(rbPower);
+            rightBack.setPower(rbPower);
 
 
             if(gamepad2.x){
@@ -183,14 +195,14 @@ public class Auto_Tele extends LinearOpMode{
            // Front_Rotate.setPower(0);
            // Front_Claw.setPower(0);*/
 
-            if(gamepad2.dpad_down){
-                BackLeftSlide.setPosition(-0.53);
-                BackRightSlide.setPosition(0.53);
-            }
-            if(gamepad2.dpad_up){
-                BackLeftSlide.setPosition(0.42);//L 436 - 444 R
-                BackRightSlide.setPosition(-0.42);
-            }
+            // //if(gamepad2.dpad_down){
+            //     BackLeftSlide.setPosition(-0.53);
+            //     BackRightSlide.setPosition(0.53);
+            // }
+            // if(gamepad2.dpad_up){
+            //     BackLeftSlide.setPosition(0.42);//L 436 - 444 R
+            //     BackRightSlide.setPosition(-0.42);
+            // }
             if(gamepad1.a){
                 BackLeftSlide.setPosition(-0.1);
                 BackRightSlide.setPosition(0.1);
@@ -206,8 +218,8 @@ public class Auto_Tele extends LinearOpMode{
                 leftslide.setPosition(-1);
             }
             if(gamepad2.right_bumper){
-                rightslide.setPosition(-0.8);//0.5
-                leftslide.setPosition(0.8);
+                rightslide.setPosition(-1);//0.5
+                leftslide.setPosition(1);
             }
 
             /****Front claw uses Front_Claw***/
@@ -264,4 +276,3 @@ public class Auto_Tele extends LinearOpMode{
         }
     }
 }
-

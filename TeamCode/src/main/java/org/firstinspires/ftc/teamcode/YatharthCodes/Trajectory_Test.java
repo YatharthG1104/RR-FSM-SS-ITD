@@ -212,20 +212,25 @@ public class Trajectory_Test extends LinearOpMode {
 
                         //trajectorychosen,
                         //new DoubleMotorAction(DAL,DAR,1200, 1200, 0.6,0.6),
-                         new DoubleServoAction(EL,ER, 0.0,0.0),
+                       // new DoubleServoAction(EL,ER, 0.0,0.0),
+                        new DoubleServoAction(TWL,TWR, 1.0,1.0),
                      //   new ServoAction(W, 0.4),
-                        new ServoAction(C, -1.0),
+                        new ServoAction(GL, -1.0),
                         new ServoAction(C, 1.0),
-                        new ServoAction(C, -1.0),
-                        new ServoAction(C, 1.0),
-                        new ServoAction(C, -1.0),
-                        new ServoAction(C, 1.0),
-                        new DoubleServoAction(EL,ER, 0.4,0.4),
+                        new DoubleServoAction(EL,ER, 0.1,0.1),
+                        new DoubleServoAction(TWL,TWR, 0.0,0.0),
+                        new ServoAction(GL, -1.0),
+                        new DoubleServoAction(EL,ER, 0.5,0.5),
+                        new ServoAction(GL, 1.0),
+                        new DoubleServoAction(EL,ER, 0.7,0.7),
+                        new ServoAction(GL, -1.0),
+                        new ServoAction(GL, 1.0)
+                        //new DoubleServoAction(EL,ER, 0.4,0.4),
                        // new ServoAction(GL, 0.7),
                     //    new MotorAction2(FS,500, 0.3),
-                        new DoubleServoAction(TWL,TWR, 0.95,0.95),
-                        new DoubleServoAction(TWL,TWR, 0.4,0.4),
-                        new DoubleServoAction(TWL,TWR, 0.1,0.1)
+                      //  new DoubleServoAction(TWL,TWR, 0.95,0.95),
+                       // new DoubleServoAction(TWL,TWR, 0.4,0.4),
+                        //new DoubleServoAction(TWL,TWR, 0.1,0.1)
                         //new MotorAction2(FS,0,-0.3),
                        /* new ParallelAction(
                                 new MotorAction2(DAL,500, -0.6),
@@ -391,7 +396,7 @@ public class Trajectory_Test extends LinearOpMode {
                 servo2.setPosition(position2);
             }
 
-            return timer.seconds() < 0.5;
+            return timer.seconds() < 1;
         }
     }
 
