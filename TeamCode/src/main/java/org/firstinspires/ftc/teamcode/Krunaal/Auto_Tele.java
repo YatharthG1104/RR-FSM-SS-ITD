@@ -206,9 +206,11 @@ public class Auto_Tele extends LinearOpMode{
                 leftslide.setPosition(-1);
             }
             if(gamepad2.right_bumper){
-                rightslide.setPosition(-0.8);//0.5
-                leftslide.setPosition(0.8);
+                rightslide.setPosition(-0.73);//0.5
+                leftslide.setPosition(0.73);
             }
+
+
 
             /****Front claw uses Front_Claw***/
             if(gamepad2.y){
@@ -227,6 +229,19 @@ public class Auto_Tele extends LinearOpMode{
             }
             else
                 Front_Rotate.setPower(0);
+
+            if (gamepad2.right_stick_button){
+                BackLeftSlide.setPosition(-0.1);
+                BackRightSlide.setPosition(0.1);
+                backClaw.setPosition(-1);
+
+            }
+            if (gamepad2.left_stick_button){
+                BackLeftSlide.setPosition(-0.6);
+                BackRightSlide.setPosition(0.6);
+                backClaw.setPosition(1);
+
+            }
 
             if(gamepad1.right_bumper){
                 FS.setPower(-1);

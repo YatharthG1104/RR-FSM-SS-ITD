@@ -213,7 +213,7 @@ public class Trajectory_Test extends LinearOpMode {
                         //trajectorychosen,
                         //new DoubleMotorAction(DAL,DAR,1200, 1200, 0.6,0.6),
                        // new DoubleServoAction(EL,ER, 0.0,0.0),
-                        new DoubleServoAction(TWL,TWR, 1.0,1.0),
+                       // new DoubleServoAction(TWL,TWR, 1.0,1.0),
                      //   new ServoAction(W, 0.4),
                         new ServoAction(GL, -1.0),
                         new ServoAction(C, 1.0),
