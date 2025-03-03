@@ -220,7 +220,7 @@ public class FsmTeleRiyansh extends OpMode {
                 if (gamepad2.x) {
                     // x is pressed, start extending
                     double dd = gamepad2.right_stick_x;
-                    double cp = Range.clip(dd, -0.5, 0.5);
+                    double cp = Range.clip(dd, -0.5, 0.5);//change it to encoder value
 
                     //allowing oporater to control the distance of the front slide
                     Actions.runBlocking(new ParallelAction(
