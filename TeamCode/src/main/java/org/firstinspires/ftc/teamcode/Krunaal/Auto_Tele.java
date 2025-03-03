@@ -143,7 +143,7 @@ public class Auto_Tele extends LinearOpMode{
 
             double dd = -gamepad2.right_stick_x;
 
-            cp    = Range.clip(dd, -0.5, 0.5) ;
+            cp    = Range.clip(dd, -0.9, 0.9) ;
 
             FS.setPower(cp);
 
@@ -202,12 +202,12 @@ public class Auto_Tele extends LinearOpMode{
 //                wrist.setPosition(-1);
 //            }
             if(gamepad2.left_bumper){
-                rightslide.setPosition(-0.6);
-                leftslide.setPosition(0.6);
+                rightslide.setPosition(-0.1);
+                leftslide.setPosition(0.1);
             }
             if(gamepad2.right_bumper){
-                rightslide.setPosition(-0.8);//0.5
-                leftslide.setPosition(0.8);
+                rightslide.setPosition(-0.85);//0.5
+                leftslide.setPosition(0.85);
             }
 
 
@@ -273,7 +273,7 @@ public class Auto_Tele extends LinearOpMode{
 
             double d = gamepad2.left_stick_y;
 
-            p = Range.clip(d, -0.6, 0.6) ;
+            p = Range.clip(d, -0.9, 0.9) ;
             DL.setPower(p);//0.5
             DR.setPower(-p);
 

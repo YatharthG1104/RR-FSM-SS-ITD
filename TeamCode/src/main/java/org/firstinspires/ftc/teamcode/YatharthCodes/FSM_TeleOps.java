@@ -78,13 +78,15 @@ public class FSM_TeleOps extends OpMode {
     public int Front_Slide_Resting_Enc = 0;
     public int Front_Slide_Intake_Enc = 450;
     public int Front_Slide_Transfer_Enc = 0;
-    public double Front_Slide_Extend_Power = 0.9;
-    public double Front_Slide_Retract_Power = -0.9;
+    public double Front_Slide_Extend_Power = -0.9;
+    public double Front_Slide_Retract_Power = 0.9;
 
     double lfPower;
     double rfPower;
     double rbPower;
     double lbPower;
+
+
 
     @Override
     public void init() {
@@ -110,14 +112,19 @@ public class FSM_TeleOps extends OpMode {
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        leftFront.setPower(lfPower);
+        leftRear.setPower(lbPower);
+        rightFront.setPower(rfPower);
+        rightRear.setPower(rbPower);
+
+
         //Define Hardware Map for all components
         Claw = hardwareMap.get(Servo.class, "Claw");
-        Claw.scaleRange(0,1);
         Claw.setDirection(Servo.Direction.FORWARD);
 
         deliveryArmLeft = hardwareMap.get(DcMotor.class, "Delivery ArmL");
         deliveryArmLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);  //Delivery arm zero power behavior
-        deliveryArmLeft.setDirection(DcMotor.Direction.FORWARD);          //Delivery arm left motor set reversed
+        deliveryArmLeft.setDirection(DcMotor.Direction.REVERSE);          //Delivery arm left motor set reversed
         deliveryArmLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);  //Delivery arm motor reset
         deliveryArmLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);       //Delivery arm run using encoders
 
@@ -128,18 +135,16 @@ public class FSM_TeleOps extends OpMode {
         deliveryArmRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);       //Delivery arm run using encoders
 
         ElbowLeft = hardwareMap.get(Servo.class, "Elbow Left");
-        ElbowLeft.scaleRange(-1,1);
-        ElbowLeft.setDirection(Servo.Direction.REVERSE);
+        //ElbowLeft.setDirection(Servo.Direction.REVERSE);
 
 
         ElbowRight = hardwareMap.get(Servo.class, "Elbow Right");
-        ElbowRight.scaleRange(-1,1);
-        ElbowRight.setDirection(Servo.Direction.FORWARD);
+       // ElbowRight.setDirection(Servo.Direction.FORWARD);
 
 
         FrontSlide = hardwareMap.get(DcMotor.class, "Front Slide");
         FrontSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);//Front Slide zero power behavior
-        FrontSlide.setDirection(DcMotor.Direction.REVERSE);          //Front Slide motor set forward
+        FrontSlide.setDirection(DcMotor.Direction.FORWARD);          //Front Slide motor set forward
         FrontSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);  //Front Slide motor reset
         FrontSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);       //Front Slide run using encoders
 
@@ -149,15 +154,12 @@ public class FSM_TeleOps extends OpMode {
         FrontClaw.setDirection(Servo.Direction.FORWARD);
 
         TwistLeft = hardwareMap.get(Servo.class, "Twist Left");
-        TwistLeft.scaleRange(-1,1);
         TwistLeft.setDirection(Servo.Direction.REVERSE);
 
         TwistRight = hardwareMap.get(Servo.class, "Twist Right");
-        TwistRight.scaleRange(-1,1);
         TwistRight.setDirection(Servo.Direction.FORWARD);
 
         Wrist = hardwareMap.get(Servo.class, "Wrist");
-        Wrist.scaleRange(-1,1);
         Wrist.setDirection(Servo.Direction.FORWARD);
 
         sensorColor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
@@ -169,23 +171,6 @@ public class FSM_TeleOps extends OpMode {
     public void loop() {
 
         switch (CurrentState) {
-            /*case RetractAll:
-                if (SlideBackL.getCurrentPosition() - Back_SLide_Up_Specimen < 30) {//set to what color it sees when sample is out of geco wheels
-                    ClawElbow.setPosition(Claw_Arm_Reset);
-                    Actions.runBlocking(new ParallelAction(
-                            new ServoAction(Claw,Claw_Open),
-                            new MotorAction(SlideBackL,-Back_slide_Reset,0.4),
-                            new MotorAction(SlideBackR,Back_slide_Reset,0.4),
-                            new ServoAction(ClawArmL,-Claw_Arm_Reset),
-                            new ServoAction(ClawArmR,Claw_Arm_Reset),
-                            new ServoAction(GecoWristL,-Geco_Wrist_Reset),
-                            new ServoAction(GecoWristR,Geco_Wrist_Reset)
-                    ));
-                    liftState = LiftState.SubmersibleReady;
-
-                    //resets all movment items to ensure nothing wrong has happend
-                }
-                break;*/
             case Drive:
                 //Driving
                 move();
@@ -206,14 +191,14 @@ public class FSM_TeleOps extends OpMode {
             case SubmersibleReady:
                 Actions.runBlocking(new SequentialAction(
                         new MotorAction2(FrontSlide, Front_Slide_Intake_Enc,Front_Slide_Extend_Power),
-                        new DoubleServoAction(ElbowLeft, ElbowRight, 0.95, 0.95)
+                        new DoubleServoAction(ElbowLeft, ElbowRight, 0.85, 0.85)
                 ));
                 CurrentState = LiftState.Drive;
             break;
 
             case SamplePicked:
                 Actions.runBlocking(new SequentialAction(
-                        new DoubleServoAction(ElbowLeft, ElbowRight, 0.7, 0.7),
+                        new DoubleServoAction(ElbowLeft, ElbowRight, 0.5, 0.5),
                         new MotorAction2(FrontSlide, Front_Slide_Resting_Enc,Front_Slide_Retract_Power)
                 ));
                 CurrentState = LiftState.Drive;
@@ -251,11 +236,6 @@ public class FSM_TeleOps extends OpMode {
         rfPower = (y - x - rx) / denominator;
         rbPower = (y + x - rx) / denominator;
 
-        // Setting all the drive motors to their power
-        leftFront.setPower(lfPower);
-        leftRear.setPower(lbPower);
-        rightFront.setPower(rfPower);
-        rightRear.setPower(rbPower);
     }
 
     public void TeleOperations() {
@@ -268,7 +248,7 @@ public class FSM_TeleOps extends OpMode {
         }
         //FrontSlide
         double FrontSlideStick = -gamepad2.right_stick_x;
-        double FrontSlidePower = Range.clip(FrontSlideStick, -0.9, 0.0);
+        double FrontSlidePower = Range.clip(FrontSlideStick, -0.9, 0.9);
         FrontSlide.setPower(FrontSlidePower);
         //Back Elbow
         if(gamepad1.a){
@@ -276,8 +256,8 @@ public class FSM_TeleOps extends OpMode {
             ElbowRight.setPosition(0.1);
         }
         if(gamepad2.dpad_up){
-            ElbowLeft.setPosition(0.9);
-            ElbowRight.setPosition(-0.9);
+            ElbowLeft.setPosition(0.7);
+            ElbowRight.setPosition(-0.7);
         }
         if(gamepad2.dpad_down){
             ElbowLeft.setPosition(-0.55);
@@ -285,12 +265,12 @@ public class FSM_TeleOps extends OpMode {
         }
         //Front Twist
         if(gamepad2.left_bumper){
-            TwistRight.setPosition(-0.6);
-            TwistLeft.setPosition(0.6);
+            TwistRight.setPosition(-0.1);
+            TwistLeft.setPosition(0.1);
         }
         if(gamepad2.right_bumper){
-            TwistRight.setPosition(-0.8);
-            TwistLeft.setPosition(0.8);
+            TwistRight.setPosition(-0.85);
+            TwistLeft.setPosition(0.85);
         }
         // Front Claw
         if(gamepad2.y){
@@ -309,7 +289,7 @@ public class FSM_TeleOps extends OpMode {
             FrontWrist.setPower(0);
         //Delivery Arm
         double DeliveryArmStick = gamepad2.left_stick_y;
-        double DeliveryArmPower = Range.clip(DeliveryArmStick, -0.6, 0.6);
+        double DeliveryArmPower = Range.clip(DeliveryArmStick, -0.9, 0.9);
         deliveryArmLeft.setPower(DeliveryArmPower);//0.5
         deliveryArmRight.setPower(-DeliveryArmPower);
     }
