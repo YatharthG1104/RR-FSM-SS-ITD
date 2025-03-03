@@ -57,22 +57,22 @@ public class FsmTeleRiyansh extends OpMode {
 
     Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(90));//set a inistal pose but will need to change this
     MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
-
-    TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)//this is our goal pose with our goal heading
-            .lineToX(25)
-            .splineTo(new Vector2d(52, -52), Math.PI / 2)
-            .waitSeconds(3);
-
-    Pose2d initialPose2 = new Pose2d(50, -60, Math.toRadians(90));//set a inistal pose but will need to change this
-
-    TrajectoryActionBuilder tab2 = drive.actionBuilder(initialPose2)//this is our goal pose with our goal heading
-            .lineToX(25)
-            .splineTo(new Vector2d(52, -52), Math.PI / 2)
-            .waitSeconds(3);
-
-
-    Action trajectoryActionChosen = tab1.build();//seting our movment path to a varibale
-    Action trajectoryActionChosen2 = tab2.build();//seting our movment path to a varibale
+//
+//    TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)//this is our goal pose with our goal heading
+//            .lineToX(25)
+//            .splineTo(new Vector2d(52, -52), Math.PI / 2)
+//            .waitSeconds(3);
+//
+//    Pose2d initialPose2 = new Pose2d(50, -60, Math.toRadians(90));//set a inistal pose but will need to change this
+//
+//    TrajectoryActionBuilder tab2 = drive.actionBuilder(initialPose2)//this is our goal pose with our goal heading
+//            .lineToX(25)
+//            .splineTo(new Vector2d(52, -52), Math.PI / 2)
+//            .waitSeconds(3);
+//
+//
+//    Action trajectoryActionChosen = tab1.build();//seting our movment path to a varibale
+//    Action trajectoryActionChosen2 = tab2.build();//seting our movment path to a varibale
     public DcMotorEx SlideFrontR;
 
     public DcMotorEx SlideBackR;
@@ -89,49 +89,50 @@ public class FsmTeleRiyansh extends OpMode {
 
     ElapsedTime liftTimer = new ElapsedTime();
 
-    double Geco_Wrist_Reset;//geco wrist is in the middle position
-    double Geco_Wrist_Down;
-    double Geco_Wrist_Claw_Deposit;
+    double Geco_Wrist_Reset = 0.7;//geco wrist is in the middle position
+    double Geco_Wrist_Down = -0.87;
+    double Geco_Wrist_Claw_Deposit=0.85;
 
 
-    double FrontClawOpen;
-    double FrontClawClose;
+    double FrontClawOpen=-1;
+    double FrontClawClose=1;
 
 
-    double BackClaw_Open;
-    double BackClaw_Close;
+    double BackClaw_Open=-1;
+    double BackClaw_Close=1;
 
 
     double Claw_Arm_Specimen_Pick = 0.5;
-    double Claw_Arm_Specimen_Drop;
-    double Claw_Arm_Transfer = -0.5;
-    double Claw_Arm_Reset = -0.3;
+    double Claw_Arm_Specimen_Drop = 0.5;
+    double Claw_Arm_Bucket=0.9;
 
-    double wrist_Specimen_Pick;
-    double getWrist_Specimen_Drop;
+    double Claw_Arm_Reset = -0.58;
+
+//    double wrist_Specimen_Pick;
+//    double getWrist_Specimen_Drop;
 
     int Back_Slide_Hang; // the high encoder position for the lift
     int Back_slide_Reset; // the high encoder position for the lift
     int Back_slide_Bucket; // the high encoder position for the lift
-    int Front_SLide_in;
-    double FrontSLidePower;
-    double LeftStick = -gamepad2.left_stick_x;
+    int Back_slide_Hang;
+    double Front_SLide_in;
+    double Front_SLide_out;
     double lfPower;
     double rfPower;
     double rbPower;
     double lbPower;
     double Tp;
 
-    ColorSensor sensorColor;
-    DistanceSensor sensorDistance;
-    float hsvValues[] = {0F, 0F, 0F};
-
-    // values is a reference to the hsvValues array.
-    final float values[] = hsvValues;
-
-    // sometimes it helps to multiply the raw RGB values with a scale factor
-    // to amplify/attentuate the measured values.
-    final float SCALE_FACTOR = 255;
+//    ColorSensor sensorColor;
+//    DistanceSensor sensorDistance;
+//    float hsvValues[] = {0F, 0F, 0F};
+//
+//    // values is a reference to the hsvValues array.
+//    final float values[] = hsvValues;
+//
+//    // sometimes it helps to multiply the raw RGB values with a scale factor
+//    // to amplify/attentuate the measured values.
+//    final float SCALE_FACTOR = 255;
 
     // get a reference to the RelativeLayout so we can change the background
     // color of the Robot Controller app to match the hue detected by the RGB sensor.
@@ -159,13 +160,13 @@ public class FsmTeleRiyansh extends OpMode {
         Wrist = hardwareMap.get(Servo.class, "Wrist");
         ClawArmR = hardwareMap.get(Servo.class, "Elbow Right");
         ClawArmL = hardwareMap.get(Servo.class, "Elbow Left");
-        sensorColor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
-        sensorDistance = hardwareMap.get(DistanceSensor.class, "sensor_color_distance");
-        int relativeLayoutId = hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id", hardwareMap.appContext.getPackageName());
-        telemetry.addData("Left Distance (cm)",
-                String.format(Locale.US, "%.02f", sensorDistance.getDistance(DistanceUnit.CM)));
-
-        final View relativeLayout = ((Activity) hardwareMap.appContext).findViewById(relativeLayoutId);
+//        sensorColor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
+//        sensorDistance = hardwareMap.get(DistanceSensor.class, "sensor_color_distance");
+//        int relativeLayoutId = hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id", hardwareMap.appContext.getPackageName());
+//        telemetry.addData("Left Distance (cm)",
+//                String.format(Locale.US, "%.02f", sensorDistance.getDistance(DistanceUnit.CM)));
+//
+//        final View relativeLayout = ((Activity) hardwareMap.appContext).findViewById(relativeLayoutId);
 
         SlideFrontR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         SlideFrontR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -178,23 +179,23 @@ public class FsmTeleRiyansh extends OpMode {
         SlideBackL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
-        GecoWristL.setPosition(-Geco_Wrist_Reset);
-        GecoWristR.setPosition(Geco_Wrist_Reset);
+        GecoWristL.setPosition(Geco_Wrist_Reset);
+        GecoWristR.setPosition(-Geco_Wrist_Reset);
         BackClaw.setPosition(BackClaw_Close);
-        ClawArmL.setPosition(-Claw_Arm_Reset);
-        ClawArmR.setPosition(Claw_Arm_Reset);
+        ClawArmL.setPosition(Claw_Arm_Reset);
+        ClawArmR.setPosition(-Claw_Arm_Reset);
         //in the init we are making sure evreything is reset
 
 
     }
 
     public void loop() {
-        Color.RGBToHSV((int) (sensorColor.red() * SCALE_FACTOR),
-                (int) (sensorColor.green() * SCALE_FACTOR),
-                (int) (sensorColor.blue() * SCALE_FACTOR),
-                hsvValues);
-        double hue = hsvValues[0];
-        FrontSLidePower = Range.clip(LeftStick, -1.0, 1.0);
+//        Color.RGBToHSV((int) (sensorColor.red() * SCALE_FACTOR),
+//                (int) (sensorColor.green() * SCALE_FACTOR),
+//                (int) (sensorColor.blue() * SCALE_FACTOR),
+//                hsvValues);
+//        double hue = hsvValues[0];
+//        FrontSLidePower = Range.clip(LeftStick, -1.0, 1.0);
 
 
         switch (liftState) {
@@ -219,13 +220,13 @@ public class FsmTeleRiyansh extends OpMode {
                 // otherwise let the driver drive
                 if (gamepad2.x) {
                     // x is pressed, start extending
-                    double dd = gamepad2.right_stick_x;
-                    double cp = Range.clip(dd, -0.5, 0.5);
+//                    double dd = gamepad2.right_stick_x;
+//                    double cp = Range.clip(dd, -0.5, 0.5);//change it to encoder value
 
                     //allowing oporater to control the distance of the front slide
                     Actions.runBlocking(new ParallelAction(
 
-                            new MotorPowerAction(SlideFrontR,cp)
+                            new MotorAction(SlideFrontR,Front_SLide_out,0.5)
                     ));
                     liftState = LiftState.SamplePicked;//changing state so we can move to the next task
                 }
@@ -235,15 +236,15 @@ public class FsmTeleRiyansh extends OpMode {
                 drive.leftFront.setPower(lfPower);
                 drive.rightFront.setPower(rfPower);
                 drive.leftBack.setPower(lbPower);
-                drive.rightBack.setPower(rbPower);//big fix think
+                drive.rightBack.setPower(rbPower);
                 TwistControl();
                 Front_Rotate.setPower(Tp);
 
                 if (gamepad2.b) {//its set b so that it only goes down when the driver and oporater have aligned with the sampele
                     // set the lift dump to dump
                     Actions.runBlocking(new ParallelAction(
-                            new ServoAction(GecoWristL,-Geco_Wrist_Down),
-                            new ServoAction(GecoWristR,Geco_Wrist_Down),
+                            new ServoAction(GecoWristL,Geco_Wrist_Down),
+                            new ServoAction(GecoWristR,-Geco_Wrist_Down),
                             new ServoAction(Front_Claw,FrontClawClose)
 
                     ));
@@ -256,28 +257,29 @@ public class FsmTeleRiyansh extends OpMode {
 
 
             case ClawReadyForSample:
-//                hue >= 0 && hue < 60 || hue > 360 || hue >= 60 && hue < 120
-                if (hue >= 0 && hue < 60 || hue >= 60 && hue < 100 ||hue >= 200 && hue < 250) {//If we missed or got wrong color we dont click it so we dont get a penelty
+//                hue >= 0 && hue < 60 || hue >= 60 && hue < 100 ||hue >= 200 && hue < 250
+                if (gamepad2.dpad_right) {//If we missed or got wrong color we dont click it so we dont get a penelty
                     Actions.runBlocking(new ParallelAction(
-                            new ServoAction(GecoWristL,-Geco_Wrist_Claw_Deposit),
-                            new ServoAction(GecoWristR,Geco_Wrist_Claw_Deposit),
+                            new ServoAction(GecoWristL,Geco_Wrist_Claw_Deposit),
+                            new ServoAction(GecoWristR,-Geco_Wrist_Claw_Deposit),
                             new MotorAction(SlideFrontR,Front_SLide_in,0.3),
-                            new ServoAction(BackClaw,BackClaw_Open)
+                            new ServoAction(BackClaw,BackClaw_Open),
+                            new SequentialAction(
+                                    new ServoAction(Front_Claw,FrontClawOpen)
+                            )
                     ));
                     liftState = LiftState.SampleDrop;
 
                     //We have captured the sample and now we are ready to do the transfer from geco wheels to claw
 
                 }
-                if(sensorDistance.getDistance(DistanceUnit.CM)>2) {//if we missed the sample or got the oponets color we dont click anything
+                if(gamepad1.dpad_left) {//if we missed the sample or got the oponets color we dont click anything
                     Actions.runBlocking(new ParallelAction(
-                            new ServoAction(GecoWristL, -Geco_Wrist_Reset),
-                            new ServoAction(GecoWristR, Geco_Wrist_Reset),
-                            new ServoAction(Front_Claw, FrontClawClose)
+                            new ServoAction(Front_Claw, FrontClawOpen)
 
                     ));
 
-                    liftState = LiftState.SubmersibleReady;
+                    liftState = LiftState.SamplePicked;
 
 
 
@@ -292,16 +294,20 @@ public class FsmTeleRiyansh extends OpMode {
                 if (gamepad2.a) {
                     Actions.runBlocking(new ParallelAction(
                             new ServoAction(BackClaw,BackClaw_Close),
-                            new ServoAction(Front_Claw,FrontClawOpen),
+
 
                             new ServoAction(ClawArmL,-Claw_Arm_Specimen_Pick),
                             new ServoAction(ClawArmR,Claw_Arm_Specimen_Pick)
                     ));
                     //does the transfer and the claw is in position to drop in obsevtary zone or do bucket
-
+                    move();
+                    drive.leftFront.setPower(lfPower);
+                    drive.rightFront.setPower(rfPower);
+                    drive.leftBack.setPower(lbPower);
+                    drive.rightBack.setPower(rbPower);
                     if (gamepad2.left_bumper) {//click left bumber if we are doing specimen
                         Actions.runBlocking(new ParallelAction(
-                                new ParallelAction(trajectoryActionChosen),//might need to change to sequncal
+
                                 new ServoAction(BackClaw,BackClaw_Open)
                         ));
 
@@ -310,16 +316,14 @@ public class FsmTeleRiyansh extends OpMode {
                     }
 
                     if (gamepad2.right_bumper) {//click right bumber if we are doing basket
-                        move();
-                        drive.leftFront.setPower(lfPower);
-                        drive.rightFront.setPower(rfPower);
-                        drive.leftBack.setPower(lbPower);
-                        drive.rightBack.setPower(rbPower);
+
                         Actions.runBlocking(new ParallelAction(
                                 //let driver contorl
 
-                                new MotorAction(SlideBackL,-Back_slide_Bucket,0.4),
-                                new MotorAction(SlideBackR,Back_slide_Bucket,0.4)
+                                new MotorAction(SlideBackL,Back_slide_Bucket,0.4),
+                                new MotorAction(SlideBackR,-Back_slide_Bucket,0.4),
+                                new ServoAction(ClawArmL,Claw_Arm_Bucket),
+                                new ServoAction(ClawArmR,-Claw_Arm_Bucket)
                         ));
                         liftState = LiftState.FinishedBasket;
                         //ready to drop off the sample at bucket slide is rasied to correct hight
@@ -329,7 +333,7 @@ public class FsmTeleRiyansh extends OpMode {
                 }
                 break;
             case FinishedBasket:
-                if (Math.abs(SlideBackL.getCurrentPosition() - Back_slide_Bucket) < 30) {
+                if (gamepad1.left_bumper) {
                     Actions.runBlocking(new ParallelAction(
                             new ServoAction(BackClaw,BackClaw_Open)
                     ));
@@ -339,19 +343,19 @@ public class FsmTeleRiyansh extends OpMode {
                 break;
 
             case SpecimenPicked:
+                move();
+                drive.leftFront.setPower(lfPower);
+                drive.rightFront.setPower(rfPower);
+                drive.leftBack.setPower(lbPower);
+                drive.rightBack.setPower(rbPower);
                 if (gamepad2.dpad_up) {//waiting for humen can change to an if statment
-                    move();
-                    drive.leftFront.setPower(lfPower);
-                    drive.rightFront.setPower(rfPower);
-                    drive.leftBack.setPower(lbPower);
-                    drive.rightBack.setPower(rbPower);
+
                     Actions.runBlocking(new ParallelAction(
                             new ServoAction(BackClaw,BackClaw_Close),
                             new MotorAction(SlideBackL,-Back_Slide_Hang,0.4),
-                            new MotorAction(SlideBackR,Back_Slide_Hang,0.4),
-                            new ServoAction(ClawArmL,-Claw_Arm_Specimen_Drop),
-                            new ServoAction(ClawArmR,Claw_Arm_Specimen_Drop),
-                            new ServoAction(Wrist,getWrist_Specimen_Drop)
+                            new MotorAction(SlideBackR,Back_Slide_Hang,0.4)
+
+
 
                     ));
 
@@ -362,29 +366,31 @@ public class FsmTeleRiyansh extends OpMode {
                 }
                 break;
             case SpecimenHanged:
+                move();
+                drive.leftFront.setPower(lfPower);
+                drive.rightFront.setPower(rfPower);
+                drive.leftBack.setPower(lbPower);
+                drive.rightBack.setPower(rbPower);
                 if (gamepad1.a) {//waiting to ensure no ones in the way
                     Actions.runBlocking(
                             new ParallelAction(
-                                    trajectoryActionChosen2,
-                                    new ParallelAction(
-                                            new ServoAction(BackClaw,BackClaw_Open),
-                                            new MotorAction(SlideBackL, -Back_slide_Reset,0.4),
-                                            new MotorAction(SlideBackR, Back_slide_Reset,0.4)
+                                    new MotorAction(SlideBackL, Back_Slide_Hang,0.4),
+                                    new MotorAction(SlideBackR, -Back_slide_Reset,0.4),
+
+                                    new SequentialAction(
+                                        new ServoAction(BackClaw,BackClaw_Open),
+                                            new ParallelAction(
+                                                    new MotorAction(SlideBackL, Back_slide_Reset,0.4),
+                                                    new MotorAction(SlideBackR, -Back_slide_Reset,0.4)
+                                            )
                                     )
                             )
+
                     );
-                    if(gamepad2.dpad_down){
-                        Actions.runBlocking(new ParallelAction(
-                                new ServoAction(Wrist,wrist_Specimen_Pick),
-                                new ServoAction(ClawArmL,-Claw_Arm_Specimen_Drop),
-                                new ServoAction(ClawArmR,Claw_Arm_Specimen_Drop)
-
-                        ));
-                        liftState = LiftState.SamplePicked;
-                    }
-
 
                 }
+                liftState = LiftState.SpecimenHanged;
+                break;
         }
 
     }
