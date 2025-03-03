@@ -237,7 +237,7 @@ public class Auto_Tele extends LinearOpMode{
                 FS.setPower(-0.5);
                 FS.setTargetPosition(1000);
                 rightslide.setPosition(0.95);
-                leftslide.setPosition(-95);
+                leftslide.setPosition(-0.95);
                 // sleep(1000);
                 //Front_Claw.setPosition(-1);
             }
