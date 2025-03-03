@@ -81,12 +81,10 @@ public class FSM_TeleOps extends OpMode {
     public double Front_Slide_Extend_Power = -0.9;
     public double Front_Slide_Retract_Power = 0.9;
 
-    double lfPower;
-    double rfPower;
-    double rbPower;
-    double lbPower;
-
-
+    public double lfPower;
+    public double rfPower;
+    public double rbPower;
+    public double lbPower;
 
     @Override
     public void init() {
@@ -112,12 +110,6 @@ public class FSM_TeleOps extends OpMode {
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        leftFront.setPower(lfPower);
-        leftRear.setPower(lbPower);
-        rightFront.setPower(rfPower);
-        rightRear.setPower(rbPower);
-
-
         //Define Hardware Map for all components
         Claw = hardwareMap.get(Servo.class, "Claw");
         Claw.setDirection(Servo.Direction.FORWARD);
@@ -137,10 +129,8 @@ public class FSM_TeleOps extends OpMode {
         ElbowLeft = hardwareMap.get(Servo.class, "Elbow Left");
         //ElbowLeft.setDirection(Servo.Direction.REVERSE);
 
-
         ElbowRight = hardwareMap.get(Servo.class, "Elbow Right");
        // ElbowRight.setDirection(Servo.Direction.FORWARD);
-
 
         FrontSlide = hardwareMap.get(DcMotor.class, "Front Slide");
         FrontSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);//Front Slide zero power behavior
@@ -154,7 +144,7 @@ public class FSM_TeleOps extends OpMode {
         FrontClaw.setDirection(Servo.Direction.FORWARD);
 
         TwistLeft = hardwareMap.get(Servo.class, "Twist Left");
-        TwistLeft.setDirection(Servo.Direction.REVERSE);
+        //TwistLeft.setDirection(Servo.Direction.REVERSE);
 
         TwistRight = hardwareMap.get(Servo.class, "Twist Right");
         TwistRight.setDirection(Servo.Direction.FORWARD);
@@ -191,15 +181,16 @@ public class FSM_TeleOps extends OpMode {
             case SubmersibleReady:
                 Actions.runBlocking(new SequentialAction(
                         new MotorAction2(FrontSlide, Front_Slide_Intake_Enc,Front_Slide_Extend_Power),
-                        new DoubleServoAction(ElbowLeft, ElbowRight, 0.85, 0.85)
+                        new DoubleServoAction(TwistLeft, TwistRight, 0.85, -0.85)
                 ));
                 CurrentState = LiftState.Drive;
             break;
 
             case SamplePicked:
                 Actions.runBlocking(new SequentialAction(
-                        new DoubleServoAction(ElbowLeft, ElbowRight, 0.5, 0.5),
-                        new MotorAction2(FrontSlide, Front_Slide_Resting_Enc,Front_Slide_Retract_Power)
+                        new DoubleServoAction(TwistLeft, TwistRight, 0.5, -0.5),
+                        new MotorAction2(FrontSlide, Front_Slide_Resting_Enc,Front_Slide_Retract_Power),
+                        new DoubleServoAction(TwistLeft, TwistRight, 0.1, -0.1)
                 ));
                 CurrentState = LiftState.Drive;
                 break;
@@ -236,6 +227,10 @@ public class FSM_TeleOps extends OpMode {
         rfPower = (y - x - rx) / denominator;
         rbPower = (y + x - rx) / denominator;
 
+        leftFront.setPower(lfPower);
+        leftRear.setPower(lbPower);
+        rightFront.setPower(rfPower);
+        rightRear.setPower(rbPower);
     }
 
     public void TeleOperations() {
