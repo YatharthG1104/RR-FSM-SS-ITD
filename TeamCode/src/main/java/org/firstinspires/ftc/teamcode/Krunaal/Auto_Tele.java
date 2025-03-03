@@ -195,19 +195,19 @@ public class Auto_Tele extends LinearOpMode{
                 BackLeftSlide.setPosition(-0.1);
                 BackRightSlide.setPosition(0.1);
             }
-            if(gamepad2.dpad_left){
-                wrist.setPosition(1);
-            }
-            if(gamepad2.dpad_right){
-                wrist.setPosition(-1);
-            }
+//            if(gamepad2.dpad_left){
+//                wrist.setPosition(1);
+//            }
+//            if(gamepad2.dpad_right){
+//                wrist.setPosition(-1);
+//            }
             if(gamepad2.left_bumper){
-                rightslide.setPosition(1);
-                leftslide.setPosition(-1);
+                rightslide.setPosition(-0.6);
+                leftslide.setPosition(0.6);
             }
             if(gamepad2.right_bumper){
-                rightslide.setPosition(-0.73);//0.5
-                leftslide.setPosition(0.73);
+                rightslide.setPosition(-0.8);//0.5
+                leftslide.setPosition(0.8);
             }
 
 
@@ -221,8 +221,9 @@ public class Auto_Tele extends LinearOpMode{
             }
 
             /**Front wrist uses Front_Rotate****/
+            boolean guess=true;
 
-            if(gamepad2.right_stick_button) {
+            if(gamepad2.right_stick_button) {//hi
                 Front_Rotate.setPower(1);
             } else if(gamepad2.left_stick_button) {
                 Front_Rotate.setPower(-1);
@@ -230,54 +231,36 @@ public class Auto_Tele extends LinearOpMode{
             else
                 Front_Rotate.setPower(0);
 
-            if (gamepad2.right_stick_button){
-                BackLeftSlide.setPosition(-0.1);
-                BackRightSlide.setPosition(0.1);
-                backClaw.setPosition(-1);
 
-            }
-            if (gamepad2.left_stick_button){
-                BackLeftSlide.setPosition(-0.6);
-                BackRightSlide.setPosition(0.6);
-                backClaw.setPosition(1);
-
-            }
 
             if(gamepad1.right_bumper){
-                FS.setPower(-1);
+                FS.setPower(-0.5);
                 FS.setTargetPosition(1000);
-                rightslide.setPosition(1);
-                leftslide.setPosition(-1);
+                rightslide.setPosition(0.95);
+                leftslide.setPosition(-95);
                 // sleep(1000);
                 //Front_Claw.setPosition(-1);
             }
 
             if(gamepad1.left_bumper){
-                FS.setPower(1);
+                FS.setPower(0.5);
                 FS.setTargetPosition(10);
-                rightslide.setPosition(-0.8);
-                leftslide.setPosition(0.8);
-                wrist.setPosition(0.5);
-                Front_Claw.setPosition(-0.9);
+                rightslide.setPosition(-0.7);
+                leftslide.setPosition(0.7);
+//                wrist.setPosition(0.5);
+
             }
 
             if(gamepad2.dpad_up){
-                DL.setPower(1);
-                DR.setPower(-1);
-                BackRightSlide.setPosition(0.6);
-                BackLeftSlide.setPosition(-0.6);
-                DL.setTargetPosition(450);
-                DR.setTargetPosition(-450);
+                BackLeftSlide.setPosition(0.9);
+                BackRightSlide.setPosition(-0.9);
 
             }
 
             if(gamepad2.dpad_down){
-                DL.setPower(1);
-                DR.setPower(-1);
-                BackRightSlide.setPosition(0.1);
-                BackLeftSlide.setPosition(-0.1);
-              DL.setTargetPosition(2600);
-              DR.setTargetPosition(-2600);
+                BackLeftSlide.setPosition(-0.55);
+                BackRightSlide.setPosition(0.55);
+
             }
 
 
