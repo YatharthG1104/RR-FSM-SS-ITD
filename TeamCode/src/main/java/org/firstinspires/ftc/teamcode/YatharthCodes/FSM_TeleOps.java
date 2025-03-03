@@ -1,385 +1,300 @@
 package org.firstinspires.ftc.teamcode.YatharthCodes;
 
-/*
- * Some declarations that are boilerplate are
- * skipped for the sake of brevity.
- * Since there are no real values to use, named constants will be used.
- */
-
-import android.app.Activity;
-import android.graphics.Color;
-import android.view.View;
-
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
-import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
-import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.MecanumDrive;
-
-import java.util.Locale;
 
 @TeleOp(name="TeleOps FSM YG")
 
 public class FSM_TeleOps extends OpMode {
     // An Enum is used to represent lift states.
-    // (This is one thing enums are designed to do)
+
     public enum LiftState {
-        RetractAll,//retract all sorts of arm etc
+        Drive,
+       // RetractAll,//retract all sorts of arm etc
         SubmersibleReady,//aka picking up a block with the slide
         SamplePicked,
-        ClawReadyForSample,//transfer of sample
+        Transfer,
         FinishedBasket,
-        SampleDrop,
         SpecimenPicked,
         SpecimenHanged,
-        LIFT_START,
-        FINAL
-    }
+       // Idle,
+        Stop
+       // FINAL
+    };
 
-    ;
+    private LiftState CurrentState;
+    private boolean EmergencyStop;
 
-    LiftState liftState = LiftState.LIFT_START;
+   // LiftState liftState = LiftState.LIFT_START;
 
-    Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(90));//set a inistal pose but will need to change this
-    MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
+    //Initialize Non drive motors and servos
+    DcMotor leftFront = null;
+    DcMotor leftRear = null;
+    DcMotor rightFront = null;
+    DcMotor rightRear = null;
+    DcMotor deliveryArmLeft = null;
+    DcMotor deliveryArmRight = null;
+    DcMotor FrontSlide = null;
 
-    TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)//this is our goal pose with our goal heading
-            .lineToX(25)
-            .splineTo(new Vector2d(52, -52), Math.PI / 2)
-            .waitSeconds(3);
+    Servo Claw = null;
+    Servo Wrist = null;
+    Servo TwistLeft = null;
+    Servo TwistRight = null;
+    CRServo FrontWrist = null;
+    Servo FrontClaw = null;
+    Servo ElbowLeft = null;
+    Servo ElbowRight = null;
 
-    Pose2d initialPose2 = new Pose2d(50, -60, Math.toRadians(90));//set a inistal pose but will need to change this
-
-    TrajectoryActionBuilder tab2 = drive.actionBuilder(initialPose2)//this is our goal pose with our goal heading
-            .lineToX(25)
-            .splineTo(new Vector2d(52, -52), Math.PI / 2)
-            .waitSeconds(3);
-
-
-    Action trajectoryActionChosen = tab1.build();//seting our movment path to a varibale
-    Action trajectoryActionChosen2 = tab2.build();//seting our movment path to a varibale
-    public DcMotorEx SlideFrontR;
-    public DcMotorEx SlideFrontL;
-    public DcMotorEx SlideBackR;
-    public DcMotorEx SlideBackL;
-
-    public Servo GecoWristL;
-    public Servo GecoWristR;
-    public CRServo GecoWheelsR;
-    public CRServo GecoWheelsL;
-    public Servo Claw;
-    public Servo ClawArmR;
-    public Servo ClawArmL;
-    public Servo Wrist;
+    // Color Sensor Hardware Map
+    ColorSensor sensorColor = null;
 
     ElapsedTime liftTimer = new ElapsedTime();
 
-    double Geco_Wrist_Reset;//geco wrist is in the middle position
-    double Geco_Wrist_Down;
-    double Geco_Wrist_Claw_Deposit;
+    //Define all Delivery Arm Encoder positions and power
+    public int Delivery_Arm_Resting_Enc = 100;
+    public int Delivery_Arm_HangReady_Enc = 1200;
+    public int Delivery_Arm_BasketReady_Enc = 2600;
+    public int Delivery_Arm_HangDone_Enc = 1000;
+    public int Delivery_Arm_IntakeDone_Enc = 300;
+    public int Delivery_Arm_Transfer_Enc = 450;
+    public double Delivery_Arm_Extend_Power = 0.9;
+    public double Delivery_Arm_Retract_Power = -0.9;
 
+    //Define all Front Slide Arm Encoder positions and power
+    public int Front_Slide_Resting_Enc = 0;
+    public int Front_Slide_Intake_Enc = 450;
+    public int Front_Slide_Transfer_Enc = 0;
+    public double Front_Slide_Extend_Power = -0.9;
+    public double Front_Slide_Retract_Power = 0.9;
 
-    double Geco_IN;
-    double Geco_OUT;
-
-
-    double Claw_Open;
-    double Claw_Close;
-
-
-    double Claw_Arm_Specimen_Pick = 0.5;
-    double Claw_Arm_Transfer = -0.5;
-    double Claw_Arm_Reset = -0.3;
-
-    double wrist_Specimen_Pick;
-    double getWrist_Specimen_Drop;
-
-
-    int Back_SLide_Up_Specimen; // the low encoder position for the lift
-    int Back_Slide_Hang; // the high encoder position for the lift
-    int Back_slide_Reset; // the high encoder position for the lift
-    int Back_slide_Bucket; // the high encoder position for the lift
-    int Front_SLide_in;
-    double FrontSLidePower;
-    double LeftStick = -gamepad2.left_stick_x;
     double lfPower;
     double rfPower;
     double rbPower;
     double lbPower;
 
-    ColorSensor sensorColor;
-    DistanceSensor sensorDistance;
-    float hsvValues[] = {0F, 0F, 0F};
 
-    // values is a reference to the hsvValues array.
-    final float values[] = hsvValues;
 
-    // sometimes it helps to multiply the raw RGB values with a scale factor
-    // to amplify/attentuate the measured values.
-    final float SCALE_FACTOR = 255;
-
-    // get a reference to the RelativeLayout so we can change the background
-    // color of the Robot Controller app to match the hue detected by the RGB sensor.
-
+    @Override
     public void init() {
         liftTimer.reset();
+        CurrentState = LiftState.Drive;
+        EmergencyStop = false;
 
-        // hardware initialization code goes here
-        // this needs to correspond with the configuration used
-        SlideFrontR = hardwareMap.get(DcMotorEx.class, "Rli");
-        SlideFrontL = hardwareMap.get(DcMotorEx.class, "Lli");
-        SlideBackR = hardwareMap.get(DcMotorEx.class, "rback");
-        SlideBackL = hardwareMap.get(DcMotorEx.class, "lback");//defining the names for all motors and servos in driver hub
+      //  Pose2d InitialPose = new Pose2d(0,0,0);     // Beginning pose
+
+        //Importing the hardware maps for all drive motors and setting the robot position
+       // MecanumDrive drive = new MecanumDrive(hardwareMap, InitialPose);
+
+        DcMotor leftFront = hardwareMap.get(DcMotor.class, "leftFront");
+        DcMotor leftRear = hardwareMap.get(DcMotor.class, "leftBack");
+        DcMotor rightFront = hardwareMap.get(DcMotor.class, "rightFront");
+        DcMotor rightRear = hardwareMap.get(DcMotor.class, "rightBack");
+
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        leftFront.setPower(lfPower);
+        leftRear.setPower(lbPower);
+        rightFront.setPower(rfPower);
+        rightRear.setPower(rbPower);
 
 
-        GecoWristL = hardwareMap.get(Servo.class, "lm");
-        GecoWristR = hardwareMap.get(Servo.class, "rm");
-        GecoWheelsR = hardwareMap.get(CRServo.class, "fr");
-        GecoWheelsL = hardwareMap.get(CRServo.class, "fl");
+        //Define Hardware Map for all components
         Claw = hardwareMap.get(Servo.class, "Claw");
-        ClawArmR = hardwareMap.get(Servo.class, "BRM");
-        ClawArmL = hardwareMap.get(Servo.class, "BLM");
+        Claw.setDirection(Servo.Direction.FORWARD);
+
+        deliveryArmLeft = hardwareMap.get(DcMotor.class, "Delivery ArmL");
+        deliveryArmLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);  //Delivery arm zero power behavior
+        deliveryArmLeft.setDirection(DcMotor.Direction.REVERSE);          //Delivery arm left motor set reversed
+        deliveryArmLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);  //Delivery arm motor reset
+        deliveryArmLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);       //Delivery arm run using encoders
+
+        deliveryArmRight = hardwareMap.get(DcMotor.class, "Delivery ArmR");
+        deliveryArmRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);  //Delivery arm zero power behavior
+        deliveryArmRight.setDirection(DcMotor.Direction.REVERSE);          //Delivery arm right motor set reversed
+        deliveryArmRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);  //Delivery arm motor reset
+        deliveryArmRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);       //Delivery arm run using encoders
+
+        ElbowLeft = hardwareMap.get(Servo.class, "Elbow Left");
+        //ElbowLeft.setDirection(Servo.Direction.REVERSE);
+
+
+        ElbowRight = hardwareMap.get(Servo.class, "Elbow Right");
+       // ElbowRight.setDirection(Servo.Direction.FORWARD);
+
+
+        FrontSlide = hardwareMap.get(DcMotor.class, "Front Slide");
+        FrontSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);//Front Slide zero power behavior
+        FrontSlide.setDirection(DcMotor.Direction.FORWARD);          //Front Slide motor set forward
+        FrontSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);  //Front Slide motor reset
+        FrontSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);       //Front Slide run using encoders
+
+        FrontWrist = hardwareMap.get(CRServo.class, "Front Wrist");
+
+        FrontClaw = hardwareMap.get(Servo.class, "Front Claw");
+        FrontClaw.setDirection(Servo.Direction.FORWARD);
+
+        TwistLeft = hardwareMap.get(Servo.class, "Twist Left");
+        TwistLeft.setDirection(Servo.Direction.REVERSE);
+
+        TwistRight = hardwareMap.get(Servo.class, "Twist Right");
+        TwistRight.setDirection(Servo.Direction.FORWARD);
+
+        Wrist = hardwareMap.get(Servo.class, "Wrist");
+        Wrist.setDirection(Servo.Direction.FORWARD);
+
         sensorColor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
-        sensorDistance = hardwareMap.get(DistanceSensor.class, "sensor_color_distance");
-        int relativeLayoutId = hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id", hardwareMap.appContext.getPackageName());
-        telemetry.addData("Left Distance (cm)",
-                String.format(Locale.US, "%.02f", sensorDistance.getDistance(DistanceUnit.CM)));
 
-        final View relativeLayout = ((Activity) hardwareMap.appContext).findViewById(relativeLayoutId);
-
-        SlideFrontR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        SlideFrontR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        SlideFrontL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        SlideFrontL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        SlideBackR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);//reseting the encoders
-        SlideBackR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);//ensuring that we are using the encoders
-
-        SlideBackL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        SlideBackL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-
-        GecoWristL.setPosition(-Geco_Wrist_Reset);
-        GecoWristR.setPosition(Geco_Wrist_Reset);
-        Claw.setPosition(Claw_Close);
-        ClawArmL.setPosition(-Claw_Arm_Reset);
-        ClawArmR.setPosition(Claw_Arm_Reset);
         //in the init we are making sure evreything is reset
-
 
     }
 
     public void loop() {
-        Color.RGBToHSV((int) (sensorColor.red() * SCALE_FACTOR),
-                (int) (sensorColor.green() * SCALE_FACTOR),
-                (int) (sensorColor.blue() * SCALE_FACTOR),
-                hsvValues);
-        double hue = hsvValues[0];
-        FrontSLidePower = Range.clip(LeftStick, -1.0, 1.0);
 
-
-        switch (liftState) {
-            case RetractAll:
-                if (SlideBackL.getCurrentPosition() - Back_SLide_Up_Specimen < 30) {//set to what color it sees when sample is out of geco wheels
-//                    ClawElbow.setPosition(Claw_Arm_Reset);
-                    Actions.runBlocking(new ParallelAction(
-                            new ServoAction(Claw,Claw_Open),
-                            new MotorAction(SlideBackL,-Back_slide_Reset,0.4),
-                            new MotorAction(SlideBackR,Back_slide_Reset,0.4),
-                            new ServoAction(ClawArmL,-Claw_Arm_Reset),
-                            new ServoAction(ClawArmR,Claw_Arm_Reset),
-                            new ServoAction(GecoWristL,-Geco_Wrist_Reset),
-                            new ServoAction(GecoWristR,Geco_Wrist_Reset)
-                    ));
-                    liftState = LiftState.SubmersibleReady;
-
-                    //resets all movment items to ensure nothing wrong has happend
-                }
-                break;
-            case SubmersibleReady:
-                // otherwise let the driver drive
-
-                if (Math.abs(SlideBackL.getCurrentPosition() - Back_slide_Reset) < 30 && gamepad2.x) {
-
-
-
-                    // x is pressed, start extending
-                    double dd = gamepad2.right_stick_x;
-
-                    double cp = Range.clip(dd, -0.5, 0.5);
-
-                    //allowing oporater to control the distance of the front slide
-                    Actions.runBlocking(new ParallelAction(
-                            new MotorPowerAction(SlideFrontL,-cp),
-                            new MotorPowerAction(SlideFrontR,cp)
-                    ));
-                    liftState = LiftState.SamplePicked;//changing state so we can move to the next task
-                }
-                break;
-            case SamplePicked:
+        switch (CurrentState) {
+            case Drive:
+                //Driving
                 move();
-                drive.leftFront.setPower(lfPower);
-                drive.rightFront.setPower(rfPower);
-                drive.leftBack.setPower(lbPower);
-                drive.rightBack.setPower(rbPower);
-
-                if (gamepad2.b) {//its set b so that it only goes down when the driver and oporater have aligned with the sampele
-                    // set the lift dump to dump
-                    Actions.runBlocking(new ParallelAction(
-                            new ServoAction(GecoWristL,-Geco_Wrist_Down),
-                            new ServoAction(GecoWristR,Geco_Wrist_Down),
-                            new CRServoAction(GecoWheelsL,1,-Geco_IN),
-                            new CRServoAction(GecoWheelsR,1,Geco_IN)
-
-                    ));
-
-                    liftTimer.reset();
-                    liftState = LiftState.ClawReadyForSample;
-                    //this grabes the sample that we were attempting to grab
+                //Regular Operations
+                TeleOperations();
+                //Other States
+                if(gamepad1.right_bumper){
+                    CurrentState = LiftState.SubmersibleReady;
+                } else
+                if(gamepad1.left_bumper){
+                    CurrentState = LiftState.SamplePicked;
+                } else
+                if(gamepad1.b){
+                    CurrentState =LiftState.Stop;
                 }
-                break;
+            break;
 
-
-            case ClawReadyForSample:
-//                hue >= 0 && hue < 60 || hue > 360 || hue >= 60 && hue < 120
-                if (hue >= 0 && hue < 60 || hue >= 60 && hue < 100 ||hue >= 200 && hue < 250) {//If we missed or got wrong color we dont click it so we dont get a penelty
-                    Actions.runBlocking(new ParallelAction(
-                            new ServoAction(GecoWristL,-Geco_Wrist_Claw_Deposit),
-                            new ServoAction(GecoWristR,Geco_Wrist_Claw_Deposit),
-                            new MotorAction(SlideFrontL,-Front_SLide_in,0.3),
-                            new MotorAction(SlideFrontR,Front_SLide_in,0.3),
-                            new ServoAction(Claw,Claw_Open)
-                    ));
-                    liftState = LiftState.SampleDrop;
-
-                    //We have captured the sample and now we are ready to do the transfer from geco wheels to claw
-
-                } if(sensorDistance.getDistance(DistanceUnit.CM)>2) {//if we missed the sample or got the oponets color we dont click anything
-                Actions.runBlocking(new ParallelAction(
-                        new ServoAction(GecoWristL,-Geco_Wrist_Reset),
-                        new ServoAction(GecoWristR,Geco_Wrist_Reset),
-                        new CRServoAction(GecoWheelsL,1,-Geco_OUT),
-                        new CRServoAction(GecoWheelsR,1,Geco_OUT)
+            case SubmersibleReady:
+                Actions.runBlocking(new SequentialAction(
+                        new MotorAction2(FrontSlide, Front_Slide_Intake_Enc,Front_Slide_Extend_Power),
+                        new DoubleServoAction(ElbowLeft, ElbowRight, 0.85, 0.85)
                 ));
+                CurrentState = LiftState.Drive;
+            break;
 
-                liftState = LiftState.SubmersibleReady;
-
-                //resets all movment things to get ready to attempt to grab a diffrent sample
-            }
+            case SamplePicked:
+                Actions.runBlocking(new SequentialAction(
+                        new DoubleServoAction(ElbowLeft, ElbowRight, 0.5, 0.5),
+                        new MotorAction2(FrontSlide, Front_Slide_Resting_Enc,Front_Slide_Retract_Power)
+                ));
+                CurrentState = LiftState.Drive;
                 break;
 
+            case Stop:
+                leftFront.setPower(0);
+                leftRear.setPower(0);
+                rightFront.setPower(0);
+                rightRear.setPower(0);
+                EmergencyStop = true;
 
-            case SampleDrop:
-                if (Math.abs(SlideFrontR.getCurrentPosition() - Front_SLide_in) < 30 && gamepad2.a) {
-                    Actions.runBlocking(new ParallelAction(
-                            new ServoAction(Claw,Claw_Close),
-                            new CRServoAction(GecoWheelsL,1,-Geco_OUT),
-                            new CRServoAction(GecoWheelsR,1,Geco_OUT),
-                            new ServoAction(ClawArmL,-Claw_Arm_Specimen_Pick),
-                            new ServoAction(ClawArmR,Claw_Arm_Specimen_Pick)
-                    ));
-                    //does the transfer and the claw is in position to drop in obsevtary zone or do bucket
-
-                    if (gamepad2.left_bumper) {//click left bumber if we are doing specimen
-                        Actions.runBlocking(new ParallelAction(
-                                new ParallelAction(trajectoryActionChosen),//might need to change to sequncal
-                                new ServoAction(Claw,Claw_Open)
-                        ));
-
-                        liftState = LiftState.SpecimenHanged;
-                        //drops sample in obsevatrey zone
-                    }
-
-                    if (gamepad2.right_bumper) {//click right bumber if we are doing basket
-                        move();
-                        drive.leftFront.setPower(lfPower);
-                        drive.rightFront.setPower(rfPower);
-                        drive.leftBack.setPower(lbPower);
-                        drive.rightBack.setPower(rbPower);
-                        Actions.runBlocking(new ParallelAction(
-                                //let driver contorl
-
-                                new MotorAction(SlideBackL,-Back_slide_Bucket,0.4),
-                                new MotorAction(SlideBackR,Back_slide_Bucket,0.4)
-                        ));
-                        liftState = LiftState.FinishedBasket;
-                        //ready to drop off the sample at bucket slide is rasied to correct hight
-                    }
-
-
+                if(gamepad1.x) {
+                    EmergencyStop = false;
+                    CurrentState = LiftState.Drive;
                 }
-                break;
-            case FinishedBasket:
-                if (Math.abs(SlideBackL.getCurrentPosition() - Back_slide_Bucket) < 30) {
-                    Actions.runBlocking(new ParallelAction(
-                            new ServoAction(Claw,Claw_Open)
-                    ));
-                    liftState = LiftState.RetractAll;
-                    //drops sample in basket and retracts evreything
-                }
-                break;
 
-            case SpecimenPicked:
-                if (gamepad2.dpad_up) {//waiting for humen can change to an if statment
-                    //add meep meep move
-                    Actions.runBlocking(new ParallelAction(
-                            new ServoAction(Claw,Claw_Close),
-                            new MotorAction(SlideBackL,-Back_SLide_Up_Specimen,0.4),
-                            new MotorAction(SlideBackR,-Back_SLide_Up_Specimen,0.4)
-                    ));
-
-
-                    //add moving code to pick up specimen
-                    liftState = LiftState.SpecimenHanged;
-                    //picks up specimen from obsevatry zone
-                }
-                break;
-            case SpecimenHanged:
-                if (Math.abs(SlideBackR.getCurrentPosition() - Back_SLide_Up_Specimen) < 30 && gamepad2.dpad_down) {//waiting to ensure no ones in the way
-                    Actions.runBlocking(new SequentialAction(
-                                    trajectoryActionChosen2,
-                                    new MotorAction(SlideBackL, -Back_Slide_Hang,0.4),
-                                    new MotorAction(SlideBackR, Back_Slide_Hang,0.4)
-                            )
-                    );//moving to hang specimen
-//                    double y = -gamepad1. left_stick_y;
-//                    double x = gamepad1.left_stick_x;
-//                    double rx = gamepad1.right_stick_x;
-//
-//                    // Denominator is the largest motor power (absolute value) or 1
-//                    // This ensures all the powers maintain the same ratio,
-//                    // but only if at least one is out of the range [-1, 1]
-//
-//                    double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-//
-//                    lfPower = (y + x + rx) / denominator;
-//                    lbPower = (y - x + rx) / denominator;
-//                    rfPower = (y - x - rx) / denominator;
-//                    rbPower = (y + x - rx) / denominator;
-
-
-                }
         }
+    }
+
+
+    public void move(){
+        double y = -gamepad1. left_stick_y;
+        double x = gamepad1.left_stick_x;
+        double rx = gamepad1.right_stick_x;
+
+        // Denominator is the largest motor power (absolute value) or 1
+        // This ensures all the powers maintain the same ratio,
+        // but only if at least one is out of the range [-1, 1]
+
+        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+
+        lfPower = (y + x + rx) / denominator;
+        lbPower = (y - x + rx) / denominator;
+        rfPower = (y - x - rx) / denominator;
+        rbPower = (y + x - rx) / denominator;
 
     }
+
+    public void TeleOperations() {
+        //Back Claw
+        if(gamepad2.x){
+            Claw.setPosition(-1);
+        }
+        if(gamepad2.b){
+            Claw.setPosition(1);
+        }
+        //FrontSlide
+        double FrontSlideStick = -gamepad2.right_stick_x;
+        double FrontSlidePower = Range.clip(FrontSlideStick, -0.9, 0.9);
+        FrontSlide.setPower(FrontSlidePower);
+        //Back Elbow
+        if(gamepad1.a){
+            ElbowLeft.setPosition(-0.1);
+            ElbowRight.setPosition(0.1);
+        }
+        if(gamepad2.dpad_up){
+            ElbowLeft.setPosition(0.7);
+            ElbowRight.setPosition(-0.7);
+        }
+        if(gamepad2.dpad_down){
+            ElbowLeft.setPosition(-0.55);
+            ElbowRight.setPosition(0.55);
+        }
+        //Front Twist
+        if(gamepad2.left_bumper){
+            TwistRight.setPosition(-0.1);
+            TwistLeft.setPosition(0.1);
+        }
+        if(gamepad2.right_bumper){
+            TwistRight.setPosition(-0.85);
+            TwistLeft.setPosition(0.85);
+        }
+        // Front Claw
+        if(gamepad2.y){
+            FrontClaw.setPosition(1);
+        }
+        if(gamepad2.a){
+            FrontClaw.setPosition(-1);
+        }
+        // Front Wrist
+        if(gamepad2.right_stick_button) {
+            FrontWrist.setPower(1);
+        } else if(gamepad2.left_stick_button) {
+            FrontWrist.setPower(-1);
+        }
+        else
+            FrontWrist.setPower(0);
+        //Delivery Arm
+        double DeliveryArmStick = gamepad2.left_stick_y;
+        double DeliveryArmPower = Range.clip(DeliveryArmStick, -0.9, 0.9);
+        deliveryArmLeft.setPower(DeliveryArmPower);//0.5
+        deliveryArmRight.setPower(-DeliveryArmPower);
+    }
+
+    // Servo action build for roadrunner to use
     public static class ServoAction implements Action {
         Servo servo;
         double position;
@@ -397,89 +312,114 @@ public class FSM_TeleOps extends OpMode {
                 servo.setPosition(position);
             }
 
-            return false;
+            return timer.seconds() < 0.5;
         }
-    }
-
-    // Motor Action build for roadrunner to use
-    public static class MotorAction implements Action {
-        DcMotor motor;
-        double position_tgt;
-        double power;
-        ElapsedTime timer = null;
-
-        public MotorAction (DcMotor mot, double pos, double pow) {
-            this.motor = mot;
-            this.position_tgt = pos;
-            this.power = pow;
-        }
-
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if (timer == null) {
-                timer = new ElapsedTime();
-                motor.setPower(power);
-                motor.setTargetPosition((int) (position_tgt));
-                motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            }
-            return false;
-        }
-    }
-
-    public void move(){
-        double y = -gamepad1. left_stick_y;
-        double x = gamepad1.left_stick_x;
-        double rx = gamepad1.right_stick_x;
-
-        // Denominator is the largest motor power (absolute value) or 1
-        // This ensures all the powers maintain the same ratio,
-        // but only if at least one is out of the range [-1, 1]
-
-        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-
-        lfPower = (y + x + rx) / denominator;
-        lbPower = (y - x + rx) / denominator;
-        rfPower = (y - x - rx) / denominator;
-        rbPower = (y + x - rx) / denominator;
     }
 
     //CRServo Action build for roadrunner to use
     public static class CRServoAction implements Action {
         CRServo crServo;
         double power;
-        int seconds;
         ElapsedTime timer= null;
 
-        public CRServoAction(CRServo crsrv, int sec, double pow ) {
+        public CRServoAction(CRServo crsrv, double pow ) {
             this.crServo = crsrv;
-            this.seconds = sec;
-            this.power = pow;
-        }
-
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if (timer.seconds() < seconds) {
-                timer = new ElapsedTime();
-                crServo.setPower(power);
-            }
-            return false;
-        }
-    }
-
-    public static class MotorPowerAction implements Action {
-        DcMotor motor;
-        double power;
-        ElapsedTime timer = null;
-
-        public MotorPowerAction(DcMotor mot, double pow) {
-            this.motor = mot;
+            // this.seconds = sec;
             this.power = pow;
         }
 
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (timer == null) {
                 timer = new ElapsedTime();
-                motor.setPower(power);
+                crServo.setPower(power);
             }
-            return false;
+            return timer.seconds() < 2;
+        }
+    }
+
+    // Double Motor Action build for roadrunner to use
+    public static class DoubleMotorAction implements Action {
+        DcMotor motor1;
+        DcMotor motor2;
+        double position_tgt1;
+        double position_tgt2;
+        double power1;
+        double power2;
+        ElapsedTime timer = null;
+
+        public DoubleMotorAction (DcMotor mot1, DcMotor mot2, double pos1, double pos2, double pow1, double pow2) {
+            this.motor1 = mot1;
+            this.position_tgt1 = pos1;
+            this.power1 = pow1;
+            this.motor2 = mot2;
+            this.position_tgt2 = pos2;
+            this.power2 = pow2;
+        }
+
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (motor1.getCurrentPosition() < position_tgt1) {
+                timer = new ElapsedTime();
+                motor1.setPower(power1);
+                motor2.setPower(power2);
+                motor1.setTargetPosition((int) (position_tgt1));
+                // motor2.setTargetPosition((int) (position_tgt2));
+                motor1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+            return timer.seconds() < 1;
+        }
+    }
+
+    // Double Servo action build for roadrunner to use
+    public static class DoubleServoAction implements Action {
+        Servo servo1;
+        double position1;
+        Servo servo2;
+        double position2;
+        ElapsedTime timer= null;
+
+        public DoubleServoAction(Servo srv1, Servo srv2,double pos1,double pos2) {
+            this.servo1 = srv1;
+            this.servo2 = srv2;
+            this.position1 = pos1;
+            this.position2 = pos2;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if(timer == null) {
+                timer = new ElapsedTime();
+                servo1.setPosition(position1);
+                servo2.setPosition(position2);
+            }
+
+            return timer.seconds() < 0.5;
+        }
+    }
+
+    // Motor Action-2 build for roadrunner to use
+    public static class MotorAction2 implements Action {
+        DcMotor motor;
+        double position_tgt;
+        double power;
+
+        public MotorAction2(DcMotor mot, double pos, double pow) {
+            this.motor = mot;
+            this.position_tgt = pos;
+            this.power = pow;
+        }
+
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+
+            if (motor.getCurrentPosition() != position_tgt) {
+                motor.setPower(power);
+                motor.setTargetPosition((int) (position_tgt));
+                motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                return true;
+            } else {
+                motor.setPower(0);
+                return false;
+            }
         }
     }
 }
