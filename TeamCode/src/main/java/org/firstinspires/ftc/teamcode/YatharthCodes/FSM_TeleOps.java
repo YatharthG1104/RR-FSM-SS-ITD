@@ -23,12 +23,11 @@ public class FSM_TeleOps extends OpMode {
     // An Enum is used to represent lift states.
 
     public enum LiftState {
-        Drive,
+        Drive, //regular drive and hardware operations
        // RetractAll,//retract all sorts of arm etc
-        SubmersibleReady,//aka picking up a block with the slide
-        SamplePicked,
-        Transfer,
-        FinishedBasket,
+        SubmersibleReady,//ready to pick up a block with the front slide
+        SamplePicked, //pickup completed and front slide gets ready to transfer
+        TransferBasket,  //complete the transfer and finish basket
         SpecimenPicked,
         SpecimenHanged,
        // Idle,
@@ -78,8 +77,36 @@ public class FSM_TeleOps extends OpMode {
     public int Front_Slide_Resting_Enc = 0;
     public int Front_Slide_Intake_Enc = 450;
     public int Front_Slide_Transfer_Enc = 0;
-    public double Front_Slide_Extend_Power = -0.9;
-    public double Front_Slide_Retract_Power = 0.9;
+    public double Front_Slide_Extend_Power = 0.9;
+    public double Front_Slide_Retract_Power = -0.9;
+
+    //Define all Twist positions
+    public static double TwistL_Intake_Pos = -0.87;
+    public static double TwistR_Intake_Pos = 0.87;
+    public static double TwistL_Transfer_Pos = 0.85;
+    public static double TwistR_Transfer_Pos = -0.85;
+    public static double TwistL_IntakeMiddle_Pos = 0.5;
+    public static double TwistR_IntakeMiddle_Pos = -0.5;
+    public static double TwistL_Rest_Pos = 0.0;
+    public static double TwistR_Rest_Pos = 0.0;
+
+    //Define all Front Claw Positions
+    public static double FrontClaw_Open_Pos = 1.0;
+    public static double FrontClaw_Close_Pos = -1.0;
+
+    //Define all Claw positions
+    public static double Claw_Open_Pos = 1.0;
+    public static double Claw_Close_Pos = -1.0;
+
+    //Define all Elbow positions
+    public static double ElbowL_Intake_Pos = 0.0;
+    public static double ElbowR_Intake_Pos = 0.0;
+    public static double ElbowL_Transfer_Pos = 0.6;
+    public static double ElbowR_Transfer_Pos = 0.6;
+    public static double ElbowL_Hang_Pos = 0.5;
+    public static double ElbowR_Hang_Pos = 0.5;
+    public static double ElbowL_Basket_Pos = 0.1;
+    public static double ElbowR_Basket_Pos = 0.1;
 
     public double lfPower;
     public double rfPower;
@@ -88,9 +115,8 @@ public class FSM_TeleOps extends OpMode {
 
     @Override
     public void init() {
+
         liftTimer.reset();
-        CurrentState = LiftState.Drive;
-        EmergencyStop = false;
 
       //  Pose2d InitialPose = new Pose2d(0,0,0);     // Beginning pose
 
@@ -134,7 +160,7 @@ public class FSM_TeleOps extends OpMode {
 
         FrontSlide = hardwareMap.get(DcMotor.class, "Front Slide");
         FrontSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);//Front Slide zero power behavior
-        FrontSlide.setDirection(DcMotor.Direction.FORWARD);          //Front Slide motor set forward
+        FrontSlide.setDirection(DcMotor.Direction.REVERSE);          //Front Slide motor set forward
         FrontSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);  //Front Slide motor reset
         FrontSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);       //Front Slide run using encoders
 
@@ -154,8 +180,18 @@ public class FSM_TeleOps extends OpMode {
 
         sensorColor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
 
-        //in the init we are making sure evreything is reset
+     /*   if(gamepad1.start) {
+            CurrentState = LiftState.Drive;
+            EmergencyStop = false;
+        }*/
+        CurrentState = LiftState.Drive;
+        EmergencyStop = false;
 
+        //in the init we are making sure evreything is reset
+        leftFront.setPower(lfPower);
+        leftRear.setPower(lbPower);
+        rightFront.setPower(rfPower);
+        rightRear.setPower(rbPower);
     }
 
     public void loop() {
@@ -173,26 +209,71 @@ public class FSM_TeleOps extends OpMode {
                 if(gamepad1.left_bumper){
                     CurrentState = LiftState.SamplePicked;
                 } else
-                if(gamepad1.b){
+                if(gamepad1.back){
                     CurrentState =LiftState.Stop;
+                } else
+                if(gamepad2.dpad_left) {
+                        CurrentState = LiftState.TransferBasket;
+                    } else
+                if(gamepad2.dpad_right) {
+                    CurrentState = LiftState.SpecimenPicked;
                 }
             break;
 
             case SubmersibleReady:
                 Actions.runBlocking(new SequentialAction(
                         new MotorAction2(FrontSlide, Front_Slide_Intake_Enc,Front_Slide_Extend_Power),
-                        new DoubleServoAction(TwistLeft, TwistRight, 0.85, -0.85)
+                        new DoubleServoAction(TwistLeft, TwistRight, TwistL_Intake_Pos, TwistR_Intake_Pos)
                 ));
-                CurrentState = LiftState.Drive;
-            break;
+                if(gamepad1.left_bumper) {
+                    CurrentState = LiftState.SamplePicked;
+                } else
+                if(gamepad1.back){
+                    CurrentState =LiftState.Stop;
+                } else
+                if(gamepad1.start){
+                    CurrentState =LiftState.Drive;
+                }
+                break;
 
             case SamplePicked:
-                Actions.runBlocking(new SequentialAction(
-                        new DoubleServoAction(TwistLeft, TwistRight, 0.5, -0.5),
-                        new MotorAction2(FrontSlide, Front_Slide_Resting_Enc,Front_Slide_Retract_Power),
-                        new DoubleServoAction(TwistLeft, TwistRight, 0.1, -0.1)
+                Actions.runBlocking(new ParallelAction(
+                        new SequentialAction(
+                                new DoubleServoAction(TwistLeft, TwistRight, TwistL_IntakeMiddle_Pos, TwistR_IntakeMiddle_Pos),
+                                new MotorAction2(FrontSlide, Front_Slide_Transfer_Enc,Front_Slide_Retract_Power),
+                                new DoubleServoAction(TwistLeft, TwistRight, TwistL_Transfer_Pos, TwistR_Transfer_Pos)
+                        ),
+                        new DoubleMotorAction(deliveryArmLeft, deliveryArmRight, Delivery_Arm_Transfer_Enc, Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power, Delivery_Arm_Retract_Power),
+                        new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Transfer_Pos, ElbowR_Transfer_Pos)
                 ));
-                CurrentState = LiftState.Drive;
+                if(gamepad1.right_bumper) {
+                    CurrentState = LiftState.SubmersibleReady;
+                } else
+                if(gamepad1.back){
+                    CurrentState =LiftState.Stop;
+                } else
+                if(gamepad1.start){
+                    CurrentState =LiftState.Drive;
+                } else
+                if(gamepad2.dpad_left){
+                    CurrentState =LiftState.TransferBasket;
+                }
+                break;
+
+            case TransferBasket:
+                Actions.runBlocking(new ParallelAction(
+                        new DoubleMotorAction(deliveryArmLeft, deliveryArmRight, Delivery_Arm_BasketReady_Enc, Delivery_Arm_BasketReady_Enc, Delivery_Arm_Extend_Power, Delivery_Arm_Extend_Power),
+                        new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Basket_Pos, ElbowR_Basket_Pos)
+                ));
+                if(gamepad1.right_bumper) {
+                    CurrentState = LiftState.SubmersibleReady;
+                } else
+                if(gamepad1.back){
+                    CurrentState =LiftState.Stop;
+                } else
+                if(gamepad1.start){
+                    CurrentState =LiftState.Drive;
+                }
                 break;
 
             case Stop:
@@ -202,7 +283,7 @@ public class FSM_TeleOps extends OpMode {
                 rightRear.setPower(0);
                 EmergencyStop = true;
 
-                if(gamepad1.x) {
+                if(gamepad1.start) {
                     EmergencyStop = false;
                     CurrentState = LiftState.Drive;
                 }
@@ -227,22 +308,18 @@ public class FSM_TeleOps extends OpMode {
         rfPower = (y - x - rx) / denominator;
         rbPower = (y + x - rx) / denominator;
 
-        leftFront.setPower(lfPower);
-        leftRear.setPower(lbPower);
-        rightFront.setPower(rfPower);
-        rightRear.setPower(rbPower);
     }
 
     public void TeleOperations() {
         //Back Claw
         if(gamepad2.x){
-            Claw.setPosition(-1);
+            Claw.setPosition(Claw_Close_Pos);
         }
         if(gamepad2.b){
-            Claw.setPosition(1);
+            Claw.setPosition(Claw_Open_Pos);
         }
         //FrontSlide
-        double FrontSlideStick = -gamepad2.right_stick_x;
+        double FrontSlideStick = gamepad2.right_stick_x;
         double FrontSlidePower = Range.clip(FrontSlideStick, -0.9, 0.9);
         FrontSlide.setPower(FrontSlidePower);
         //Back Elbow
@@ -251,28 +328,28 @@ public class FSM_TeleOps extends OpMode {
             ElbowRight.setPosition(0.1);
         }
         if(gamepad2.dpad_up){
-            ElbowLeft.setPosition(0.7);
-            ElbowRight.setPosition(-0.7);
+            ElbowLeft.setPosition(0.9);
+            ElbowRight.setPosition(-0.9);
         }
         if(gamepad2.dpad_down){
-            ElbowLeft.setPosition(-0.55);
-            ElbowRight.setPosition(0.55);
+            ElbowLeft.setPosition(-0.58);
+            ElbowRight.setPosition(0.58);
         }
         //Front Twist
         if(gamepad2.left_bumper){
-            TwistRight.setPosition(-0.1);
-            TwistLeft.setPosition(0.1);
+            TwistRight.setPosition(TwistR_Intake_Pos);
+            TwistLeft.setPosition(TwistL_Intake_Pos);
         }
         if(gamepad2.right_bumper){
-            TwistRight.setPosition(-0.85);
-            TwistLeft.setPosition(0.85);
+            TwistRight.setPosition(TwistR_Transfer_Pos);
+            TwistLeft.setPosition(TwistL_Transfer_Pos);
         }
         // Front Claw
         if(gamepad2.y){
-            FrontClaw.setPosition(1);
+            FrontClaw.setPosition(FrontClaw_Open_Pos);
         }
         if(gamepad2.a){
-            FrontClaw.setPosition(-1);
+            FrontClaw.setPosition(FrontClaw_Close_Pos);
         }
         // Front Wrist
         if(gamepad2.right_stick_button) {
@@ -285,7 +362,7 @@ public class FSM_TeleOps extends OpMode {
         //Delivery Arm
         double DeliveryArmStick = gamepad2.left_stick_y;
         double DeliveryArmPower = Range.clip(DeliveryArmStick, -0.9, 0.9);
-        deliveryArmLeft.setPower(DeliveryArmPower);//0.5
+        deliveryArmLeft.setPower(DeliveryArmPower);
         deliveryArmRight.setPower(-DeliveryArmPower);
     }
 

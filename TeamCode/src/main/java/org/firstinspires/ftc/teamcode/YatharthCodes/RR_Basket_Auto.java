@@ -51,36 +51,39 @@ public class RR_Basket_Auto extends LinearOpMode {
     //Define all Delivery Arm Encoder positions and power
     public static int Delivery_Arm_Resting_Enc = 100;
     public static int Delivery_Arm_HangReady_Enc = 1200;
-    public static int Delivery_Arm_BasketReady_Enc = 2600;
+    public static int Delivery_Arm_BasketReady_Enc = 2000;
     public static int Delivery_Arm_HangDone_Enc = 1000;
     public static int Delivery_Arm_IntakeDone_Enc = 300;
     public static int Delivery_Arm_Transfer_Enc = 450;
-    public static double Delivery_Arm_Extend_Power = 0.9;
-    public static double Delivery_Arm_Retract_Power = -0.9;
+    public static double Delivery_Arm_Extend_Power = 0.0;// Change to 0.9
+    public static double Delivery_Arm_Retract_Power = 0.0;// Change to -0.9
 
     //Define all Elbow positions
     public static double ElbowL_Intake_Pos = 0.0;
     public static double ElbowR_Intake_Pos = 0.0;
-    public static double ElbowL_Transfer_Pos = 0.6;
-    public static double ElbowR_Transfer_Pos = 0.6;
+    public static double ElbowL_Transfer_Pos = 0.63;
+    public static double ElbowR_Transfer_Pos = 0.63;
+    public static double ElbowL_Level1_Pos = 0.15;
+    public static double ElbowR_Level1_Pos = 0.15;
     public static double ElbowL_Hang_Pos = 0.5;
     public static double ElbowR_Hang_Pos = 0.5;
-    public static double ElbowL_Basket_Pos = 0.1;
-    public static double ElbowR_Basket_Pos = 0.1;
+    public static double ElbowL_Basket_Pos = 0.15;// Change to 0.1
+    public static double ElbowR_Basket_Pos = 0.15;// Change to 0.1
 
     //Define all Front Slide Arm Encoder positions and power
     public static int Front_Slide_Resting_Enc = 0;
     public static int Front_Slide_Intake_Enc = 450;
     public static int Front_Slide_Transfer_Enc = 0;
+    public static int Front_Slide_Hold_Enc = -10;
     public static double Front_Slide_Extend_Power = 0.9;
     public static double Front_Slide_Retract_Power = -0.9;
 
     //Define all Twist positions
-    public static double TwistL_Intake_Pos = -1.0;
-    public static double TwistR_Intake_Pos = 1.0;
-    public static double TwistL_Transfer_Pos = -0.1;
-    public static double TwistR_Transfer_Pos = 0.1;
-    public static double TwistL_IntakeReady_Pos = -0.5;
+    public static double TwistL_Intake_Pos = 0.95;
+    public static double TwistR_Intake_Pos = 0.95;
+    public static double TwistL_Transfer_Pos = -0.95;
+    public static double TwistR_Transfer_Pos = -0.95;
+    public static double TwistL_IntakeReady_Pos = 0.5;
     public static double TwistR_IntakeReady_Pos = 0.5;
     public static double TwistL_Rest_Pos = 0.0;
     public static double TwistR_Rest_Pos = 0.0;
@@ -88,6 +91,9 @@ public class RR_Basket_Auto extends LinearOpMode {
     //Define all Front Claw Positions
     public static double FrontClaw_Open_Pos = 0.0;
     public static double FrontClaw_Close_Pos = 0.9;
+
+    // Wait Variable
+    public static double Wait = 0.05;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -162,29 +168,29 @@ public class RR_Basket_Auto extends LinearOpMode {
                new SequentialAction(
                        new ServoAction(Claw,Claw_Close_Pos),
                        new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Hang_Pos,ElbowR_Hang_Pos),
-                       new MotorAction2(FrontSlide, Front_Slide_Resting_Enc, Front_Slide_Retract_Power),
                       new ParallelAction(
+                              new MotorAction2(FrontSlide, Front_Slide_Hold_Enc, Front_Slide_Retract_Power),
                               drive.actionBuilder(new Pose2d(0,0,0)) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
-                                      .strafeTo(new Vector2d(8,24))
+                                      .strafeTo(new Vector2d(6,24))
                                       .turnTo(Math.toRadians(-50))
                                       .build(),
-                              new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_BasketReady_Enc,Delivery_Arm_BasketReady_Enc,Delivery_Arm_Extend_Power,Delivery_Arm_Extend_Power),
+                            //  new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_BasketReady_Enc,Delivery_Arm_BasketReady_Enc,Delivery_Arm_Extend_Power,Delivery_Arm_Extend_Power),
                               new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Basket_Pos,ElbowR_Basket_Pos)
                       ),
-                       new SleepAction(0.1),
+                       new SleepAction(Wait),
                        new ServoAction(Claw, Claw_Open_Pos),
                        new ParallelAction(
-                               drive.actionBuilder(new Pose2d(8,24,Math.toRadians(-50))) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
-                                       .strafeTo(new Vector2d(16,23))
+                               drive.actionBuilder(new Pose2d(6,24,Math.toRadians(-50))) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
+                                       .strafeTo(new Vector2d(17,23))
                                        .turnTo(Math.toRadians(-10))
                                        .build(),
                                new MotorAction2(FrontSlide, Front_Slide_Intake_Enc, Front_Slide_Extend_Power),
                                new ServoAction(FrontClaw, FrontClaw_Open_Pos),
                                new DoubleServoAction(TwistLeft,TwistRight, TwistL_IntakeReady_Pos, TwistR_IntakeReady_Pos),
-                               new ParallelAction(
-                                       new MotorAction2(deliveryArmLeft, Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power),
-                                       new MotorAction2(deliveryArmRight, Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power)
-                               ),
+                              // new ParallelAction(
+                              //        new MotorAction2(deliveryArmLeft, Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power),
+                              //         new MotorAction2(deliveryArmRight, Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power)
+                             //  ),
                                new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Transfer_Pos,ElbowR_Transfer_Pos)
                        ),
                        new DoubleServoAction(TwistLeft,TwistRight, TwistL_Intake_Pos, TwistR_Intake_Pos),
@@ -194,50 +200,99 @@ public class RR_Basket_Auto extends LinearOpMode {
                                        new MotorAction2(FrontSlide, Front_Slide_Transfer_Enc, Front_Slide_Retract_Power)
                                ),
                        new DoubleServoAction(TwistLeft,TwistRight, TwistL_Transfer_Pos, TwistR_Transfer_Pos),
-                       new ServoAction(FrontClaw, FrontClaw_Open_Pos)
-                   //    new ServoAction(Claw, Claw_Close_Pos)
-
-                       /*drive.actionBuilder(new Pose2d(7,17,Math.toRadians(25))) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
-                               .turnTo(Math.toRadians(-50))
-                               .build(),
-                        new ServoAction(Claw, Claw_Close_Pos),
-                        new ServoAction(FrontClaw, FrontClaw_Open_Pos),
-                        new ParallelAction(
-                                new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_HangReady_Enc,Delivery_Arm_HangReady_Enc,Delivery_Arm_Extend_Power,Delivery_Arm_Extend_Power),
-                                new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Hang_Pos,ElbowR_Hang_Pos)
-                        ),
-                        new ServoAction(Claw, Claw_Open_Pos),
-                       drive.actionBuilder(new Pose2d(7,17,Math.toRadians(-50))) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
-                               .turnTo(Math.toRadians(-55))
-                               .build(),
-                       new MotorAction(FrontSlide, Front_Slide_Intake_Enc, Front_Slide_Extend_Power),
                        new ServoAction(FrontClaw, FrontClaw_Open_Pos),
+                       new SleepAction(Wait),
+                       new ServoAction(Claw, Claw_Close_Pos),
+                       new ParallelAction(
+                               drive.actionBuilder(new Pose2d(17,23,Math.toRadians(-10))) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
+                                       .strafeTo(new Vector2d(6,24))// Change 6 to 8
+                                       .turnTo(Math.toRadians(-50))
+                                       .build(),
+                             //  new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_BasketReady_Enc,Delivery_Arm_BasketReady_Enc,Delivery_Arm_Extend_Power,Delivery_Arm_Extend_Power),
+                               new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Basket_Pos,ElbowR_Basket_Pos)
+                       ),
+                       new SleepAction(Wait),
+                       new ServoAction(Claw, Claw_Open_Pos),
+                       // Second Transfer
+                       new ParallelAction(
+                               drive.actionBuilder(new Pose2d(6,24,Math.toRadians(-50))) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
+                                       .strafeTo(new Vector2d(17,25))
+                                       .turnTo(Math.toRadians(10))
+                                       .build(),
+                               new MotorAction2(FrontSlide, Front_Slide_Intake_Enc, Front_Slide_Extend_Power),
+                               new ServoAction(FrontClaw, FrontClaw_Open_Pos),
+                               new DoubleServoAction(TwistLeft,TwistRight, TwistL_IntakeReady_Pos, TwistR_IntakeReady_Pos),
+                               // new ParallelAction(
+                               //         new MotorAction2(deliveryArmLeft, Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power),
+                               //         new MotorAction2(deliveryArmRight, Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power)
+                               //  ),
+                               new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Transfer_Pos,ElbowR_Transfer_Pos)
+                       ),
                        new DoubleServoAction(TwistLeft,TwistRight, TwistL_Intake_Pos, TwistR_Intake_Pos),
                        new ServoAction(FrontClaw, FrontClaw_Close_Pos),
                        new ParallelAction(
-                               new MotorAction(FrontSlide, Front_Slide_Resting_Enc, Front_Slide_Retract_Power),
-                               new DoubleServoAction(TwistLeft,TwistRight, TwistL_Transfer_Pos, TwistR_Transfer_Pos),
-                               new ParallelAction(
-                                       new MotorAction(deliveryArmLeft, Delivery_Arm_IntakeDone_Enc, Delivery_Arm_Retract_Power),
-                                       new MotorAction(deliveryArmRight, Delivery_Arm_IntakeDone_Enc, Delivery_Arm_Retract_Power)
-                               ),
-                               new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Intake_Pos,ElbowR_Intake_Pos)
+                               new DoubleServoAction(TwistLeft,TwistRight, TwistL_IntakeReady_Pos, TwistR_IntakeReady_Pos),
+                               new MotorAction2(FrontSlide, Front_Slide_Transfer_Enc, Front_Slide_Retract_Power)
                        ),
-                       drive.actionBuilder(new Pose2d(7,17,Math.toRadians(-55))) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
-                               .turnTo(Math.toRadians(-50))
-                               .build(),
-                       new ServoAction(Claw, Claw_Close_Pos),
+                       new DoubleServoAction(TwistLeft,TwistRight, TwistL_Transfer_Pos, TwistR_Transfer_Pos),
                        new ServoAction(FrontClaw, FrontClaw_Open_Pos),
+                       new SleepAction(Wait),
+                       new ServoAction(Claw, Claw_Close_Pos),
                        new ParallelAction(
-                               new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_HangReady_Enc,Delivery_Arm_HangReady_Enc,Delivery_Arm_Extend_Power,Delivery_Arm_Extend_Power),
-                               new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Hang_Pos,ElbowR_Hang_Pos)
+                               drive.actionBuilder(new Pose2d(17,25,Math.toRadians(10))) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
+                                       .strafeTo(new Vector2d(6,24))// Change 6 to 8
+                                       .turnTo(Math.toRadians(-50))
+                                       .build(),
+                               //  new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_BasketReady_Enc,Delivery_Arm_BasketReady_Enc,Delivery_Arm_Extend_Power,Delivery_Arm_Extend_Power),
+                               new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Basket_Pos,ElbowR_Basket_Pos)
                        ),
+                       new SleepAction(Wait),
                        new ServoAction(Claw, Claw_Open_Pos),
-                       drive.actionBuilder(new Pose2d(7,17,Math.toRadians(-50))) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
-                               .turnTo(Math.toRadians(-60))
-                               .build()*/
-
+                       // Third Transfer
+                /*       new ParallelAction(
+                               drive.actionBuilder(new Pose2d(6,24,Math.toRadians(-50))) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
+                                       .strafeTo(new Vector2d(20,25))
+                                       .turnTo(Math.toRadians(90))
+                                       .build(),
+                               new MotorAction2(FrontSlide, Front_Slide_Intake_Enc, Front_Slide_Extend_Power),
+                               new ServoAction(FrontClaw, FrontClaw_Open_Pos),
+                               new DoubleServoAction(TwistLeft,TwistRight, TwistL_IntakeReady_Pos, TwistR_IntakeReady_Pos),
+                               // new ParallelAction(
+                               //         new MotorAction2(deliveryArmLeft, Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power),
+                               //         new MotorAction2(deliveryArmRight, Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power)
+                               //  ),
+                               new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Transfer_Pos,ElbowR_Transfer_Pos)
+                       ),
+                       new DoubleServoAction(TwistLeft,TwistRight, TwistL_Intake_Pos, TwistR_Intake_Pos),
+                       new ServoAction(FrontClaw, FrontClaw_Close_Pos),
+                       new ParallelAction(
+                               new DoubleServoAction(TwistLeft,TwistRight, TwistL_IntakeReady_Pos, TwistR_IntakeReady_Pos),
+                               new MotorAction2(FrontSlide, Front_Slide_Transfer_Enc, Front_Slide_Retract_Power)
+                       ),
+                       new DoubleServoAction(TwistLeft,TwistRight, TwistL_Transfer_Pos, TwistR_Transfer_Pos),
+                       new ServoAction(FrontClaw, FrontClaw_Open_Pos),
+                       new SleepAction(Wait),
+                       new ServoAction(Claw, Claw_Close_Pos),
+                       new ParallelAction(
+                               drive.actionBuilder(new Pose2d(20,25,Math.toRadians(90))) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
+                                       .strafeTo(new Vector2d(6,24))// Change 6 to 8
+                                       .turnTo(Math.toRadians(-50))
+                                       .build(),
+                               //  new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_BasketReady_Enc,Delivery_Arm_BasketReady_Enc,Delivery_Arm_Extend_Power,Delivery_Arm_Extend_Power),
+                               new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Basket_Pos,ElbowR_Basket_Pos)
+                       ),
+                       new SleepAction(Wait),
+                       new ServoAction(Claw, Claw_Open_Pos),*/
+                       new ParallelAction(
+                               drive.actionBuilder(new Pose2d(6,24,Math.toRadians(-50)))
+                                       .strafeTo(new Vector2d(60,5))
+                                       .turnTo(Math.toRadians(90))
+                                       .strafeTo(new Vector2d(61,-7))
+                                       .build(),
+                               new DoubleServoAction(ElbowLeft,ElbowRight, ElbowL_Level1_Pos,ElbowR_Level1_Pos)
                        )
+
+               )
         );
     }
 
