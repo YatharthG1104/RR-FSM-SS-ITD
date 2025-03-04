@@ -20,7 +20,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 @Config
-@Autonomous(name = "RR Path Check")
+//@Autonomous(name = "RR Path Check")
 public class RR_Path_Check extends LinearOpMode {
 
 

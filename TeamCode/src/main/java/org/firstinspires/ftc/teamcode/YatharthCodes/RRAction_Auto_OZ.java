@@ -25,7 +25,7 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.TankDrive;
 
 
-@Autonomous(name = "RRAction Auto_OZ_ZONE")
+//@Autonomous(name = "RRAction Auto_OZ_ZONE")
 public class RRAction_Auto_OZ extends LinearOpMode {
 
     // Time into the Autonomous round

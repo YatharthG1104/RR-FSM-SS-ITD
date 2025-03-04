@@ -21,7 +21,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 @Config
-@Autonomous(name = "Sample road runner Trajectory", group = "Autonomous")
+//@Autonomous(name = "Sample road runner Trajectory", group = "Autonomous")
 public class Sample_RR_Trajectory extends LinearOpMode {
 
     double deliveryarm_high_tick = 3000.0;

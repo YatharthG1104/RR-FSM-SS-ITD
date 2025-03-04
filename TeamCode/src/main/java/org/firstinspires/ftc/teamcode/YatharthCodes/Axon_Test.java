@@ -14,7 +14,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 
-@Autonomous(name = "Axon test")
+//@Autonomous(name = "Axon test")
 public class Axon_Test extends LinearOpMode {
 
     @Override

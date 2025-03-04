@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name = "Clean tele ", group = "Linear OpMode")
+//@TeleOp(name = "Clean tele ", group = "Linear OpMode")
 public class Clean_tele extends LinearOpMode {
 
     // Declare OpMode members

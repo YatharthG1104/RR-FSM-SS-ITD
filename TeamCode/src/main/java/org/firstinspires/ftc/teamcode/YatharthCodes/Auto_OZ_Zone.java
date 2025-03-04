@@ -28,7 +28,7 @@ import org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_Twist;
 import org.firstinspires.ftc.teamcode.Yatharth.SubSystem.SS_FrontSlide;
 
 // Auto for Observation zone to hang specimens
-@Autonomous(name="Observation zone auton" )
+//@Autonomous(name="Observation zone auton" )
 public class Auto_OZ_Zone extends LinearOpMode {
 
     // Define the states of the FSM

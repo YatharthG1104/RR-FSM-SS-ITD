@@ -155,7 +155,6 @@ public class RR_Basket_Auto extends LinearOpMode {
 
         sensorColor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
 
-
         //set  start game clock
         mRuntime.reset();// Zero game clock
 
@@ -168,9 +167,9 @@ public class RR_Basket_Auto extends LinearOpMode {
                new SequentialAction(
                        new ServoAction(Claw,Claw_Close_Pos),
                        new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Hang_Pos,ElbowR_Hang_Pos),
-                      new ParallelAction(
+                       new ParallelAction(
                               new MotorAction2(FrontSlide, Front_Slide_Hold_Enc, Front_Slide_Retract_Power),
-                              drive.actionBuilder(new Pose2d(0,0,0)) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
+                              drive.actionBuilder(new Pose2d(0,0,0))
                                       .strafeTo(new Vector2d(6,24))
                                       .turnTo(Math.toRadians(-50))
                                       .build(),
@@ -180,7 +179,7 @@ public class RR_Basket_Auto extends LinearOpMode {
                        new SleepAction(Wait),
                        new ServoAction(Claw, Claw_Open_Pos),
                        new ParallelAction(
-                               drive.actionBuilder(new Pose2d(6,24,Math.toRadians(-50))) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
+                               drive.actionBuilder(new Pose2d(6,24,Math.toRadians(-50)))
                                        .strafeTo(new Vector2d(17,23))
                                        .turnTo(Math.toRadians(-10))
                                        .build(),
@@ -204,7 +203,7 @@ public class RR_Basket_Auto extends LinearOpMode {
                        new SleepAction(Wait),
                        new ServoAction(Claw, Claw_Close_Pos),
                        new ParallelAction(
-                               drive.actionBuilder(new Pose2d(17,23,Math.toRadians(-10))) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
+                               drive.actionBuilder(new Pose2d(17,23,Math.toRadians(-10)))
                                        .strafeTo(new Vector2d(6,24))// Change 6 to 8
                                        .turnTo(Math.toRadians(-50))
                                        .build(),
@@ -215,7 +214,7 @@ public class RR_Basket_Auto extends LinearOpMode {
                        new ServoAction(Claw, Claw_Open_Pos),
                        // Second Transfer
                        new ParallelAction(
-                               drive.actionBuilder(new Pose2d(6,24,Math.toRadians(-50))) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
+                               drive.actionBuilder(new Pose2d(6,24,Math.toRadians(-50)))
                                        .strafeTo(new Vector2d(17,25))
                                        .turnTo(Math.toRadians(10))
                                        .build(),
@@ -239,7 +238,7 @@ public class RR_Basket_Auto extends LinearOpMode {
                        new SleepAction(Wait),
                        new ServoAction(Claw, Claw_Close_Pos),
                        new ParallelAction(
-                               drive.actionBuilder(new Pose2d(17,25,Math.toRadians(10))) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
+                               drive.actionBuilder(new Pose2d(17,25,Math.toRadians(10)))
                                        .strafeTo(new Vector2d(6,24))// Change 6 to 8
                                        .turnTo(Math.toRadians(-50))
                                        .build(),

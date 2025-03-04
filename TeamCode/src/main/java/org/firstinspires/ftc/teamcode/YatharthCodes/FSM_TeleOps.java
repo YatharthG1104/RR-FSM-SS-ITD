@@ -180,18 +180,14 @@ public class FSM_TeleOps extends OpMode {
 
         sensorColor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
 
-     /*   if(gamepad1.start) {
-            CurrentState = LiftState.Drive;
-            EmergencyStop = false;
-        }*/
         CurrentState = LiftState.Drive;
         EmergencyStop = false;
 
-        //in the init we are making sure evreything is reset
         leftFront.setPower(lfPower);
         leftRear.setPower(lbPower);
         rightFront.setPower(rfPower);
         rightRear.setPower(rbPower);
+
     }
 
     public void loop() {
@@ -221,9 +217,10 @@ public class FSM_TeleOps extends OpMode {
             break;
 
             case SubmersibleReady:
-                Actions.runBlocking(new SequentialAction(
+                Actions.runBlocking(new ParallelAction(
                         new MotorAction2(FrontSlide, Front_Slide_Intake_Enc,Front_Slide_Extend_Power),
-                        new DoubleServoAction(TwistLeft, TwistRight, TwistL_Intake_Pos, TwistR_Intake_Pos)
+                        new DoubleServoAction(TwistLeft, TwistRight, TwistL_Intake_Pos, TwistR_Intake_Pos),
+                        new ServoAction(FrontClaw, FrontClaw_Open_Pos)
                 ));
                 if(gamepad1.left_bumper) {
                     CurrentState = LiftState.SamplePicked;
@@ -239,12 +236,15 @@ public class FSM_TeleOps extends OpMode {
             case SamplePicked:
                 Actions.runBlocking(new ParallelAction(
                         new SequentialAction(
-                                new DoubleServoAction(TwistLeft, TwistRight, TwistL_IntakeMiddle_Pos, TwistR_IntakeMiddle_Pos),
-                                new MotorAction2(FrontSlide, Front_Slide_Transfer_Enc,Front_Slide_Retract_Power),
+                                new ParallelAction(
+                                        new DoubleServoAction(TwistLeft, TwistRight, TwistL_IntakeMiddle_Pos, TwistR_IntakeMiddle_Pos),
+                                        new MotorAction2(FrontSlide, Front_Slide_Transfer_Enc,Front_Slide_Retract_Power)
+                                        ),
                                 new DoubleServoAction(TwistLeft, TwistRight, TwistL_Transfer_Pos, TwistR_Transfer_Pos)
                         ),
                         new DoubleMotorAction(deliveryArmLeft, deliveryArmRight, Delivery_Arm_Transfer_Enc, Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power, Delivery_Arm_Retract_Power),
-                        new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Transfer_Pos, ElbowR_Transfer_Pos)
+                        new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Transfer_Pos, ElbowR_Transfer_Pos),
+                        new ServoAction(Claw,Claw_Open_Pos)
                 ));
                 if(gamepad1.right_bumper) {
                     CurrentState = LiftState.SubmersibleReady;
@@ -384,7 +384,7 @@ public class FSM_TeleOps extends OpMode {
                 servo.setPosition(position);
             }
 
-            return timer.seconds() < 0.5;
+            return timer.seconds() < 0.3;
         }
     }
 
@@ -405,7 +405,7 @@ public class FSM_TeleOps extends OpMode {
                 timer = new ElapsedTime();
                 crServo.setPower(power);
             }
-            return timer.seconds() < 2;
+            return timer.seconds() < 1;
         }
     }
 
@@ -438,7 +438,7 @@ public class FSM_TeleOps extends OpMode {
                 motor1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
-            return timer.seconds() < 1;
+            return timer.seconds() < 0.5;
         }
     }
 
@@ -465,7 +465,7 @@ public class FSM_TeleOps extends OpMode {
                 servo2.setPosition(position2);
             }
 
-            return timer.seconds() < 0.5;
+            return timer.seconds() < 0.3;
         }
     }
 
