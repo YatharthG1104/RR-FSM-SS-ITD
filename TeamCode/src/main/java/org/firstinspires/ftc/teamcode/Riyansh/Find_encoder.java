@@ -119,7 +119,7 @@ public class Find_encoder extends LinearOpMode {
             cp    = Range.clip(dd, -1, 1) ;
 
 
-            a.setPower(-leftPower);//1028,-1028
+            a.setPower(-leftPower);//
             b.setPower(-leftPower);
             d.setPower(cp);
 

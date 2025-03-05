@@ -24,27 +24,27 @@ public class FSM_TeleOps extends OpMode {
 
     public enum LiftState {
         Drive, //regular drive and hardware operations
-       // RetractAll,//retract all sorts of arm etc
+        // RetractAll,//retract all sorts of arm etc
         SubmersibleReady,//ready to pick up a block with the front slide
         SamplePicked, //pickup completed and front slide gets ready to transfer
         TransferBasket,  //complete the transfer and finish basket
         SpecimenPicked,
         SpecimenHanged,
-       // Idle,
+        // Idle,
         Stop
-       // FINAL
+        // FINAL
     };
 
     private LiftState CurrentState;
     private boolean EmergencyStop;
 
-   // LiftState liftState = LiftState.LIFT_START;
+    // LiftState liftState = LiftState.LIFT_START;
 
     //Initialize Non drive motors and servos
-    DcMotor leftFront = null;
-    DcMotor leftRear = null;
-    DcMotor rightFront = null;
-    DcMotor rightRear = null;
+    DcMotor leftFront;
+    DcMotor leftRear;
+    DcMotor rightFront;
+    DcMotor rightRear;
     DcMotor deliveryArmLeft = null;
     DcMotor deliveryArmRight = null;
     DcMotor FrontSlide = null;
@@ -75,10 +75,10 @@ public class FSM_TeleOps extends OpMode {
 
     //Define all Front Slide Arm Encoder positions and power
     public int Front_Slide_Resting_Enc = 0;
-    public int Front_Slide_Intake_Enc = 450;
+    public int Front_Slide_Intake_Enc = 425;
     public int Front_Slide_Transfer_Enc = 0;
-    public double Front_Slide_Extend_Power = 0.9;
-    public double Front_Slide_Retract_Power = -0.9;
+    public double Front_Slide_Extend_Power = 0.5;
+    public double Front_Slide_Retract_Power = -0.5;
 
     //Define all Twist positions
     public static double TwistL_Intake_Pos = -0.87;
@@ -113,20 +113,22 @@ public class FSM_TeleOps extends OpMode {
     public double rbPower;
     public double lbPower;
 
+
+
     @Override
     public void init() {
 
         liftTimer.reset();
 
-      //  Pose2d InitialPose = new Pose2d(0,0,0);     // Beginning pose
+        //  Pose2d InitialPose = new Pose2d(0,0,0);     // Beginning pose
 
         //Importing the hardware maps for all drive motors and setting the robot position
-       // MecanumDrive drive = new MecanumDrive(hardwareMap, InitialPose);
+        // MecanumDrive drive = new MecanumDrive(hardwareMap, InitialPose);
 
-        DcMotor leftFront = hardwareMap.get(DcMotor.class, "leftFront");
-        DcMotor leftRear = hardwareMap.get(DcMotor.class, "leftBack");
-        DcMotor rightFront = hardwareMap.get(DcMotor.class, "rightFront");
-        DcMotor rightRear = hardwareMap.get(DcMotor.class, "rightBack");
+        leftFront = hardwareMap.get(DcMotor.class, "leftFront");
+        leftRear = hardwareMap.get(DcMotor.class, "leftBack");
+        rightFront = hardwareMap.get(DcMotor.class, "rightFront");
+        rightRear = hardwareMap.get(DcMotor.class, "rightBack");
 
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -156,7 +158,7 @@ public class FSM_TeleOps extends OpMode {
         //ElbowLeft.setDirection(Servo.Direction.REVERSE);
 
         ElbowRight = hardwareMap.get(Servo.class, "Elbow Right");
-       // ElbowRight.setDirection(Servo.Direction.FORWARD);
+        // ElbowRight.setDirection(Servo.Direction.FORWARD);
 
         FrontSlide = hardwareMap.get(DcMotor.class, "Front Slide");
         FrontSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);//Front Slide zero power behavior
@@ -182,20 +184,33 @@ public class FSM_TeleOps extends OpMode {
 
         CurrentState = LiftState.Drive;
         EmergencyStop = false;
+    }
 
+    public void loop() {
+
+        //Driving
+        double y = -gamepad1. left_stick_y;
+        double x = gamepad1.left_stick_x;
+        double rx = gamepad1.right_stick_x;
+
+        // Denominator is the largest motor power (absolute value) or 1
+        // This ensures all the powers maintain the same ratio,
+        // but only if at least one is out of the range [-1, 1]
+
+        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+
+        lfPower = (y + x + rx) / denominator;
+        lbPower = (y - x + rx) / denominator;
+        rfPower = (y - x - rx) / denominator;
+        rbPower = (y + x - rx) / denominator;
         leftFront.setPower(lfPower);
         leftRear.setPower(lbPower);
         rightFront.setPower(rfPower);
         rightRear.setPower(rbPower);
 
-    }
-
-    public void loop() {
-
         switch (CurrentState) {
             case Drive:
-                //Driving
-                move();
+
                 //Regular Operations
                 TeleOperations();
                 //Other States
@@ -209,12 +224,12 @@ public class FSM_TeleOps extends OpMode {
                     CurrentState =LiftState.Stop;
                 } else
                 if(gamepad2.dpad_left) {
-                        CurrentState = LiftState.TransferBasket;
-                    } else
+                    CurrentState = LiftState.TransferBasket;
+                } else
                 if(gamepad2.dpad_right) {
                     CurrentState = LiftState.SpecimenPicked;
                 }
-            break;
+                break;
 
             case SubmersibleReady:
                 Actions.runBlocking(new ParallelAction(
@@ -239,7 +254,7 @@ public class FSM_TeleOps extends OpMode {
                                 new ParallelAction(
                                         new DoubleServoAction(TwistLeft, TwistRight, TwistL_IntakeMiddle_Pos, TwistR_IntakeMiddle_Pos),
                                         new MotorAction2(FrontSlide, Front_Slide_Transfer_Enc,Front_Slide_Retract_Power)
-                                        ),
+                                ),
                                 new DoubleServoAction(TwistLeft, TwistRight, TwistL_Transfer_Pos, TwistR_Transfer_Pos)
                         ),
                         new DoubleMotorAction(deliveryArmLeft, deliveryArmRight, Delivery_Arm_Transfer_Enc, Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power, Delivery_Arm_Retract_Power),

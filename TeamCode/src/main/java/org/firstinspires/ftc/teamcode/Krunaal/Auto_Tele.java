@@ -143,7 +143,7 @@ public class Auto_Tele extends LinearOpMode{
 
             double dd = -gamepad2.right_stick_x;
 
-            cp    = Range.clip(dd, -0.9, 0.9) ;
+            cp    = Range.clip(dd, -0.5, 0.5) ;
 
             FS.setPower(cp);
 
@@ -202,7 +202,6 @@ public class Auto_Tele extends LinearOpMode{
 //                wrist.setPosition(-1);
 //            }
             if(gamepad2.left_bumper){
-
                 rightslide.setPosition(-0.6);
                 leftslide.setPosition(0.6);
 //                Front_Claw.setPosition(-1);
@@ -213,18 +212,10 @@ public class Auto_Tele extends LinearOpMode{
             if(gamepad2.right_bumper){
                 rightslide.setPosition(-0.8);//0.5
                 leftslide.setPosition(0.8);
-//                backClaw.setPosition(1);
-//                Front_Claw.setPosition(-1);
-//                BackLeftSlide.setPosition(-0.58);
-//                BackRightSlide.setPosition(0.58);
-
-
-                rightslide.setPosition(-0.1);
-                leftslide.setPosition(0.1);
-            }
-            if(gamepad2.right_bumper){
-                rightslide.setPosition(-0.85);//0.5
-                leftslide.setPosition(0.85);
+                backClaw.setPosition(1);
+                Front_Claw.setPosition(-1);
+                BackLeftSlide.setPosition(-0.58);
+                BackRightSlide.setPosition(0.58);
 
             }
 
@@ -254,13 +245,8 @@ public class Auto_Tele extends LinearOpMode{
             if(gamepad1.right_bumper){
                 FS.setPower(-0.5);
                 FS.setTargetPosition(1000);
-
                 rightslide.setPosition(0.87);
-                leftslide.setPosition(-0.87);
-
-                rightslide.setPosition(0.95);
-                leftslide.setPosition(-0.95);
-
+                leftslide.setPosition(-87);
                 // sleep(1000);
                 //Front_Claw.setPosition(-1);
             }
@@ -296,7 +282,7 @@ public class Auto_Tele extends LinearOpMode{
 
             double d = gamepad2.left_stick_y;
 
-            p = Range.clip(d, -0.9, 0.9) ;
+            p = Range.clip(d, -0.6, 0.6) ;
             DL.setPower(p);//0.5
             DR.setPower(-p);
 
@@ -304,4 +290,3 @@ public class Auto_Tele extends LinearOpMode{
         }
     }
 }
-
