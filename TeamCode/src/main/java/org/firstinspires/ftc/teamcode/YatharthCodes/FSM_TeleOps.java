@@ -28,12 +28,11 @@ public class FSM_TeleOps extends OpMode {
         SubmersibleReady,//ready to pick up a block with the front slide
         TransferReady,
         SamplePicked, //pickup completed and front slide gets ready to transfer
-        TransferBasket,  //complete the transfer and finish basket
+        TransferBasket,  //finish basket
         SpecimenPicked,
         SpecimenHanged,
         // Idle,
         Stop
-        // FINAL
     };
 
     private LiftState CurrentState;
@@ -65,8 +64,8 @@ public class FSM_TeleOps extends OpMode {
     ElapsedTime liftTimer = new ElapsedTime();
 
     //Define all Delivery Arm Encoder positions and power
-    public int Delivery_Arm_Resting_Enc = 100;
-    public int Delivery_Arm_HangReady_Enc = 1200;
+    public int Delivery_Arm_Resting_Enc = 20;
+    public int Delivery_Arm_HangReady_Enc = 1500;
     public int Delivery_Arm_BasketReady_Enc = 2600;
     public int Delivery_Arm_HangDone_Enc = 1000;
     public int Delivery_Arm_IntakeDone_Enc = 300;
@@ -75,9 +74,9 @@ public class FSM_TeleOps extends OpMode {
     public double Delivery_Arm_Retract_Power = -0.9;
 
     //Define all Front Slide Arm Encoder positions and power
-    public int Front_Slide_Resting_Enc = 0;
+    public int Front_Slide_Resting_Enc = -80;
     public int Front_Slide_Intake_Enc = 425;
-    public int Front_Slide_Transfer_Enc = 0;
+    public int Front_Slide_Transfer_Enc = -80;
     public double Front_Slide_Extend_Power = 0.5;
     public double Front_Slide_Retract_Power = -0.5;
 
@@ -88,8 +87,6 @@ public class FSM_TeleOps extends OpMode {
     public static double TwistR_Transfer_Pos = -0.85;
     public static double TwistL_IntakeMiddle_Pos = 0.5;
     public static double TwistR_IntakeMiddle_Pos = -0.5;
-    public static double TwistL_Rest_Pos = 0.0;
-    public static double TwistR_Rest_Pos = 0.0;
 
     //Define all Front Claw Positions
     public static double FrontClaw_Open_Pos = -1.0;
@@ -114,17 +111,10 @@ public class FSM_TeleOps extends OpMode {
     public double rbPower;
     public double lbPower;
 
-
-
     @Override
     public void init() {
 
         liftTimer.reset();
-
-        //  Pose2d InitialPose = new Pose2d(0,0,0);     // Beginning pose
-
-        //Importing the hardware maps for all drive motors and setting the robot position
-        // MecanumDrive drive = new MecanumDrive(hardwareMap, InitialPose);
 
         leftFront = hardwareMap.get(DcMotor.class, "leftFront");
         leftRear = hardwareMap.get(DcMotor.class, "leftBack");
@@ -220,14 +210,14 @@ public class FSM_TeleOps extends OpMode {
                 if(gamepad1.left_bumper){
                     CurrentState = LiftState.SamplePicked;
                 } else
-                if(gamepad1.back){
-                    CurrentState =LiftState.Stop;
-                } else
                 if(gamepad2.dpad_left) {
                     CurrentState = LiftState.TransferBasket;
                 } else
                 if(gamepad2.dpad_right) {
-                    CurrentState = LiftState.SpecimenPicked;
+                    CurrentState = LiftState.TransferReady;
+                } else
+                if(gamepad1.back) {
+                    CurrentState = LiftState.Stop;
                 }
                 break;
 
@@ -243,7 +233,7 @@ public class FSM_TeleOps extends OpMode {
                 if(gamepad1.back){
                     CurrentState =LiftState.Stop;
                 } else
-                if(gamepad1.start){
+                if(gamepad2.back){
                     CurrentState =LiftState.Drive;
                 }
                 break;
@@ -266,7 +256,7 @@ public class FSM_TeleOps extends OpMode {
                 if(gamepad1.back){
                     CurrentState =LiftState.Stop;
                 } else
-                if(gamepad1.start){
+                if(gamepad2.back){
                     CurrentState =LiftState.Drive;
                 } else
                 if(gamepad2.dpad_left){
@@ -279,9 +269,22 @@ public class FSM_TeleOps extends OpMode {
                         new DoubleMotorAction(deliveryArmLeft, deliveryArmRight, Delivery_Arm_BasketReady_Enc, Delivery_Arm_BasketReady_Enc, Delivery_Arm_Extend_Power, Delivery_Arm_Extend_Power),
                         new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Basket_Pos, ElbowR_Basket_Pos)
                 ));
-                if(gamepad1.right_bumper) {
-                    CurrentState = LiftState.SubmersibleReady;
+                if(gamepad1.back){
+                    CurrentState =LiftState.Stop;
                 } else
+                if(gamepad2.back){
+                    CurrentState =LiftState.Drive;
+                }
+                break;
+
+            case TransferReady:
+                Actions.runBlocking(new ParallelAction(
+                        new ParallelAction(
+                                new MotorAction2(deliveryArmLeft,Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power),
+                                new MotorAction2(deliveryArmRight,Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power)
+                        ),
+                        new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Transfer_Pos, ElbowR_Transfer_Pos)
+                ));
                 if(gamepad1.back){
                     CurrentState =LiftState.Stop;
                 } else
