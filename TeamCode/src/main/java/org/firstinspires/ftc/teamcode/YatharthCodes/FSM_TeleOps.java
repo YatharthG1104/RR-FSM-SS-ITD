@@ -26,6 +26,7 @@ public class FSM_TeleOps extends OpMode {
         Drive, //regular drive and hardware operations
         // RetractAll,//retract all sorts of arm etc
         SubmersibleReady,//ready to pick up a block with the front slide
+        TransferReady,
         SamplePicked, //pickup completed and front slide gets ready to transfer
         TransferBasket,  //complete the transfer and finish basket
         SpecimenPicked,
@@ -91,18 +92,18 @@ public class FSM_TeleOps extends OpMode {
     public static double TwistR_Rest_Pos = 0.0;
 
     //Define all Front Claw Positions
-    public static double FrontClaw_Open_Pos = 1.0;
-    public static double FrontClaw_Close_Pos = -1.0;
+    public static double FrontClaw_Open_Pos = -1.0;
+    public static double FrontClaw_Close_Pos = 1.0;
 
     //Define all Claw positions
-    public static double Claw_Open_Pos = 1.0;
-    public static double Claw_Close_Pos = -1.0;
+    public static double Claw_Open_Pos = -1.0;
+    public static double Claw_Close_Pos = 1.0;
 
     //Define all Elbow positions
     public static double ElbowL_Intake_Pos = 0.0;
     public static double ElbowR_Intake_Pos = 0.0;
-    public static double ElbowL_Transfer_Pos = 0.6;
-    public static double ElbowR_Transfer_Pos = 0.6;
+    public static double ElbowL_Transfer_Pos = 0.63;
+    public static double ElbowR_Transfer_Pos = 0.63;
     public static double ElbowL_Hang_Pos = 0.5;
     public static double ElbowR_Hang_Pos = 0.5;
     public static double ElbowL_Basket_Pos = 0.1;
@@ -210,7 +211,6 @@ public class FSM_TeleOps extends OpMode {
 
         switch (CurrentState) {
             case Drive:
-
                 //Regular Operations
                 TeleOperations();
                 //Other States
@@ -257,7 +257,6 @@ public class FSM_TeleOps extends OpMode {
                                 ),
                                 new DoubleServoAction(TwistLeft, TwistRight, TwistL_Transfer_Pos, TwistR_Transfer_Pos)
                         ),
-                        new DoubleMotorAction(deliveryArmLeft, deliveryArmRight, Delivery_Arm_Transfer_Enc, Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power, Delivery_Arm_Retract_Power),
                         new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Transfer_Pos, ElbowR_Transfer_Pos),
                         new ServoAction(Claw,Claw_Open_Pos)
                 ));

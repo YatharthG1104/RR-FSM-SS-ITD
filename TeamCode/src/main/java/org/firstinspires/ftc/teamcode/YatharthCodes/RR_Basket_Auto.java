@@ -44,8 +44,8 @@ public class RR_Basket_Auto extends LinearOpMode {
     ColorSensor sensorColor = null;
 
     //Define all Claw positions
-    public static double Claw_Open_Pos = 0.0;
-    public static double Claw_Close_Pos = 0.7;
+    public static double Claw_Open_Pos = -0.9;
+    public static double Claw_Close_Pos = 0.9;
     public static double Claw_Initial_Pos = 0.7;
 
     //Define all Delivery Arm Encoder positions and power
@@ -73,16 +73,16 @@ public class RR_Basket_Auto extends LinearOpMode {
     //Define all Front Slide Arm Encoder positions and power
     public static int Front_Slide_Resting_Enc = 0;
     public static int Front_Slide_Intake_Enc = 450;
-    public static int Front_Slide_Transfer_Enc = 0;
-    public static int Front_Slide_Hold_Enc = -10;
+    public static int Front_Slide_Transfer_Enc = -70;
+    public static int Front_Slide_Hold_Enc = 0;
     public static double Front_Slide_Extend_Power = 0.9;
     public static double Front_Slide_Retract_Power = -0.9;
 
     //Define all Twist positions
     public static double TwistL_Intake_Pos = 0.95;
     public static double TwistR_Intake_Pos = 0.95;
-    public static double TwistL_Transfer_Pos = -0.95;
-    public static double TwistR_Transfer_Pos = -0.95;
+    public static double TwistL_Transfer_Pos = -0.85;
+    public static double TwistR_Transfer_Pos = -0.85;
     public static double TwistL_IntakeReady_Pos = 0.5;
     public static double TwistR_IntakeReady_Pos = 0.5;
     public static double TwistL_Rest_Pos = 0.0;
@@ -162,7 +162,7 @@ public class RR_Basket_Auto extends LinearOpMode {
 
         if (isStopRequested()) return;
 
-
+        // Pre-loaded specimen drop in upper basket
         Actions.runBlocking(
                new SequentialAction(
                        new ServoAction(Claw,Claw_Close_Pos),
@@ -170,18 +170,18 @@ public class RR_Basket_Auto extends LinearOpMode {
                        new ParallelAction(
                               new MotorAction2(FrontSlide, Front_Slide_Hold_Enc, Front_Slide_Retract_Power),
                               drive.actionBuilder(new Pose2d(0,0,0))
-                                      .strafeTo(new Vector2d(6,24))
-                                      .turnTo(Math.toRadians(-50))
+                                      .strafeToLinearHeading(new Vector2d(6,24), Math.toRadians(-50))
                                       .build(),
                             //  new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_BasketReady_Enc,Delivery_Arm_BasketReady_Enc,Delivery_Arm_Extend_Power,Delivery_Arm_Extend_Power),
                               new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Basket_Pos,ElbowR_Basket_Pos)
                       ),
                        new SleepAction(Wait),
                        new ServoAction(Claw, Claw_Open_Pos),
+
+    //Second sample pick up and drop in upper basket
                        new ParallelAction(
-                               drive.actionBuilder(new Pose2d(6,24,Math.toRadians(-50)))
-                                       .strafeTo(new Vector2d(17,23))
-                                       .turnTo(Math.toRadians(-10))
+                               drive.actionBuilder(new Pose2d(5,24,Math.toRadians(-50)))
+                                       .strafeToLinearHeading(new Vector2d(18,23), Math.toRadians(-10))
                                        .build(),
                                new MotorAction2(FrontSlide, Front_Slide_Intake_Enc, Front_Slide_Extend_Power),
                                new ServoAction(FrontClaw, FrontClaw_Open_Pos),
@@ -203,9 +203,8 @@ public class RR_Basket_Auto extends LinearOpMode {
                        new SleepAction(Wait),
                        new ServoAction(Claw, Claw_Close_Pos),
                        new ParallelAction(
-                               drive.actionBuilder(new Pose2d(17,23,Math.toRadians(-10)))
-                                       .strafeTo(new Vector2d(6,24))// Change 6 to 8
-                                       .turnTo(Math.toRadians(-50))
+                               drive.actionBuilder(new Pose2d(18,23,Math.toRadians(-10)))
+                                       .strafeToLinearHeading(new Vector2d(4,24), Math.toRadians(-50))
                                        .build(),
                              //  new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_BasketReady_Enc,Delivery_Arm_BasketReady_Enc,Delivery_Arm_Extend_Power,Delivery_Arm_Extend_Power),
                                new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Basket_Pos,ElbowR_Basket_Pos)
@@ -214,9 +213,8 @@ public class RR_Basket_Auto extends LinearOpMode {
                        new ServoAction(Claw, Claw_Open_Pos),
                        // Second Transfer
                        new ParallelAction(
-                               drive.actionBuilder(new Pose2d(6,24,Math.toRadians(-50)))
-                                       .strafeTo(new Vector2d(17,25))
-                                       .turnTo(Math.toRadians(10))
+                               drive.actionBuilder(new Pose2d(4,24,Math.toRadians(-50)))
+                                       .strafeToLinearHeading(new Vector2d(17,25), Math.toRadians(10))
                                        .build(),
                                new MotorAction2(FrontSlide, Front_Slide_Intake_Enc, Front_Slide_Extend_Power),
                                new ServoAction(FrontClaw, FrontClaw_Open_Pos),
@@ -239,8 +237,7 @@ public class RR_Basket_Auto extends LinearOpMode {
                        new ServoAction(Claw, Claw_Close_Pos),
                        new ParallelAction(
                                drive.actionBuilder(new Pose2d(17,25,Math.toRadians(10)))
-                                       .strafeTo(new Vector2d(6,24))// Change 6 to 8
-                                       .turnTo(Math.toRadians(-50))
+                                       .strafeToLinearHeading(new Vector2d(4,24), Math.toRadians(-50))
                                        .build(),
                                //  new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_BasketReady_Enc,Delivery_Arm_BasketReady_Enc,Delivery_Arm_Extend_Power,Delivery_Arm_Extend_Power),
                                new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Basket_Pos,ElbowR_Basket_Pos)
@@ -250,7 +247,7 @@ public class RR_Basket_Auto extends LinearOpMode {
                        // Third Transfer
                 /*       new ParallelAction(
                                drive.actionBuilder(new Pose2d(6,24,Math.toRadians(-50))) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
-                                       .strafeTo(new Vector2d(20,25))
+                                       .strafeTo(new Vector2d(25,25))
                                        .turnTo(Math.toRadians(90))
                                        .build(),
                                new MotorAction2(FrontSlide, Front_Slide_Intake_Enc, Front_Slide_Extend_Power),
@@ -273,7 +270,7 @@ public class RR_Basket_Auto extends LinearOpMode {
                        new SleepAction(Wait),
                        new ServoAction(Claw, Claw_Close_Pos),
                        new ParallelAction(
-                               drive.actionBuilder(new Pose2d(20,25,Math.toRadians(90))) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
+                               drive.actionBuilder(new Pose2d(25,25,Math.toRadians(90))) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
                                        .strafeTo(new Vector2d(6,24))// Change 6 to 8
                                        .turnTo(Math.toRadians(-50))
                                        .build(),
@@ -284,9 +281,8 @@ public class RR_Basket_Auto extends LinearOpMode {
                        new ServoAction(Claw, Claw_Open_Pos),*/
                        new ParallelAction(
                                drive.actionBuilder(new Pose2d(6,24,Math.toRadians(-50)))
-                                       .strafeTo(new Vector2d(60,5))
-                                       .turnTo(Math.toRadians(90))
-                                       .strafeTo(new Vector2d(61,-7))
+                                       .strafeToLinearHeading(new Vector2d(52,5), Math.toRadians(90))
+                                       .strafeTo(new Vector2d(53,-7))
                                        .build(),
                                new DoubleServoAction(ElbowLeft,ElbowRight, ElbowL_Level1_Pos,ElbowR_Level1_Pos)
                        )
