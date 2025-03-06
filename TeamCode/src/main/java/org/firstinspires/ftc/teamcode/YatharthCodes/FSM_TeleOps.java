@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -23,16 +24,15 @@ public class FSM_TeleOps extends OpMode {
     // An Enum is used to represent lift states.
 
     public enum LiftState {
-        Drive, //regular drive and hardware operations
-        // RetractAll,//retract all sorts of arm etc
+        RegTele, //regular hardware operations
         SubmersibleReady,//ready to pick up a block with the front slide
-        TransferReady,
         SamplePicked, //pickup completed and front slide gets ready to transfer
-        TransferBasket,  //finish basket
-        SpecimenPicked,
-        SpecimenHanged,
-        // Idle,
-        Stop
+        TransferBasket,  //finish basket except first one
+        PickSpecimen,  //Get ready to Pick specimen from human player
+        SpecimenHangReady, //Pick specimen from human player and get ready to hang
+        SpecimenHanged, //Hang specimen
+        Stop,
+        Reset
     };
 
     private LiftState CurrentState;
@@ -64,19 +64,22 @@ public class FSM_TeleOps extends OpMode {
     ElapsedTime liftTimer = new ElapsedTime();
 
     //Define all Delivery Arm Encoder positions and power
-    public int Delivery_Arm_Resting_Enc = 20;
+    // Left is positive ticks and right is negative ticks
+    // Power is reversed
+    public int Delivery_Arm_Resting_Enc = 10;
     public int Delivery_Arm_HangReady_Enc = 1500;
-    public int Delivery_Arm_BasketReady_Enc = 2600;
-    public int Delivery_Arm_HangDone_Enc = 1000;
+    public int Delivery_Arm_BasketReady_Enc = 2150;
+    public int Delivery_Arm_LowBasketR_Enc = 1050;
+    public int Delivery_Arm_HangDone_Enc = 1050;
     public int Delivery_Arm_IntakeDone_Enc = 300;
-    public int Delivery_Arm_Transfer_Enc = 450;
-    public double Delivery_Arm_Extend_Power = 0.9;
-    public double Delivery_Arm_Retract_Power = -0.9;
+    public int Delivery_Arm_Transfer_Enc = 490;
+    public double Delivery_Arm_Extend_Power = -0.9;
+    public double Delivery_Arm_Retract_Power = 0.9;
 
     //Define all Front Slide Arm Encoder positions and power
-    public int Front_Slide_Resting_Enc = -80;
+    public int Front_Slide_Resting_Enc = -200;
     public int Front_Slide_Intake_Enc = 425;
-    public int Front_Slide_Transfer_Enc = -80;
+    public int Front_Slide_Transfer_Enc = -100;
     public double Front_Slide_Extend_Power = 0.5;
     public double Front_Slide_Retract_Power = -0.5;
 
@@ -87,6 +90,8 @@ public class FSM_TeleOps extends OpMode {
     public static double TwistR_Transfer_Pos = -0.85;
     public static double TwistL_IntakeMiddle_Pos = 0.5;
     public static double TwistR_IntakeMiddle_Pos = -0.5;
+    public static double TwistL_Rest_Pos = 0.85;
+    public static double TwistR_Rest_Pos = -0.85;
 
     //Define all Front Claw Positions
     public static double FrontClaw_Open_Pos = -1.0;
@@ -97,14 +102,21 @@ public class FSM_TeleOps extends OpMode {
     public static double Claw_Close_Pos = 1.0;
 
     //Define all Elbow positions
-    public static double ElbowL_Intake_Pos = 0.0;
-    public static double ElbowR_Intake_Pos = 0.0;
-    public static double ElbowL_Transfer_Pos = 0.63;
-    public static double ElbowR_Transfer_Pos = 0.63;
-    public static double ElbowL_Hang_Pos = 0.5;
-    public static double ElbowR_Hang_Pos = 0.5;
-    public static double ElbowL_Basket_Pos = 0.1;
-    public static double ElbowR_Basket_Pos = 0.1;
+    public static double ElbowL_Intake_Pos = 0.01;
+    public static double ElbowR_Intake_Pos = 0.01;
+    public static double ElbowL_Transfer_Pos = 0.6;
+    public static double ElbowR_Transfer_Pos = 0.6;
+    public static double ElbowL_Hang_Pos = 0.3;
+    public static double ElbowR_Hang_Pos = 0.3;
+    public static double ElbowL_HangDone_Pos = 0.45;
+    public static double ElbowR_HangDone_Pos = 0.45;
+    public static double ElbowL_Basket_Pos = 0.18;
+    public static double ElbowR_Basket_Pos = 0.18 ;
+
+    //Define all Wrist positions and mode
+    public static double Wrist_Intake_Pos = 0.3;
+    public static double Wrist_Hang_Pos = 0.8;
+    public static double Wrist_Rest_Pos = 0.3;
 
     public double lfPower;
     public double rfPower;
@@ -135,21 +147,21 @@ public class FSM_TeleOps extends OpMode {
 
         deliveryArmLeft = hardwareMap.get(DcMotor.class, "Delivery ArmL");
         deliveryArmLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);  //Delivery arm zero power behavior
-        deliveryArmLeft.setDirection(DcMotor.Direction.REVERSE);          //Delivery arm left motor set reversed
+        deliveryArmLeft.setDirection(DcMotor.Direction.FORWARD);          //Delivery arm left motor set reversed
         deliveryArmLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);  //Delivery arm motor reset
         deliveryArmLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);       //Delivery arm run using encoders
 
         deliveryArmRight = hardwareMap.get(DcMotor.class, "Delivery ArmR");
         deliveryArmRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);  //Delivery arm zero power behavior
-        deliveryArmRight.setDirection(DcMotor.Direction.REVERSE);          //Delivery arm right motor set reversed
+        deliveryArmRight.setDirection(DcMotor.Direction.FORWARD);          //Delivery arm right motor set reversed
         deliveryArmRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);  //Delivery arm motor reset
         deliveryArmRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);       //Delivery arm run using encoders
 
         ElbowLeft = hardwareMap.get(Servo.class, "Elbow Left");
-        //ElbowLeft.setDirection(Servo.Direction.REVERSE);
+        ElbowLeft.setDirection(Servo.Direction.REVERSE);
 
         ElbowRight = hardwareMap.get(Servo.class, "Elbow Right");
-        // ElbowRight.setDirection(Servo.Direction.FORWARD);
+        ElbowRight.setDirection(Servo.Direction.FORWARD);
 
         FrontSlide = hardwareMap.get(DcMotor.class, "Front Slide");
         FrontSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);//Front Slide zero power behavior
@@ -173,11 +185,25 @@ public class FSM_TeleOps extends OpMode {
 
         sensorColor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
 
-        CurrentState = LiftState.Drive;
+        CurrentState = LiftState.RegTele;
         EmergencyStop = false;
     }
 
     public void loop() {
+
+        //Print Telemetry for all components and current state
+        telemetry.addData("State",CurrentState);
+        telemetry.addData("Delivery ArmL Position: ", deliveryArmLeft.getCurrentPosition());
+        telemetry.addData("Delivery ArmR Position: ", deliveryArmRight.getCurrentPosition());
+        telemetry.addData("Elbowleft Position: ", ElbowLeft.getPosition());
+        telemetry.addData("ElbowRight Position: ", ElbowRight.getPosition());
+        telemetry.addData("Twist Left Position: ", TwistLeft.getPosition());
+        telemetry.addData("Twist Right Position: ", TwistRight.getPosition());
+        telemetry.addData("Frontslide Position: ", FrontSlide.getCurrentPosition());
+        telemetry.addData("Wrist Position: ", Wrist.getPosition());
+        telemetry.addData("Claw Position: ", Claw.getPosition());
+        telemetry.addData("Front Claw Position:", FrontClaw.getPosition());
+        telemetry.update();
 
         //Driving
         double y = -gamepad1. left_stick_y;
@@ -200,7 +226,7 @@ public class FSM_TeleOps extends OpMode {
         rightRear.setPower(rbPower);
 
         switch (CurrentState) {
-            case Drive:
+            case RegTele:
                 //Regular Operations
                 TeleOperations();
                 //Other States
@@ -213,29 +239,30 @@ public class FSM_TeleOps extends OpMode {
                 if(gamepad2.dpad_left) {
                     CurrentState = LiftState.TransferBasket;
                 } else
+                if (gamepad2.b) {
+                    CurrentState = LiftState.SamplePicked;
+                } else
+                if (gamepad2.x) {
+                    CurrentState = LiftState.SpecimenHangReady;
+                } else
                 if(gamepad2.dpad_right) {
-                    CurrentState = LiftState.TransferReady;
+                    CurrentState = LiftState.SpecimenHanged;
                 } else
                 if(gamepad1.back) {
                     CurrentState = LiftState.Stop;
                 }
+                telemetry.update();
                 break;
 
             case SubmersibleReady:
                 Actions.runBlocking(new ParallelAction(
                         new MotorAction2(FrontSlide, Front_Slide_Intake_Enc,Front_Slide_Extend_Power),
                         new DoubleServoAction(TwistLeft, TwistRight, TwistL_Intake_Pos, TwistR_Intake_Pos),
+                        new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Transfer_Pos, ElbowR_Transfer_Pos),
                         new ServoAction(FrontClaw, FrontClaw_Open_Pos)
                 ));
-                if(gamepad1.left_bumper) {
-                    CurrentState = LiftState.SamplePicked;
-                } else
-                if(gamepad1.back){
-                    CurrentState =LiftState.Stop;
-                } else
-                if(gamepad2.back){
-                    CurrentState =LiftState.Drive;
-                }
+                telemetry.update();
+                CurrentState =LiftState.RegTele;
                 break;
 
             case SamplePicked:
@@ -250,60 +277,87 @@ public class FSM_TeleOps extends OpMode {
                         new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Transfer_Pos, ElbowR_Transfer_Pos),
                         new ServoAction(Claw,Claw_Open_Pos)
                 ));
-                if(gamepad1.right_bumper) {
-                    CurrentState = LiftState.SubmersibleReady;
-                } else
-                if(gamepad1.back){
-                    CurrentState =LiftState.Stop;
-                } else
-                if(gamepad2.back){
-                    CurrentState =LiftState.Drive;
-                } else
-                if(gamepad2.dpad_left){
-                    CurrentState =LiftState.TransferBasket;
-                }
+                telemetry.update();
+                CurrentState =LiftState.RegTele;
                 break;
 
             case TransferBasket:
-                Actions.runBlocking(new ParallelAction(
-                        new DoubleMotorAction(deliveryArmLeft, deliveryArmRight, Delivery_Arm_BasketReady_Enc, Delivery_Arm_BasketReady_Enc, Delivery_Arm_Extend_Power, Delivery_Arm_Extend_Power),
-                        new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Basket_Pos, ElbowR_Basket_Pos)
-                ));
-                if(gamepad1.back){
-                    CurrentState =LiftState.Stop;
-                } else
-                if(gamepad2.back){
-                    CurrentState =LiftState.Drive;
-                }
+                Actions.runBlocking(new SequentialAction(
+                        new ServoAction(Claw,Claw_Close_Pos),
+                        new DoubleMotorAction(deliveryArmLeft, deliveryArmRight, Delivery_Arm_BasketReady_Enc, -Delivery_Arm_BasketReady_Enc,Delivery_Arm_Extend_Power, Delivery_Arm_Extend_Power),
+                        new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Basket_Pos, ElbowR_Basket_Pos),
+                        new SleepAction(0.5),
+                        new ServoAction(Claw,Claw_Open_Pos),
+                                new ParallelAction(
+                                        new MotorAction2(deliveryArmLeft,Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power),
+                                        new MotorAction2(deliveryArmRight,-Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power),
+                                        new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Transfer_Pos, ElbowR_Transfer_Pos)
+                        )
+                        ));
+                telemetry.update();
+                CurrentState =LiftState.RegTele;
                 break;
 
-            case TransferReady:
+            case PickSpecimen:
                 Actions.runBlocking(new ParallelAction(
                         new ParallelAction(
-                                new MotorAction2(deliveryArmLeft,Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power),
-                                new MotorAction2(deliveryArmRight,Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power)
+                                new MotorAction2(deliveryArmLeft,Delivery_Arm_Resting_Enc, Delivery_Arm_Retract_Power),
+                                new MotorAction2(deliveryArmRight,-Delivery_Arm_Resting_Enc, Delivery_Arm_Retract_Power)
                         ),
-                        new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Transfer_Pos, ElbowR_Transfer_Pos)
+                        new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Intake_Pos, ElbowR_Intake_Pos),
+                        new ServoAction(Wrist, Wrist_Intake_Pos),
+                        new ServoAction(Claw,Claw_Open_Pos)
                 ));
-                if(gamepad1.back){
-                    CurrentState =LiftState.Stop;
-                } else
-                if(gamepad1.start){
-                    CurrentState =LiftState.Drive;
-                }
+                telemetry.update();
+                CurrentState = LiftState.RegTele;
                 break;
 
-            case Stop:
+            case SpecimenHangReady:
+                Actions.runBlocking(new SequentialAction(
+                        new ServoAction(Claw, Claw_Close_Pos),
+                        new ParallelAction(
+                                new ParallelAction(
+                                new MotorAction2(deliveryArmLeft,Delivery_Arm_HangReady_Enc, Delivery_Arm_Extend_Power),
+                                new MotorAction2(deliveryArmRight,-Delivery_Arm_HangReady_Enc, Delivery_Arm_Extend_Power)
+                                ),
+                        new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Hang_Pos, ElbowR_Hang_Pos),
+                        new ServoAction(Wrist, Wrist_Hang_Pos)
+                        )
+                        )
+                );
+                telemetry.update();
+                CurrentState = LiftState.RegTele;
+                break;
+
+            case SpecimenHanged:
+                Actions.runBlocking(new SequentialAction(
+                                new ParallelAction(
+                                        new ParallelAction(
+                                                new MotorAction2(deliveryArmLeft,Delivery_Arm_HangDone_Enc, Delivery_Arm_Retract_Power),
+                                                new MotorAction2(deliveryArmRight,-Delivery_Arm_HangDone_Enc, Delivery_Arm_Retract_Power)
+                                        ),
+                                        new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_HangDone_Pos, ElbowR_HangDone_Pos)
+                                ),
+                        new ServoAction(Claw, Claw_Open_Pos)
+                        )
+                );
+                telemetry.update();
+                CurrentState = LiftState.RegTele;
+                break;
+
+
+          /*  case Stop:
                 leftFront.setPower(0);
                 leftRear.setPower(0);
                 rightFront.setPower(0);
                 rightRear.setPower(0);
                 EmergencyStop = true;
 
-                if(gamepad1.start) {
+                if(gamepad2.back) {
                     EmergencyStop = false;
-                    CurrentState = LiftState.Drive;
+                    CurrentState = LiftState.RegTele;
                 }
+                break;*/
 
         }
     }
@@ -329,28 +383,28 @@ public class FSM_TeleOps extends OpMode {
 
     public void TeleOperations() {
         //Back Claw
-        if(gamepad2.x){
+        if(gamepad1.x){
             Claw.setPosition(Claw_Close_Pos);
         }
-        if(gamepad2.b){
+        if(gamepad1.b){
             Claw.setPosition(Claw_Open_Pos);
         }
         //FrontSlide
         double FrontSlideStick = gamepad2.right_stick_x;
-        double FrontSlidePower = Range.clip(FrontSlideStick, -0.9, 0.9);
+        double FrontSlidePower = Range.clip(FrontSlideStick, Front_Slide_Retract_Power, Front_Slide_Extend_Power);
         FrontSlide.setPower(FrontSlidePower);
         //Back Elbow
         if(gamepad1.a){
-            ElbowLeft.setPosition(-0.1);
-            ElbowRight.setPosition(0.1);
+            ElbowLeft.setPosition(ElbowL_Intake_Pos);
+            ElbowRight.setPosition(ElbowR_Intake_Pos);
         }
         if(gamepad2.dpad_up){
-            ElbowLeft.setPosition(0.9);
-            ElbowRight.setPosition(-0.9);
+            ElbowLeft.setPosition(ElbowL_Basket_Pos);
+            ElbowRight.setPosition(ElbowR_Basket_Pos);
         }
         if(gamepad2.dpad_down){
-            ElbowLeft.setPosition(-0.58);
-            ElbowRight.setPosition(0.58);
+            ElbowLeft.setPosition(ElbowL_Transfer_Pos);
+            ElbowRight.setPosition(ElbowR_Transfer_Pos);
         }
         //Front Twist
         if(gamepad2.left_bumper){
@@ -378,7 +432,7 @@ public class FSM_TeleOps extends OpMode {
             FrontWrist.setPower(0);
         //Delivery Arm
         double DeliveryArmStick = gamepad2.left_stick_y;
-        double DeliveryArmPower = Range.clip(DeliveryArmStick, -0.9, 0.9);
+        double DeliveryArmPower = Range.clip(DeliveryArmStick, Delivery_Arm_Extend_Power, Delivery_Arm_Retract_Power);
         deliveryArmLeft.setPower(DeliveryArmPower);
         deliveryArmRight.setPower(-DeliveryArmPower);
     }
@@ -405,27 +459,6 @@ public class FSM_TeleOps extends OpMode {
         }
     }
 
-    //CRServo Action build for roadrunner to use
-    public static class CRServoAction implements Action {
-        CRServo crServo;
-        double power;
-        ElapsedTime timer= null;
-
-        public CRServoAction(CRServo crsrv, double pow ) {
-            this.crServo = crsrv;
-            // this.seconds = sec;
-            this.power = pow;
-        }
-
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if (timer == null) {
-                timer = new ElapsedTime();
-                crServo.setPower(power);
-            }
-            return timer.seconds() < 1;
-        }
-    }
-
     // Double Motor Action build for roadrunner to use
     public static class DoubleMotorAction implements Action {
         DcMotor motor1;
@@ -441,7 +474,7 @@ public class FSM_TeleOps extends OpMode {
             this.position_tgt1 = pos1;
             this.power1 = pow1;
             this.motor2 = mot2;
-            this.position_tgt2 = pos2;
+            this.position_tgt2 = -pos2;
             this.power2 = pow2;
         }
 

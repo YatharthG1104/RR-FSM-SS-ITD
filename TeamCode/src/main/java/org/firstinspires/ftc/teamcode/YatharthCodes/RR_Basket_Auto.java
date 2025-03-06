@@ -51,12 +51,12 @@ public class RR_Basket_Auto extends LinearOpMode {
     //Define all Delivery Arm Encoder positions and power
     public static int Delivery_Arm_Resting_Enc = 100;
     public static int Delivery_Arm_HangReady_Enc = 1200;
-    public static int Delivery_Arm_BasketReady_Enc = 2000;
+    public static int Delivery_Arm_BasketReady_Enc = 2150;
     public static int Delivery_Arm_HangDone_Enc = 1000;
     public static int Delivery_Arm_IntakeDone_Enc = 300;
     public static int Delivery_Arm_Transfer_Enc = 450;
-    public static double Delivery_Arm_Extend_Power = 0.0;// Change to 0.9
-    public static double Delivery_Arm_Retract_Power = 0.0;// Change to -0.9
+    public static double Delivery_Arm_Extend_Power = 0.9;
+    public static double Delivery_Arm_Retract_Power = -0.9;
 
     //Define all Elbow positions
     public static double ElbowL_Intake_Pos = 0.0;
