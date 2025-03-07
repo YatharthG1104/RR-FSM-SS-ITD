@@ -86,8 +86,8 @@ public class FSM_TeleOps extends OpMode {
     //Define all Twist positions
     public static double TwistL_Intake_Pos = -0.87;
     public static double TwistR_Intake_Pos = 0.87;
-    public static double TwistL_Transfer_Pos = 0.85;
-    public static double TwistR_Transfer_Pos = -0.85;
+    public static double TwistL_Transfer_Pos = 0.8;
+    public static double TwistR_Transfer_Pos = -0.8;
     public static double TwistL_IntakeMiddle_Pos = 0.5;
     public static double TwistR_IntakeMiddle_Pos = -0.5;
     public static double TwistL_Rest_Pos = 0.85;
