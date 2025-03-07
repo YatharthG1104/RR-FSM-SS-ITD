@@ -34,7 +34,7 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 import java.util.Locale;
 
-@TeleOp(name="FSM tele Riyansh")
+//@TeleOp(name="FSM tele Riyansh")
 public class FsmTeleRiyansh extends OpMode {
     // An Enum is used to represent lift states.
     // (This is one thing enums are designed to do)

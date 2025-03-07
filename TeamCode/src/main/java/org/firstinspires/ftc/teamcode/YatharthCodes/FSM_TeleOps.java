@@ -18,7 +18,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name="TeleOps FSM YG")
+@TeleOp(name="AA_TeleOps FSM")
 
 public class FSM_TeleOps extends OpMode {
     // An Enum is used to represent lift states.
@@ -70,7 +70,7 @@ public class FSM_TeleOps extends OpMode {
     public int Delivery_Arm_HangReady_Enc = 1500;
     public int Delivery_Arm_BasketReady_Enc = 2150;
     public int Delivery_Arm_LowBasketR_Enc = 1050;
-    public int Delivery_Arm_HangDone_Enc = 1050;
+    public int Delivery_Arm_HangDone_Enc = 1450;
     public int Delivery_Arm_IntakeDone_Enc = 300;
     public int Delivery_Arm_Transfer_Enc = 490;
     public double Delivery_Arm_Extend_Power = -0.9;
@@ -106,17 +106,17 @@ public class FSM_TeleOps extends OpMode {
     public static double ElbowR_Intake_Pos = 0.01;
     public static double ElbowL_Transfer_Pos = 0.6;
     public static double ElbowR_Transfer_Pos = 0.6;
-    public static double ElbowL_Hang_Pos = 0.3;
-    public static double ElbowR_Hang_Pos = 0.3;
-    public static double ElbowL_HangDone_Pos = 0.45;
-    public static double ElbowR_HangDone_Pos = 0.45;
+    public static double ElbowL_Hang_Pos = 0.15;
+    public static double ElbowR_Hang_Pos = 0.15;
+    public static double ElbowL_HangDone_Pos = 0.47;
+    public static double ElbowR_HangDone_Pos = 0.47;
     public static double ElbowL_Basket_Pos = 0.18;
     public static double ElbowR_Basket_Pos = 0.18 ;
 
     //Define all Wrist positions and mode
-    public static double Wrist_Intake_Pos = 0.3;
-    public static double Wrist_Hang_Pos = 0.8;
-    public static double Wrist_Rest_Pos = 0.3;
+    public static double Wrist_Intake_Pos = 0.25;
+    public static double Wrist_Hang_Pos = 0.9;
+    public static double Wrist_Rest_Pos = 0.25;
 
     public double lfPower;
     public double rfPower;
@@ -205,28 +205,11 @@ public class FSM_TeleOps extends OpMode {
         telemetry.addData("Front Claw Position:", FrontClaw.getPosition());
         telemetry.update();
 
-        //Driving
-        double y = -gamepad1. left_stick_y;
-        double x = gamepad1.left_stick_x;
-        double rx = gamepad1.right_stick_x;
-
-        // Denominator is the largest motor power (absolute value) or 1
-        // This ensures all the powers maintain the same ratio,
-        // but only if at least one is out of the range [-1, 1]
-
-        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-
-        lfPower = (y + x + rx) / denominator;
-        lbPower = (y - x + rx) / denominator;
-        rfPower = (y - x - rx) / denominator;
-        rbPower = (y + x - rx) / denominator;
-        leftFront.setPower(lfPower);
-        leftRear.setPower(lbPower);
-        rightFront.setPower(rfPower);
-        rightRear.setPower(rbPower);
+        move();
 
         switch (CurrentState) {
             case RegTele:
+                move();
                 //Regular Operations
                 TeleOperations();
                 //Other States
@@ -240,7 +223,7 @@ public class FSM_TeleOps extends OpMode {
                     CurrentState = LiftState.TransferBasket;
                 } else
                 if (gamepad2.b) {
-                    CurrentState = LiftState.SamplePicked;
+                    CurrentState = LiftState.PickSpecimen;
                 } else
                 if (gamepad2.x) {
                     CurrentState = LiftState.SpecimenHangReady;
@@ -255,6 +238,7 @@ public class FSM_TeleOps extends OpMode {
                 break;
 
             case SubmersibleReady:
+                move();
                 Actions.runBlocking(new ParallelAction(
                         new MotorAction2(FrontSlide, Front_Slide_Intake_Enc,Front_Slide_Extend_Power),
                         new DoubleServoAction(TwistLeft, TwistRight, TwistL_Intake_Pos, TwistR_Intake_Pos),
@@ -266,6 +250,7 @@ public class FSM_TeleOps extends OpMode {
                 break;
 
             case SamplePicked:
+                move();
                 Actions.runBlocking(new ParallelAction(
                         new SequentialAction(
                                 new ParallelAction(
@@ -282,6 +267,7 @@ public class FSM_TeleOps extends OpMode {
                 break;
 
             case TransferBasket:
+                move();
                 Actions.runBlocking(new SequentialAction(
                         new ServoAction(Claw,Claw_Close_Pos),
                         new DoubleMotorAction(deliveryArmLeft, deliveryArmRight, Delivery_Arm_BasketReady_Enc, -Delivery_Arm_BasketReady_Enc,Delivery_Arm_Extend_Power, Delivery_Arm_Extend_Power),
@@ -299,6 +285,7 @@ public class FSM_TeleOps extends OpMode {
                 break;
 
             case PickSpecimen:
+                move();
                 Actions.runBlocking(new ParallelAction(
                         new ParallelAction(
                                 new MotorAction2(deliveryArmLeft,Delivery_Arm_Resting_Enc, Delivery_Arm_Retract_Power),
@@ -313,6 +300,7 @@ public class FSM_TeleOps extends OpMode {
                 break;
 
             case SpecimenHangReady:
+                move();
                 Actions.runBlocking(new SequentialAction(
                         new ServoAction(Claw, Claw_Close_Pos),
                         new ParallelAction(
@@ -330,6 +318,7 @@ public class FSM_TeleOps extends OpMode {
                 break;
 
             case SpecimenHanged:
+                move();
                 Actions.runBlocking(new SequentialAction(
                                 new ParallelAction(
                                         new ParallelAction(
@@ -364,6 +353,7 @@ public class FSM_TeleOps extends OpMode {
 
 
     public void move(){
+        //Driving
         double y = -gamepad1. left_stick_y;
         double x = gamepad1.left_stick_x;
         double rx = gamepad1.right_stick_x;
@@ -378,7 +368,10 @@ public class FSM_TeleOps extends OpMode {
         lbPower = (y - x + rx) / denominator;
         rfPower = (y - x - rx) / denominator;
         rbPower = (y + x - rx) / denominator;
-
+        leftFront.setPower(lfPower);
+        leftRear.setPower(lbPower);
+        rightFront.setPower(rfPower);
+        rightRear.setPower(rbPower);
     }
 
     public void TeleOperations() {

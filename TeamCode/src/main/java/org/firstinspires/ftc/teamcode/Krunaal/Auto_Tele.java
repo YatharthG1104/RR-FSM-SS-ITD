@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name="Tele Automated", group="Linear OpMode")
+//@TeleOp(name="Tele Automated", group="Linear OpMode")
 public class Auto_Tele extends LinearOpMode{
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftDrive = null;

@@ -22,7 +22,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 
-@Autonomous(name = "RRAction Auto_OZ_ZONE krunnal")
+//@Autonomous(name = "RRAction Auto_OZ_ZONE krunnal")
 public class RRAction_Auto_OZ extends LinearOpMode {
 
     // Time into the Autonomous round

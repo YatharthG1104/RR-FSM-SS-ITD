@@ -52,7 +52,7 @@ public class Trajectory_Test extends LinearOpMode {
         ER.setDirection(Servo.Direction.FORWARD);
         ER.scaleRange(-1,1);
 
-        TWL.setDirection(Servo.Direction.REVERSE);
+        TWL.setDirection(Servo.Direction.FORWARD);
         TWR.setDirection(Servo.Direction.FORWARD);
 
         DAR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);  //Delivery arm zero power behavior
@@ -215,19 +215,19 @@ public class Trajectory_Test extends LinearOpMode {
                        // new DoubleServoAction(EL,ER, 0.0,0.0),
                        // new DoubleServoAction(TWL,TWR, 1.0,1.0),
                      //   new ServoAction(W, 0.4),
-                        new ServoAction(GL, 1.0),
+                        new ServoAction(C, 1.0),
                    //     new ServoAction(C, 1.0),
                       //  new DoubleServoAction(TWL,TWR, -0.95,-0.95),
                      //   new DoubleServoAction(EL,ER, 0.1,0.1),
                       //  new DoubleServoAction(TWL,TWR, 0.5,0.5),
-                        new ServoAction(GL, -1.0),
+                        new ServoAction(C, -1.0),
                       //  new DoubleServoAction(TWL,TWR, 0.95,0.95),
                        // new DoubleServoAction(EL,ER, 0.5,0.5),
-                        new ServoAction(GL, 1.0),
+                        new ServoAction(C, 1.0),
                         //new DoubleServoAction(EL,ER, 0.7,0.7),
                       //  new DoubleServoAction(TWL,TWR, -0.8,-0.8),
-                        new ServoAction(GL, -1.0),
-                        new ServoAction(GL, 1.0)
+                        new ServoAction(C, -1.0),
+                        new ServoAction(C, 1.0)
                         //new DoubleServoAction(EL,ER, 0.4,0.4),
                        // new ServoAction(GL, 0.7),
                     //    new MotorAction2(FS,500, 0.3),

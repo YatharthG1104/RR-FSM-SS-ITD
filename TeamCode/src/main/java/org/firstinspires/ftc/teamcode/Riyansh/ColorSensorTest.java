@@ -30,7 +30,7 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 import java.util.Locale;
 
-@TeleOp(name="color")
+//@TeleOp(name="color")
 public class ColorSensorTest extends OpMode {
     // An Enum is used to represent lift states.
     // (This is one thing enums are designed to do)

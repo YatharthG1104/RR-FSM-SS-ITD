@@ -55,7 +55,7 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name="way to find ticks", group="Linear OpMode")
+//@TeleOp(name="way to find ticks", group="Linear OpMode")
 //@Disabled
 public class Find_encoder extends LinearOpMode {
 

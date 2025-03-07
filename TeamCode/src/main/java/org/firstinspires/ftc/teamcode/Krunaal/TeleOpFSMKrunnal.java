@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="TeleOp FSM", group="Linear OpMode")
+//@TeleOp(name="TeleOp FSM", group="Linear OpMode")
 public class TeleOpFSMKrunnal extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
