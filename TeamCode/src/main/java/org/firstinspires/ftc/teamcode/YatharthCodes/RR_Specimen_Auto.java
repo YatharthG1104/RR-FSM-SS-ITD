@@ -51,7 +51,7 @@ public class RR_Specimen_Auto extends LinearOpMode {
     public static double Claw_Open_Pos = -1.0;
     public static double Claw_Close_Pos = 1.0;
 
-    public int Delivery_Arm_Resting_Enc = 10;
+    public int Delivery_Arm_Resting_Enc = 0;
     public int Delivery_Arm_HangReady_Enc = 1500;
     public int Delivery_Arm_HangDone_Enc = 1500;
     public int Delivery_Arm_IntakeDone_Enc = 300;
@@ -60,16 +60,16 @@ public class RR_Specimen_Auto extends LinearOpMode {
     public static int Delivery_Arm_HangIntake_Enc = 100;
 
     //Define all Elbow positions
-    public static double ElbowL_Intake_Pos = 0.0;
-    public static double ElbowR_Intake_Pos = 0.0;
-    public static double ElbowL_Transfer_Pos = 0.6;
-    public static double ElbowR_Transfer_Pos = 0.6;
-    public static double ElbowL_Hang_Pos = 0.18;
-    public static double ElbowR_Hang_Pos = 0.18;
-    public static double ElbowL_HangDone_Pos = 0.47;
-    public static double ElbowR_HangDone_Pos = 0.47;
-    public static double ElbowL_Rest_Pos = 0.2;
-    public static double ElbowR_Rest_Pos = 0.2;
+    public static double ElbowL_Intake_Pos = 0.02;
+    public static double ElbowR_Intake_Pos = 0.02;
+    public static double ElbowL_Transfer_Pos = 0.63;
+    public static double ElbowR_Transfer_Pos = 0.63;
+    public static double ElbowL_Hang_Pos = 0.2;
+    public static double ElbowR_Hang_Pos = 0.2;
+    public static double ElbowL_HangDone_Pos = 0.55;
+    public static double ElbowR_HangDone_Pos = 0.55;
+    public static double ElbowL_Rest_Pos = 0.5;
+    public static double ElbowR_Rest_Pos = 0.5;
 
     //Define all Twist positions
     public static double TwistL_Intake_Pos = -0.85;
@@ -87,6 +87,7 @@ public class RR_Specimen_Auto extends LinearOpMode {
 
     // Wait Variable
     public static double Wait = 0.05;
+    public static double servo_stepsize = 0.01;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -158,8 +159,8 @@ public class RR_Specimen_Auto extends LinearOpMode {
         Actions.runBlocking(
             new SequentialAction(
                     new ServoAction(Claw, Claw_Close_Pos),
-                    new SleepAction(0.3),
                     new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Hang_Pos,ElbowR_Hang_Pos),
+                    new SleepAction(0.6),
                     new ParallelAction(
                             drive.actionBuilder(new Pose2d(0,0,0))
                                     .lineToX(30)
@@ -175,45 +176,30 @@ public class RR_Specimen_Auto extends LinearOpMode {
                                 .setTangent(Math.toRadians(0))
                                 .lineToX(10)
                                 .setTangent(-Math.PI/2)
-                                .splineToConstantHeading(new Vector2d(53,-35), Math.PI/2)
-                                .setTangent(Math.PI/2)
-                                .splineToConstantHeading(new Vector2d(55,-37), Math.PI/2)
+                                .splineToConstantHeading(new Vector2d(53,-33), Math.PI/2)
+                                .strafeTo(new Vector2d(54,-38))
+                                //.setTangent(Math.PI/2)
+                               // .splineToConstantHeading(new Vector2d(55,-37), Math.PI/2)
                                 .setReversed(true)
                                 .setTangent(0)
-                                .lineToX(8)
-                                .strafeTo(new Vector2d(55,-42))
-                                .strafeTo(new Vector2d(55,-50))
-                                .setReversed(true)
-                                .setTangent(0)
-                                .lineToX(8)
-                             //   .strafeToLinearHeading(new Vector2d(10,-30), 0)
-                               // .strafeTo(new Vector2d(7,-30))
+                                .lineToX(12)
                                 .build(),
                         new ServoAction(Wrist,Wrist_Intake_Pos),
-                        new ParallelAction(
-                                new MotorAction2(deliveryArmLeft,Delivery_Arm_HangIntake_Enc,Delivery_Arm_Retract_Power),
-                                new MotorAction2(deliveryArmRight,Delivery_Arm_HangIntake_Enc,Delivery_Arm_Retract_Power)
-                        )
+                            new MotorAction2(deliveryArmLeft,Delivery_Arm_HangIntake_Enc,Delivery_Arm_Retract_Power),
+                            new MotorAction2(deliveryArmRight,Delivery_Arm_HangIntake_Enc,Delivery_Arm_Retract_Power)
                     ),
-                    new DoubleServoAction(ElbowLeft,ElbowRight, ElbowL_Intake_Pos,ElbowR_Intake_Pos),
-                    new ServoAction(Claw, Claw_Close_Pos),
-                    new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Hang_Pos,ElbowR_Hang_Pos),
-                    new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_IntakeDone_Enc,Delivery_Arm_IntakeDone_Enc, Delivery_Arm_Extend_Power,Delivery_Arm_Extend_Power),
-                    new DoubleServoAction(TwistLeft,TwistRight, TwistL_IntakeReady_Pos, TwistR_IntakeReady_Pos),
-                    new ParallelAction(
-                        drive.actionBuilder(new Pose2d(7,-30,0))
-                                .strafeToLinearHeading(new Vector2d(31, 15),0)
-                                .build(),
-                            new MotorAction2(FrontSlide, Front_Slide_Resting_Enc, Front_Slide_Retract_Power),
-                            new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_HangReady_Enc,Delivery_Arm_HangReady_Enc,Delivery_Arm_Extend_Power,Delivery_Arm_Extend_Power),
-                            new ServoAction(Wrist, Wrist_Hang_Pos)
-                        ),
-                    new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_HangDone_Pos,ElbowR_HangDone_Pos),
-                    new ServoAction(Claw, Claw_Open_Pos)
-                    )
-
-             );
-
+                    new SequentialAction(
+                            new DoubleServoAction(ElbowLeft,ElbowRight, ElbowL_Intake_Pos,ElbowR_Intake_Pos),
+                    drive.actionBuilder(new Pose2d(12,-35,0))
+                                    .waitSeconds(0.5)
+                                    .setReversed(true)
+                                    .setTangent(0)
+                                    .lineToX(7)
+                                    .build()
+                   // new ServoAction(Claw, Claw_Close_Pos)
+            )
+            )
+        );
 
     }
 
@@ -235,52 +221,7 @@ public class RR_Specimen_Auto extends LinearOpMode {
                 servo.setPosition(position);
             }
 
-            return timer.seconds() < 0.5;
-        }
-    }
-
-    // Motor Action build for roadrunner to use
-    public static class MotorAction implements Action {
-        DcMotor motor;
-        double position_tgt;
-        double power;
-        ElapsedTime timer = null;
-
-        public MotorAction (DcMotor mot, double pos, double pow) {
-            this.motor = mot;
-            this.position_tgt = pos;
-            this.power = pow;
-        }
-
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if (motor.getCurrentPosition() < position_tgt) {
-                timer = new ElapsedTime();
-                motor.setPower(power);
-                motor.setTargetPosition((int) (position_tgt));
-                motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            }
-            return timer.seconds() < 1;
-        }
-    }
-
-    //CRServo Action build for roadrunner to use
-    public static class CRServoAction implements Action {
-        CRServo crServo;
-        double power;
-        ElapsedTime timer= null;
-
-        public CRServoAction(CRServo crsrv, double pow ) {
-            this.crServo = crsrv;
-            // this.seconds = sec;
-            this.power = pow;
-        }
-
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if (timer == null) {
-                timer = new ElapsedTime();
-                crServo.setPower(power);
-            }
-            return timer.seconds() < 2;
+            return timer.seconds() < 0.3;
         }
     }
 
@@ -313,7 +254,7 @@ public class RR_Specimen_Auto extends LinearOpMode {
                 motor1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
-            return timer.seconds() < 1;
+            return timer.seconds() < 0.5;
         }
     }
 
@@ -340,7 +281,7 @@ public class RR_Specimen_Auto extends LinearOpMode {
                 servo2.setPosition(position2);
             }
 
-            return timer.seconds() < 0.5;
+            return timer.seconds() < 1;
         }
     }
 
@@ -370,4 +311,109 @@ public class RR_Specimen_Auto extends LinearOpMode {
         }
     }
 
+    // Servo stepwise decrease action build for roadrunner to use
+    public static class DecStepServoAction implements Action {
+        Servo servo;
+        double endposition;
+        double startposition;
+        double stepcount;
+        double stepsize;
+        ElapsedTime timer= null;
+
+        public DecStepServoAction(Servo srv, double pos) {
+            this.servo= srv;
+            this.endposition = pos;
+            this.startposition = srv.getPosition();
+            this.stepsize = servo_stepsize;
+            this.stepcount = (this.startposition - this.endposition)/this.stepsize;
+        }
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+           for (int i= 0; i<= stepcount; i++) {
+               double CurrentPosition = startposition - (stepsize*i);
+               servo.setPosition(CurrentPosition);
+               return true;
+           }
+           return false;
+        }
+    }
+
+    // Servo stepwise decrease action build for roadrunner to use
+    public static class IncStepServoAction implements Action {
+        Servo servo;
+        double endposition;
+        double startposition;
+        double stepcount;
+        double stepsize;
+        ElapsedTime timer= null;
+
+        public IncStepServoAction(Servo srv, double pos) {
+            this.servo= srv;
+            this.endposition = pos;
+            this.startposition = srv.getPosition();
+            this.stepsize = servo_stepsize;
+            this.stepcount = (-this.startposition + this.endposition)/this.stepsize;
+        }
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            for (int i= 0; i<= stepcount; i++) {
+                double CurrentPosition = startposition + (stepsize*i);
+                servo.setPosition(CurrentPosition);
+                return true;
+            }
+            return false;
+        }
+    }
+
 }
+
+
+
+/*  .strafeTo(new Vector2d(55,-42))
+                                .strafeTo(new Vector2d(55,-50))
+                                .setReversed(true)
+                                .setTangent(0)
+                                .lineToX(8)*/
+//   .strafeToLinearHeading(new Vector2d(10,-30), 0)
+// .strafeTo(new Vector2d(7,-30))
+
+       /*   new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Hang_Pos,ElbowR_Hang_Pos),
+                    new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_IntakeDone_Enc,Delivery_Arm_IntakeDone_Enc, Delivery_Arm_Extend_Power,Delivery_Arm_Extend_Power),
+                    new DoubleServoAction(TwistLeft,TwistRight, TwistL_IntakeReady_Pos, TwistR_IntakeReady_Pos),
+                    new ParallelAction(
+                        drive.actionBuilder(new Pose2d(8,-37,0))
+                                .strafeToLinearHeading(new Vector2d(31, 15),0)
+                                .build(),
+                            new MotorAction2(FrontSlide, Front_Slide_Resting_Enc, Front_Slide_Retract_Power),
+                            new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_HangReady_Enc,Delivery_Arm_HangReady_Enc,Delivery_Arm_Extend_Power,Delivery_Arm_Extend_Power),
+                            new ServoAction(Wrist, Wrist_Hang_Pos)
+                        ),
+                    new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_HangDone_Pos,ElbowR_HangDone_Pos),
+                    new ServoAction(Claw, Claw_Open_Pos),
+                    new ParallelAction(
+                            drive.actionBuilder(new Pose2d(31,15,0))
+                            .strafeTo(new Vector2d(55,-37))
+                            .build(),
+                            new ServoAction(Wrist,Wrist_Intake_Pos),
+                            new ParallelAction(
+                                    new MotorAction2(deliveryArmLeft,Delivery_Arm_HangIntake_Enc,Delivery_Arm_Retract_Power),
+                                    new MotorAction2(deliveryArmRight,Delivery_Arm_HangIntake_Enc,Delivery_Arm_Retract_Power)
+                            )
+                        ),
+                    new DoubleServoAction(ElbowLeft,ElbowRight, ElbowL_Intake_Pos,ElbowR_Intake_Pos),
+                    new ServoAction(Claw, Claw_Close_Pos),
+                    new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Hang_Pos,ElbowR_Hang_Pos),
+                    new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_IntakeDone_Enc,Delivery_Arm_IntakeDone_Enc, Delivery_Arm_Extend_Power,Delivery_Arm_Extend_Power),
+                    new DoubleServoAction(TwistLeft,TwistRight, TwistL_IntakeReady_Pos, TwistR_IntakeReady_Pos),
+                    new ParallelAction(
+                            drive.actionBuilder(new Pose2d(55,-37,0))
+                                    .strafeToLinearHeading(new Vector2d(31, 15),0)
+                                    .build(),
+                            new MotorAction2(FrontSlide, Front_Slide_Resting_Enc, Front_Slide_Retract_Power),
+                            new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_HangReady_Enc,Delivery_Arm_HangReady_Enc,Delivery_Arm_Extend_Power,Delivery_Arm_Extend_Power),
+                            new ServoAction(Wrist, Wrist_Hang_Pos)
+                    ),
+                    new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_HangDone_Pos,ElbowR_HangDone_Pos),
+                    new ServoAction(Claw, Claw_Open_Pos)
+                    )
+*/

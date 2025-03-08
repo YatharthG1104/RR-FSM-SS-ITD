@@ -32,7 +32,7 @@ public class FSM_TeleOps extends OpMode {
         SpecimenHangReady, //Pick specimen from human player and get ready to hang
         SpecimenHanged, //Hang specimen
         Stop,
-        Reset
+        Begin
     };
 
     private LiftState CurrentState;
@@ -66,13 +66,13 @@ public class FSM_TeleOps extends OpMode {
     //Define all Delivery Arm Encoder positions and power
     // Left is positive ticks and right is negative ticks
     // Power is reversed
-    public int Delivery_Arm_Resting_Enc = 10;
+    public int Delivery_Arm_Resting_Enc = 0;
     public int Delivery_Arm_HangReady_Enc = 1500;
-    public int Delivery_Arm_BasketReady_Enc = 2150;
+    public int Delivery_Arm_BasketReady_Enc = 2500;
     public int Delivery_Arm_LowBasketR_Enc = 1050;
     public int Delivery_Arm_HangDone_Enc = 1450;
     public int Delivery_Arm_IntakeDone_Enc = 300;
-    public int Delivery_Arm_Transfer_Enc = 490;
+    public int Delivery_Arm_Transfer_Enc = 530;
     public double Delivery_Arm_Extend_Power = -0.9;
     public double Delivery_Arm_Retract_Power = 0.9;
 
@@ -84,8 +84,8 @@ public class FSM_TeleOps extends OpMode {
     public double Front_Slide_Retract_Power = -0.5;
 
     //Define all Twist positions
-    public static double TwistL_Intake_Pos = -0.87;
-    public static double TwistR_Intake_Pos = 0.87;
+    public static double TwistL_Intake_Pos = -0.9;
+    public static double TwistR_Intake_Pos = 0.9;
     public static double TwistL_Transfer_Pos = 0.8;
     public static double TwistR_Transfer_Pos = -0.8;
     public static double TwistL_IntakeMiddle_Pos = 0.5;
@@ -102,16 +102,16 @@ public class FSM_TeleOps extends OpMode {
     public static double Claw_Close_Pos = 1.0;
 
     //Define all Elbow positions
-    public static double ElbowL_Intake_Pos = 0.01;
-    public static double ElbowR_Intake_Pos = 0.01;
-    public static double ElbowL_Transfer_Pos = 0.6;
-    public static double ElbowR_Transfer_Pos = 0.6;
-    public static double ElbowL_Hang_Pos = 0.15;
-    public static double ElbowR_Hang_Pos = 0.15;
-    public static double ElbowL_HangDone_Pos = 0.47;
-    public static double ElbowR_HangDone_Pos = 0.47;
-    public static double ElbowL_Basket_Pos = 0.18;
-    public static double ElbowR_Basket_Pos = 0.18 ;
+    public static double ElbowL_Intake_Pos = 0.02;
+    public static double ElbowR_Intake_Pos = 0.02;
+    public static double ElbowL_Transfer_Pos = 0.63;
+    public static double ElbowR_Transfer_Pos = 0.63;
+    public static double ElbowL_Hang_Pos = 0.2;
+    public static double ElbowR_Hang_Pos = 0.2;
+    public static double ElbowL_HangDone_Pos = 0.45;
+    public static double ElbowR_HangDone_Pos = 0.45;
+    public static double ElbowL_Basket_Pos = 0.15;
+    public static double ElbowR_Basket_Pos = 0.15 ;
 
     //Define all Wrist positions and mode
     public static double Wrist_Intake_Pos = 0.25;
@@ -233,6 +233,9 @@ public class FSM_TeleOps extends OpMode {
                 } else
                 if(gamepad1.back) {
                     CurrentState = LiftState.Stop;
+                } else
+                if(gamepad2.start) {
+                    CurrentState = LiftState.Begin;
                 }
                 telemetry.update();
                 break;
@@ -334,8 +337,18 @@ public class FSM_TeleOps extends OpMode {
                 CurrentState = LiftState.RegTele;
                 break;
 
+            case Begin:
+                Actions.runBlocking(
+                        new SequentialAction(
+                               new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_Transfer_Enc, Delivery_Arm_Transfer_Enc, Delivery_Arm_Extend_Power, Delivery_Arm_Extend_Power),
+                               new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Transfer_Pos,ElbowR_Transfer_Pos)
+                        )
+                );
+                telemetry.update();
+                CurrentState = LiftState.RegTele;
+                break;
 
-          /*  case Stop:
+           case Stop:
                 leftFront.setPower(0);
                 leftRear.setPower(0);
                 rightFront.setPower(0);
@@ -346,7 +359,7 @@ public class FSM_TeleOps extends OpMode {
                     EmergencyStop = false;
                     CurrentState = LiftState.RegTele;
                 }
-                break;*/
+                break;
 
         }
     }
