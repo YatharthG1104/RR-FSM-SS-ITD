@@ -68,11 +68,11 @@ public class FSM_TeleOps extends OpMode {
     // Power is reversed
     public int Delivery_Arm_Resting_Enc = 0;
     public int Delivery_Arm_HangReady_Enc = 1500;
-    public int Delivery_Arm_BasketReady_Enc = 2500;
+    public int Delivery_Arm_BasketReady_Enc = 2200;
     public int Delivery_Arm_LowBasketR_Enc = 1050;
     public int Delivery_Arm_HangDone_Enc = 1450;
     public int Delivery_Arm_IntakeDone_Enc = 300;
-    public int Delivery_Arm_Transfer_Enc = 530;
+    public int Delivery_Arm_Transfer_Enc = 475;
     public double Delivery_Arm_Extend_Power = -0.9;
     public double Delivery_Arm_Retract_Power = 0.9;
 
@@ -104,14 +104,14 @@ public class FSM_TeleOps extends OpMode {
     //Define all Elbow positions
     public static double ElbowL_Intake_Pos = 0.02;
     public static double ElbowR_Intake_Pos = 0.02;
-    public static double ElbowL_Transfer_Pos = 0.63;
-    public static double ElbowR_Transfer_Pos = 0.63;
+    public static double ElbowL_Transfer_Pos = 0.74;
+    public static double ElbowR_Transfer_Pos = 0.74;
     public static double ElbowL_Hang_Pos = 0.2;
     public static double ElbowR_Hang_Pos = 0.2;
     public static double ElbowL_HangDone_Pos = 0.45;
     public static double ElbowR_HangDone_Pos = 0.45;
-    public static double ElbowL_Basket_Pos = 0.15;
-    public static double ElbowR_Basket_Pos = 0.15 ;
+    public static double ElbowL_Basket_Pos = 0.2;
+    public static double ElbowR_Basket_Pos = 0.2 ;
 
     //Define all Wrist positions and mode
     public static double Wrist_Intake_Pos = 0.25;
@@ -275,7 +275,7 @@ public class FSM_TeleOps extends OpMode {
                         new ServoAction(Claw,Claw_Close_Pos),
                         new DoubleMotorAction(deliveryArmLeft, deliveryArmRight, Delivery_Arm_BasketReady_Enc, -Delivery_Arm_BasketReady_Enc,Delivery_Arm_Extend_Power, Delivery_Arm_Extend_Power),
                         new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Basket_Pos, ElbowR_Basket_Pos),
-                        new SleepAction(0.5),
+                        new SleepAction(1),
                         new ServoAction(Claw,Claw_Open_Pos),
                                 new ParallelAction(
                                         new MotorAction2(deliveryArmLeft,Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power),
