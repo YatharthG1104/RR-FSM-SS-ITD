@@ -211,7 +211,7 @@ public class Trajectory_Test extends LinearOpMode {
 
 
                         //trajectorychosen,
-                        new DoubleMotorAction(DAL,DAR,1200, 1200, 0.9,0.9),
+                        //new DoubleMotorAction(DAL,DAR,1200, 1200, 0.9,0.9),
                     //    new DoubleServoAction(EL,ER, 0.15,0.15),
                        // new DoubleServoAction(TWL,TWR, 1.0,1.0),
                      //   new ServoAction(W, 0.4),
@@ -221,7 +221,7 @@ public class Trajectory_Test extends LinearOpMode {
                       //  new DoubleServoAction(EL,ER, 0.1,0.1),
                       //  new DoubleServoAction(TWL,TWR, 0.5,0.5),
                         //new ServoAction(GL, -1.0),
-                        new DoubleMotorAction(DAL,DAR,20, 20, -0.9,-0.9),
+                       // new DoubleMotorAction(DAL,DAR,20, 20, -0.9,-0.9),
                         //  new DoubleServoAction(TWL,TWR, 0.95,0.95),
                         //new DoubleServoAction(EL,ER, 0.45,0.45),
                         //new ServoAction(GL, 1.0),
@@ -230,13 +230,15 @@ public class Trajectory_Test extends LinearOpMode {
                        // new ServoAction(GL, -1.0),
                         //new ServoAction(GL, 1.0),
                         //new DoubleServoAction(EL,ER, 0.4,0.4)
-                        new DoubleMotorAction(DAL,DAR,2200, 2200, 0.9,0.9),
+                       // new DoubleMotorAction(DAL,DAR,2200, 2200, 0.9,0.9),
                         new ServoAction(C, 1.0),
+                        new ServoAction(GL, 1.0),
+                        new ServoAction(GL, -1.0)
                         // new ServoAction(GL, 0.7),
                     //    new MotorAction2(FS,500, 0.3),
                       //  new DoubleServoAction(TWL,TWR, 0.95,0.95),
                        // new DoubleServoAction(TWL,TWR, 0.4,0.4),
-                        new DoubleMotorAction(DAL,DAR,490, 490, -0.9,-0.9)
+                       // new DoubleMotorAction(DAL,DAR,490, 490, -0.9,-0.9)
                         //new DoubleServoAction(TWL,TWR, 0.1,0.1)
                         //new MotorAction2(FS,0,-0.3),
                        /* new ParallelAction(
