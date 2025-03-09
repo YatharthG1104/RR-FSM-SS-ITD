@@ -60,14 +60,12 @@ public class RR_Specimen_Auto extends LinearOpMode {
     public static int Delivery_Arm_HangIntake_Enc = 100;
 
     //Define all Elbow positions
-    public static double ElbowL_Intake_Pos = 0.02;
-    public static double ElbowR_Intake_Pos = 0.02;
-    public static double ElbowL_Transfer_Pos = 0.63;
-    public static double ElbowR_Transfer_Pos = 0.63;
+    public static double ElbowL_Intake_Pos = 0.05;
+    public static double ElbowR_Intake_Pos = 0.05;
     public static double ElbowL_Hang_Pos = 0.2;
     public static double ElbowR_Hang_Pos = 0.2;
-    public static double ElbowL_HangDone_Pos = 0.55;
-    public static double ElbowR_HangDone_Pos = 0.55;
+    public static double ElbowL_HangDone_Pos = 0.58;
+    public static double ElbowR_HangDone_Pos = 0.58;
     public static double ElbowL_Rest_Pos = 0.5;
     public static double ElbowR_Rest_Pos = 0.5;
 
@@ -88,6 +86,7 @@ public class RR_Specimen_Auto extends LinearOpMode {
     // Wait Variable
     public static double Wait = 0.05;
     public static double servo_stepsize = 0.01;
+    public static double action_wait = 0.5;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -147,7 +146,7 @@ public class RR_Specimen_Auto extends LinearOpMode {
         Wrist.scaleRange(-1,1);
         Wrist.setDirection(Servo.Direction.FORWARD);
 
-        sensorColor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
+      //  sensorColor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
 
         //set  start game clock
         mRuntime.reset();// Zero game clock
@@ -177,7 +176,7 @@ public class RR_Specimen_Auto extends LinearOpMode {
                                 .lineToX(10)
                                 .setTangent(-Math.PI/2)
                                 .splineToConstantHeading(new Vector2d(53,-33), Math.PI/2)
-                                .strafeTo(new Vector2d(54,-38))
+                                .strafeTo(new Vector2d(54,-40))
                                 //.setTangent(Math.PI/2)
                                // .splineToConstantHeading(new Vector2d(55,-37), Math.PI/2)
                                 .setReversed(true)
@@ -195,12 +194,11 @@ public class RR_Specimen_Auto extends LinearOpMode {
                                     .setReversed(true)
                                     .setTangent(0)
                                     .lineToX(7)
-                                    .build()
-                   // new ServoAction(Claw, Claw_Close_Pos)
-            )
+                                    .build(),
+                    new ServoAction(Claw, Claw_Close_Pos)
+                )
             )
         );
-
     }
 
     // Servo action build for roadrunner to use
@@ -221,7 +219,7 @@ public class RR_Specimen_Auto extends LinearOpMode {
                 servo.setPosition(position);
             }
 
-            return timer.seconds() < 0.3;
+            return timer.seconds() < action_wait;
         }
     }
 
@@ -281,7 +279,7 @@ public class RR_Specimen_Auto extends LinearOpMode {
                 servo2.setPosition(position2);
             }
 
-            return timer.seconds() < 1;
+            return timer.seconds() < action_wait;
         }
     }
 

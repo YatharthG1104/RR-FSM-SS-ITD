@@ -66,13 +66,13 @@ public class FSM_TeleOps extends OpMode {
     //Define all Delivery Arm Encoder positions and power
     // Left is positive ticks and right is negative ticks
     // Power is reversed
-    public int Delivery_Arm_Resting_Enc = 0;
-    public int Delivery_Arm_HangReady_Enc = 1500;
+    public int Delivery_Arm_Resting_Enc = 20;
+    public int Delivery_Arm_HangReady_Enc = 1350;
     public int Delivery_Arm_BasketReady_Enc = 2200;
     public int Delivery_Arm_LowBasketR_Enc = 1050;
-    public int Delivery_Arm_HangDone_Enc = 1450;
+    public int Delivery_Arm_HangDone_Enc = 1250;
     public int Delivery_Arm_IntakeDone_Enc = 300;
-    public int Delivery_Arm_Transfer_Enc = 475;
+    public int Delivery_Arm_Transfer_Enc = 490;
     public double Delivery_Arm_Extend_Power = -0.9;
     public double Delivery_Arm_Retract_Power = 0.9;
 
@@ -86,8 +86,8 @@ public class FSM_TeleOps extends OpMode {
     //Define all Twist positions
     public static double TwistL_Intake_Pos = -0.9;
     public static double TwistR_Intake_Pos = 0.9;
-    public static double TwistL_Transfer_Pos = 0.8;
-    public static double TwistR_Transfer_Pos = -0.8;
+    public static double TwistL_Transfer_Pos = 0.75;
+    public static double TwistR_Transfer_Pos = -0.75;
     public static double TwistL_IntakeMiddle_Pos = 0.5;
     public static double TwistR_IntakeMiddle_Pos = -0.5;
     public static double TwistL_Rest_Pos = 0.85;
@@ -98,25 +98,28 @@ public class FSM_TeleOps extends OpMode {
     public static double FrontClaw_Close_Pos = 1.0;
 
     //Define all Claw positions
-    public static double Claw_Open_Pos = -1.0;
-    public static double Claw_Close_Pos = 1.0;
+    public static double Claw_Open_Pos = 1;
+    public static double Claw_Close_Pos = 0.55;
 
     //Define all Elbow positions
-    public static double ElbowL_Intake_Pos = 0.02;
-    public static double ElbowR_Intake_Pos = 0.02;
-    public static double ElbowL_Transfer_Pos = 0.74;
-    public static double ElbowR_Transfer_Pos = 0.74;
-    public static double ElbowL_Hang_Pos = 0.2;
-    public static double ElbowR_Hang_Pos = 0.2;
-    public static double ElbowL_HangDone_Pos = 0.45;
-    public static double ElbowR_HangDone_Pos = 0.45;
-    public static double ElbowL_Basket_Pos = 0.2;
-    public static double ElbowR_Basket_Pos = 0.2 ;
+    public static double ElbowL_Intake_Pos = 0.23;
+    public static double ElbowR_Intake_Pos = 0.23;
+    public static double ElbowL_Transfer_Pos = 0.87;
+    public static double ElbowR_Transfer_Pos = 0.87;
+    public static double ElbowL_Hang_Pos = 0.6;
+    public static double ElbowR_Hang_Pos = 0.6;
+    public static double ElbowL_HangDone_Pos = 0.83;
+    public static double ElbowR_HangDone_Pos = 0.83;
+    public static double ElbowL_Basket_Pos = 0.35;
+    public static double ElbowR_Basket_Pos = 0.35 ;
 
     //Define all Wrist positions and mode
     public static double Wrist_Intake_Pos = 0.25;
     public static double Wrist_Hang_Pos = 0.9;
     public static double Wrist_Rest_Pos = 0.25;
+
+    //Define wait variable
+    public static double action_wait = 0.2;
 
     public double lfPower;
     public double rfPower;
@@ -143,7 +146,7 @@ public class FSM_TeleOps extends OpMode {
 
         //Define Hardware Map for all components
         Claw = hardwareMap.get(Servo.class, "Claw");
-        Claw.setDirection(Servo.Direction.FORWARD);
+        Claw.setDirection(Servo.Direction.REVERSE);
 
         deliveryArmLeft = hardwareMap.get(DcMotor.class, "Delivery ArmL");
         deliveryArmLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);  //Delivery arm zero power behavior
@@ -183,7 +186,7 @@ public class FSM_TeleOps extends OpMode {
         Wrist = hardwareMap.get(Servo.class, "Wrist");
         Wrist.setDirection(Servo.Direction.FORWARD);
 
-        sensorColor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
+        //sensorColor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
 
         CurrentState = LiftState.RegTele;
         EmergencyStop = false;
@@ -280,7 +283,9 @@ public class FSM_TeleOps extends OpMode {
                                 new ParallelAction(
                                         new MotorAction2(deliveryArmLeft,Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power),
                                         new MotorAction2(deliveryArmRight,-Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power),
-                                        new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Transfer_Pos, ElbowR_Transfer_Pos)
+                                        new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Transfer_Pos, ElbowR_Transfer_Pos),
+                                        new MotorAction2(FrontSlide, Front_Slide_Resting_Enc,Front_Slide_Retract_Power)
+
                         )
                         ));
                 telemetry.update();
@@ -296,7 +301,8 @@ public class FSM_TeleOps extends OpMode {
                         ),
                         new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Intake_Pos, ElbowR_Intake_Pos),
                         new ServoAction(Wrist, Wrist_Intake_Pos),
-                        new ServoAction(Claw,Claw_Open_Pos)
+                        new ServoAction(Claw,Claw_Open_Pos),
+                        new MotorAction2(FrontSlide, Front_Slide_Resting_Enc,Front_Slide_Retract_Power)
                 ));
                 telemetry.update();
                 CurrentState = LiftState.RegTele;
@@ -311,9 +317,10 @@ public class FSM_TeleOps extends OpMode {
                                 new MotorAction2(deliveryArmLeft,Delivery_Arm_HangReady_Enc, Delivery_Arm_Extend_Power),
                                 new MotorAction2(deliveryArmRight,-Delivery_Arm_HangReady_Enc, Delivery_Arm_Extend_Power)
                                 ),
-                        new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Hang_Pos, ElbowR_Hang_Pos),
-                        new ServoAction(Wrist, Wrist_Hang_Pos)
-                        )
+                                new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Hang_Pos, ElbowR_Hang_Pos),
+                                new ServoAction(Wrist, Wrist_Hang_Pos),
+                                new MotorAction2(FrontSlide, Front_Slide_Resting_Enc,Front_Slide_Retract_Power)
+                            )
                         )
                 );
                 telemetry.update();
@@ -328,7 +335,8 @@ public class FSM_TeleOps extends OpMode {
                                                 new MotorAction2(deliveryArmLeft,Delivery_Arm_HangDone_Enc, Delivery_Arm_Retract_Power),
                                                 new MotorAction2(deliveryArmRight,-Delivery_Arm_HangDone_Enc, Delivery_Arm_Retract_Power)
                                         ),
-                                        new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_HangDone_Pos, ElbowR_HangDone_Pos)
+                                        new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_HangDone_Pos, ElbowR_HangDone_Pos),
+                                        new MotorAction2(FrontSlide, Front_Slide_Resting_Enc,Front_Slide_Retract_Power)
                                 ),
                         new ServoAction(Claw, Claw_Open_Pos)
                         )
@@ -341,7 +349,8 @@ public class FSM_TeleOps extends OpMode {
                 Actions.runBlocking(
                         new SequentialAction(
                                new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_Transfer_Enc, Delivery_Arm_Transfer_Enc, Delivery_Arm_Extend_Power, Delivery_Arm_Extend_Power),
-                               new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Transfer_Pos,ElbowR_Transfer_Pos)
+                               new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Transfer_Pos,ElbowR_Transfer_Pos),
+                                new ServoAction(Claw,Claw_Open_Pos)
                         )
                 );
                 telemetry.update();
@@ -461,7 +470,7 @@ public class FSM_TeleOps extends OpMode {
                 servo.setPosition(position);
             }
 
-            return timer.seconds() < 0.3;
+            return timer.seconds() < action_wait;
         }
     }
 
@@ -494,7 +503,7 @@ public class FSM_TeleOps extends OpMode {
                 motor1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
-            return timer.seconds() < 0.5;
+            return timer.seconds() < action_wait;
         }
     }
 
@@ -521,7 +530,7 @@ public class FSM_TeleOps extends OpMode {
                 servo2.setPosition(position2);
             }
 
-            return timer.seconds() < 0.3;
+            return timer.seconds() < action_wait;
         }
     }
 
