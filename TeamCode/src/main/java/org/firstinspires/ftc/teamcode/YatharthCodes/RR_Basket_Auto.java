@@ -92,7 +92,7 @@ public class RR_Basket_Auto extends LinearOpMode {
     public static double FrontClaw_Close_Pos = 0.9;
 
     // Wait Variable
-    public static double Wait = 0.5;
+    public static double Wait = 1;
     public static double action_wait = 0.5;
 
 

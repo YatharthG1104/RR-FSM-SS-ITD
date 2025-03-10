@@ -64,8 +64,8 @@ public class RR_Specimen_Auto extends LinearOpMode {
     public static double ElbowR_Intake_Pos = 0.23;
     public static double ElbowL_Hang_Pos = 0.45;
     public static double ElbowR_Hang_Pos = 0.45;
-    public static double ElbowL_HangDone_Pos = 0.65;
-    public static double ElbowR_HangDone_Pos = 0.65;
+    public static double ElbowL_HangDone_Pos = 0.8;
+    public static double ElbowR_HangDone_Pos = 0.8;
     public static double ElbowL_Rest_Pos = 0.5;
     public static double ElbowR_Rest_Pos = 0.5;
 
@@ -160,7 +160,7 @@ public class RR_Specimen_Auto extends LinearOpMode {
                     //First specimen hang
                     new ServoAction(Claw, Claw_Close_Pos),
                     new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Hang_Pos,ElbowR_Hang_Pos),
-                    new SleepAction(0.3),
+                    new SleepAction(1),
                     new ParallelAction(
                             drive.actionBuilder(new Pose2d(0,0,0))
                                     .lineToX(30)
@@ -169,6 +169,7 @@ public class RR_Specimen_Auto extends LinearOpMode {
                             new MotorAction2(FrontSlide, Front_Slide_Resting_Enc, Front_Slide_Retract_Power)
                     ),
                     new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_HangDone_Pos,ElbowR_HangDone_Pos),
+                    new SleepAction(1),
                     new ServoAction(Claw, Claw_Open_Pos),
 
                     //Drag one sample
@@ -182,15 +183,16 @@ public class RR_Specimen_Auto extends LinearOpMode {
                                 .strafeTo(new Vector2d(54,-40))
                                 .setReversed(true)
                                 .setTangent(0)
-                                .lineToX(12)
+                                .lineToX(7)
                                 .build(),
-                        new ServoAction(Wrist,Wrist_Intake_Pos),
-                        new MotorAction2(deliveryArmLeft,Delivery_Arm_HangIntake_Enc,Delivery_Arm_Retract_Power),
-                        new MotorAction2(deliveryArmRight,Delivery_Arm_HangIntake_Enc,Delivery_Arm_Retract_Power)
-                    ),
+                       // new ServoAction(Wrist,Wrist_Intake_Pos),
+                        new MotorAction2(deliveryArmLeft,Delivery_Arm_Resting_Enc,Delivery_Arm_Retract_Power),
+                        new MotorAction2(deliveryArmRight,Delivery_Arm_Resting_Enc,Delivery_Arm_Retract_Power),
+                        new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Intake_Pos,ElbowR_Intake_Pos)
+                    )
 
                     //Intake and hang second specimen
-                    new SequentialAction(
+                 /*   new SequentialAction(
                     new DoubleServoAction(ElbowLeft,ElbowRight, ElbowL_Intake_Pos,ElbowR_Intake_Pos),
                     drive.actionBuilder(new Pose2d(12,-40,0))
                                     .waitSeconds(0.2)
@@ -211,19 +213,17 @@ public class RR_Specimen_Auto extends LinearOpMode {
                                     new ServoAction(Wrist, Wrist_Hang_Pos)
                             ),
                     new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_HangDone_Pos,ElbowR_HangDone_Pos),
-                    new ServoAction(Claw, Claw_Open_Pos),
+                    new ServoAction(Claw, Claw_Open_Pos),*/
 
         //Park and reset back slide
-                            new ParallelAction(
-                                    drive.actionBuilder(new Pose2d(30,15,0))
-                                            .strafeTo(new Vector2d(7,-35))
-                                            .build(),
+                          /*  new ParallelAction(
+                                  //  drive.actionBuilder(new Pose2d(30,15,0))
+                                    //        .strafeTo(new Vector2d(7,-35))
+                                      //      .build(),
                                     new MotorAction2(deliveryArmLeft,Delivery_Arm_Resting_Enc,Delivery_Arm_Retract_Power),
                                     new MotorAction2(deliveryArmRight,Delivery_Arm_Resting_Enc,Delivery_Arm_Retract_Power),
-                                    new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Intake_Pos,ElbowR_Intake_Pos)
-                            )
+                            )*/
                     )
-            )
         );
     }
 
