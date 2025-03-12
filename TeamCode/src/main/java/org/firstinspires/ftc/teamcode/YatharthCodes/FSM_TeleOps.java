@@ -38,7 +38,6 @@ public class FSM_TeleOps extends OpMode {
     private LiftState CurrentState;
     private boolean EmergencyStop;
 
-    // LiftState liftState = LiftState.LIFT_START;
 
     //Initialize Non drive motors and servos
     DcMotor leftFront;
