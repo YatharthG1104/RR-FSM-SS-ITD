@@ -2,25 +2,35 @@ package org.firstinspires.ftc.teamcode.YatharthCodes;
 
 import androidx.annotation.NonNull;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
+import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
+import com.qualcomm.hardware.dfrobot.HuskyLens;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-//@TeleOp(name="AA_TeleOps FSM")
+import org.firstinspires.ftc.teamcode.MecanumDrive;
 
-public class FSM_TeleOps extends OpMode {
+
+@TeleOp(name="Tele RR FSM")
+public class RR_Tele_Test extends OpMode {
+
+    private MecanumDrive mecanumDrive;
+
     // An Enum is used to represent lift states.
 
     public enum LiftState {
@@ -38,7 +48,6 @@ public class FSM_TeleOps extends OpMode {
     private LiftState CurrentState;
     private boolean EmergencyStop;
 
-
     //Initialize Non drive motors and servos
     DcMotor leftFront;
     DcMotor leftRear;
@@ -49,7 +58,7 @@ public class FSM_TeleOps extends OpMode {
     DcMotor FrontSlide = null;
 
     Servo Claw = null;
-    Servo Wrist = null;
+   // Servo Wrist = null;
     Servo TwistLeft = null;
     Servo TwistRight = null;
     CRServo FrontWrist = null;
@@ -57,95 +66,90 @@ public class FSM_TeleOps extends OpMode {
     Servo ElbowLeft = null;
     Servo ElbowRight = null;
 
-    // Color Sensor Hardware Map
-    ColorSensor sensorColor = null;
+    // Sensor Hardware Map
+    RevColorSensorV3 sensorColor = null;
+    HuskyLens camera = null;
 
     ElapsedTime liftTimer = new ElapsedTime();
 
     //Define all Delivery Arm Encoder positions and power
     // Left is positive ticks and right is negative ticks
     // Power is reversed
-    public int Delivery_Arm_Resting_Enc = 20;
-    public int Delivery_Arm_HangReady_Enc = 1350;
-    public int Delivery_Arm_BasketReady_Enc = 2200;
-    public int Delivery_Arm_LowBasketR_Enc = 1050;
-    public int Delivery_Arm_HangDone_Enc = 1250;
+    public int Delivery_Arm_Resting_Enc = 10;
+    public int Delivery_Arm_HangReady_Enc = 1500;
+    public int Delivery_Arm_BasketReady_Enc = 2500;
+    public int Delivery_Arm_LowBasketR_Enc = 800;
+    public int Delivery_Arm_HangDone_Enc = 1000;
     public int Delivery_Arm_IntakeDone_Enc = 300;
-    public int Delivery_Arm_Transfer_Enc = 490;
+    public int Delivery_Arm_Transfer_Enc = 750;
+    public int Delivery_Arm_Start_Enc = 700;
     public double Delivery_Arm_Extend_Power = -0.9;
     public double Delivery_Arm_Retract_Power = 0.9;
 
     //Define all Front Slide Arm Encoder positions and power
-    public int Front_Slide_Resting_Enc = -200;
-    public int Front_Slide_Intake_Enc = 425;
-    public int Front_Slide_Transfer_Enc = -100;
-    public double Front_Slide_Extend_Power = 0.5;
+    public int Front_Slide_Resting_Enc = -100;
+    public int Front_Slide_Intake_Enc = 530;
+    public int Front_Slide_Transfer_Enc = -50;
+    public double Front_Slide_Extend_Power = 0.8;
     public double Front_Slide_Retract_Power = -0.5;
 
     //Define all Twist positions
-    public static double TwistL_Intake_Pos = -0.87;
-    public static double TwistR_Intake_Pos = 0.87;
-    public static double TwistL_Transfer_Pos = 0.85;
-    public static double TwistR_Transfer_Pos = -0.85;
-    public static double TwistL_IntakeMiddle_Pos = 0.5;
-    public static double TwistR_IntakeMiddle_Pos = -0.5;
-    public static double TwistL_Rest_Pos = 0.85;
-    public static double TwistR_Rest_Pos = -0.85;
+    public static double TwistL_Intake_Pos = 0.75;
+    public static double TwistR_Intake_Pos = 0.75;
+    public static double TwistL_Transfer_Pos = 0.05;
+    public static double TwistR_Transfer_Pos = 0.05;
+    public static double TwistL_IntakeMiddle_Pos = 0.45;
+    public static double TwistR_IntakeMiddle_Pos = 0.45;
+    public static double TwistL_Rest_Pos = 0.0;
+    public static double TwistR_Rest_Pos = 0.0;
 
     //Define all Front Claw Positions
-    public static double FrontClaw_Open_Pos = -1.0;
-    public static double FrontClaw_Close_Pos = 1.0;
+    public static double FrontClaw_Open_Pos = 0.05;
+    public static double FrontClaw_Close_Pos = 0.5;
 
     //Define all Claw positions
-    public static double Claw_Open_Pos = 1;
-    public static double Claw_Close_Pos = 0.55;
+    public static double Claw_Open_Pos = 0.25;
+    public static double Claw_Close_Pos = 0.8;
 
     //Define all Elbow positions
-    public static double ElbowL_Intake_Pos = 0.23;
-    public static double ElbowR_Intake_Pos = 0.23;
-    public static double ElbowL_Transfer_Pos = 0.87;
-    public static double ElbowR_Transfer_Pos = 0.87;
-    public static double ElbowL_Hang_Pos = 0.6;
-    public static double ElbowR_Hang_Pos = 0.6;
-    public static double ElbowL_HangDone_Pos = 0.83;
-    public static double ElbowR_HangDone_Pos = 0.83;
-    public static double ElbowL_Basket_Pos = 0.35;
-    public static double ElbowR_Basket_Pos = 0.35 ;
+    public static double ElbowL_Intake_Pos = 0.015;
+    public static double ElbowR_Intake_Pos = 0.015;
+    public static double ElbowL_Transfer_Pos = 0.6;
+    public static double ElbowR_Transfer_Pos = 0.6;
+    public static double ElbowL_Hang_Pos = 0.2;
+    public static double ElbowR_Hang_Pos = 0.2;
+    public static double ElbowL_HangDone_Pos = 0.05;
+    public static double ElbowR_HangDone_Pos = 0.05;
+    public static double ElbowL_Basket_Pos = 0.18;
+    public static double ElbowR_Basket_Pos = 0.18;
 
     //Define all Wrist positions and mode
-    public static double Wrist_Intake_Pos = 0.25;
-    public static double Wrist_Hang_Pos = 0.9;
-    public static double Wrist_Rest_Pos = 0.25;
+//    public static double Wrist_Intake_Pos = 0.25;
+//    public static double Wrist_Hang_Pos = 0.9;
+//    public static double Wrist_Rest_Pos = 0.25;
 
     //Define wait variable
-    public static double action_wait = 0.2;
+    public static double action_wait = 0.1;
+    public static double pause = 1;
 
-    public double lfPower;
-    public double rfPower;
-    public double rbPower;
-    public double lbPower;
+//    public double lfPower;
+//    public double rfPower;
+//    public double rbPower;
+//    public double lbPower;
 
     @Override
     public void init() {
 
+        Pose2d InitialPose = new Pose2d(0, 0, 0);     // Beginning pose
+
+        //Importing the hardware maps for all drive motors and setting the robot position
+        mecanumDrive = new MecanumDrive(hardwareMap, InitialPose);
+
         liftTimer.reset();
-
-        leftFront = hardwareMap.get(DcMotor.class, "leftFront");
-        leftRear = hardwareMap.get(DcMotor.class, "leftBack");
-        rightFront = hardwareMap.get(DcMotor.class, "rightFront");
-        rightRear = hardwareMap.get(DcMotor.class, "rightBack");
-
-        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         //Define Hardware Map for all components
         Claw = hardwareMap.get(Servo.class, "Claw");
-        Claw.setDirection(Servo.Direction.REVERSE);
+        Claw.setDirection(Servo.Direction.FORWARD);
 
         deliveryArmLeft = hardwareMap.get(DcMotor.class, "Delivery ArmL");
         deliveryArmLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);  //Delivery arm zero power behavior
@@ -177,15 +181,17 @@ public class FSM_TeleOps extends OpMode {
         FrontClaw.setDirection(Servo.Direction.FORWARD);
 
         TwistLeft = hardwareMap.get(Servo.class, "Twist Left");
-        //TwistLeft.setDirection(Servo.Direction.REVERSE);
+        TwistLeft.setDirection(Servo.Direction.REVERSE);
 
         TwistRight = hardwareMap.get(Servo.class, "Twist Right");
         TwistRight.setDirection(Servo.Direction.FORWARD);
 
-        Wrist = hardwareMap.get(Servo.class, "Wrist");
-        Wrist.setDirection(Servo.Direction.FORWARD);
+//        Wrist = hardwareMap.get(Servo.class, "Wrist");
+//        Wrist.setDirection(Servo.Direction.FORWARD);
 
-        //sensorColor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
+        camera = hardwareMap.get(HuskyLens.class, "AI Husky Lens");
+
+        sensorColor = hardwareMap.get(RevColorSensorV3.class, "Color");
 
         CurrentState = LiftState.RegTele;
         EmergencyStop = false;
@@ -193,8 +199,14 @@ public class FSM_TeleOps extends OpMode {
 
     public void loop() {
 
+        move();
+        Pose2d currentpose = mecanumDrive.localizer.getPose();
+
+
         //Print Telemetry for all components and current state
-        telemetry.addData("State",CurrentState);
+        telemetry.addData("State", CurrentState);
+        telemetry.addData("Current Pose", currentpose.position);
+        telemetry.addData("Current Pose", currentpose.heading);
         telemetry.addData("Delivery ArmL Position: ", deliveryArmLeft.getCurrentPosition());
         telemetry.addData("Delivery ArmR Position: ", deliveryArmRight.getCurrentPosition());
         telemetry.addData("Elbowleft Position: ", ElbowLeft.getPosition());
@@ -202,12 +214,10 @@ public class FSM_TeleOps extends OpMode {
         telemetry.addData("Twist Left Position: ", TwistLeft.getPosition());
         telemetry.addData("Twist Right Position: ", TwistRight.getPosition());
         telemetry.addData("Frontslide Position: ", FrontSlide.getCurrentPosition());
-        telemetry.addData("Wrist Position: ", Wrist.getPosition());
+//        telemetry.addData("Wrist Position: ", Wrist.getPosition());
         telemetry.addData("Claw Position: ", Claw.getPosition());
         telemetry.addData("Front Claw Position:", FrontClaw.getPosition());
         telemetry.update();
-
-        move();
 
         switch (CurrentState) {
             case RegTele:
@@ -215,28 +225,21 @@ public class FSM_TeleOps extends OpMode {
                 //Regular Operations
                 TeleOperations();
                 //Other States
-                if(gamepad1.right_bumper){
+                if (gamepad1.right_bumper) {
                     CurrentState = LiftState.SubmersibleReady;
-                } else
-                if(gamepad1.left_bumper){
+                } else if (gamepad1.left_bumper) {
                     CurrentState = LiftState.SamplePicked;
-                } else
-                if(gamepad2.dpad_left) {
+                } else if (gamepad2.dpad_left) {
                     CurrentState = LiftState.TransferBasket;
-                } else
-                if (gamepad2.b) {
+                } else if (gamepad2.b) {
                     CurrentState = LiftState.PickSpecimen;
-                } else
-                if (gamepad2.x) {
+                } else if (gamepad2.x) {
                     CurrentState = LiftState.SpecimenHangReady;
-                } else
-                if(gamepad2.dpad_right) {
+                } else if (gamepad2.dpad_right) {
                     CurrentState = LiftState.SpecimenHanged;
-                } else
-                if(gamepad1.back) {
+                } else if (gamepad1.back) {
                     CurrentState = LiftState.Stop;
-                } else
-                if(gamepad2.start) {
+                } else if (gamepad2.start) {
                     CurrentState = LiftState.Begin;
                 }
                 telemetry.update();
@@ -245,13 +248,13 @@ public class FSM_TeleOps extends OpMode {
             case SubmersibleReady:
                 move();
                 Actions.runBlocking(new ParallelAction(
-                        new MotorAction2(FrontSlide, Front_Slide_Intake_Enc,Front_Slide_Extend_Power),
+                        new MotorAction2(FrontSlide, Front_Slide_Intake_Enc, Front_Slide_Extend_Power),
                         new DoubleServoAction(TwistLeft, TwistRight, TwistL_Intake_Pos, TwistR_Intake_Pos),
-                     //   new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Transfer_Pos, ElbowR_Transfer_Pos),
+                        // new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Transfer_Pos, ElbowR_Transfer_Pos),
                         new ServoAction(FrontClaw, FrontClaw_Open_Pos)
                 ));
                 telemetry.update();
-                CurrentState =LiftState.RegTele;
+                CurrentState = LiftState.RegTele;
                 break;
 
             case SamplePicked:
@@ -259,67 +262,68 @@ public class FSM_TeleOps extends OpMode {
                 Actions.runBlocking(new ParallelAction(
                         new SequentialAction(
                                 new ParallelAction(
-                                        new DoubleServoAction(TwistLeft, TwistRight, TwistL_IntakeMiddle_Pos, TwistR_IntakeMiddle_Pos),
-                                        new MotorAction2(FrontSlide, Front_Slide_Transfer_Enc,Front_Slide_Retract_Power)
-                                ),
-                                new DoubleServoAction(TwistLeft, TwistRight, TwistL_Transfer_Pos, TwistR_Transfer_Pos)
+                                        new DoubleServoAction(TwistLeft, TwistRight, TwistL_Transfer_Pos, TwistR_Transfer_Pos),
+                                        new MotorAction2(FrontSlide, Front_Slide_Transfer_Enc, Front_Slide_Retract_Power)
+                                )
+                               // new ServoAction(FrontClaw, FrontClaw_Open_Pos)
                         ),
-                     //   new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Transfer_Pos, ElbowR_Transfer_Pos),
-                        new ServoAction(Claw,Claw_Open_Pos)
+                        //  new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Transfer_Pos, ElbowR_Transfer_Pos),
+                         new ServoAction(Claw,Claw_Open_Pos)
+
                 ));
                 telemetry.update();
-                CurrentState =LiftState.RegTele;
+                CurrentState = LiftState.RegTele;
                 break;
 
             case TransferBasket:
-                move();
+                 move();
                 Actions.runBlocking(new SequentialAction(
-                        new ServoAction(Claw,Claw_Close_Pos),
-                        new DoubleMotorAction(deliveryArmLeft, deliveryArmRight, Delivery_Arm_BasketReady_Enc, -Delivery_Arm_BasketReady_Enc,Delivery_Arm_Extend_Power, Delivery_Arm_Extend_Power),
+                        new ServoAction(Claw, Claw_Close_Pos),
+                        new DoubleMotorAction(deliveryArmLeft, deliveryArmRight, Delivery_Arm_BasketReady_Enc, -Delivery_Arm_BasketReady_Enc, Delivery_Arm_Extend_Power, Delivery_Arm_Extend_Power),
                         new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Basket_Pos, ElbowR_Basket_Pos),
-                        new SleepAction(1),
-                        new ServoAction(Claw,Claw_Open_Pos),
-                                new ParallelAction(
-                                        new MotorAction2(deliveryArmLeft,Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power),
-                                        new MotorAction2(deliveryArmRight,-Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power),
-                                        new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Transfer_Pos, ElbowR_Transfer_Pos),
-                                        new MotorAction2(FrontSlide, Front_Slide_Resting_Enc,Front_Slide_Retract_Power)
+                        new SleepAction(pause),
+                        new ServoAction(Claw, Claw_Open_Pos),
+                        new ParallelAction(
+                                new MotorAction2(deliveryArmLeft, Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power),
+                                new MotorAction2(deliveryArmRight, -Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power),
+                                new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Transfer_Pos, ElbowR_Transfer_Pos)
+//                                new MotorAction2(FrontSlide, Front_Slide_Resting_Enc, Front_Slide_Retract_Power)
 
                         )
-                        ));
+                ));
                 telemetry.update();
-                CurrentState =LiftState.RegTele;
+                CurrentState = LiftState.RegTele;
                 break;
 
             case PickSpecimen:
                 move();
                 Actions.runBlocking(new ParallelAction(
                         new ParallelAction(
-                                new MotorAction2(deliveryArmLeft,Delivery_Arm_Resting_Enc, Delivery_Arm_Retract_Power),
-                                new MotorAction2(deliveryArmRight,-Delivery_Arm_Resting_Enc, Delivery_Arm_Retract_Power)
+                                new MotorAction2(deliveryArmLeft, Delivery_Arm_Resting_Enc, Delivery_Arm_Retract_Power),
+                                new MotorAction2(deliveryArmRight, -Delivery_Arm_Resting_Enc, Delivery_Arm_Retract_Power)
                         ),
                         new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Intake_Pos, ElbowR_Intake_Pos),
-                        new ServoAction(Wrist, Wrist_Intake_Pos),
-                        new ServoAction(Claw,Claw_Open_Pos),
-                        new MotorAction2(FrontSlide, Front_Slide_Resting_Enc,Front_Slide_Retract_Power)
+//                        new ServoAction(Wrist, Wrist_Intake_Pos),
+                        new ServoAction(Claw, Claw_Open_Pos)
+//                        new MotorAction2(FrontSlide, Front_Slide_Resting_Enc, Front_Slide_Retract_Power)
                 ));
                 telemetry.update();
                 CurrentState = LiftState.RegTele;
                 break;
 
             case SpecimenHangReady:
-                move();
+                 move();
                 Actions.runBlocking(new SequentialAction(
-                        new ServoAction(Claw, Claw_Close_Pos),
-                        new ParallelAction(
+                                new ServoAction(Claw, Claw_Close_Pos),
                                 new ParallelAction(
-                                new MotorAction2(deliveryArmLeft,Delivery_Arm_HangReady_Enc, Delivery_Arm_Extend_Power),
-                                new MotorAction2(deliveryArmRight,-Delivery_Arm_HangReady_Enc, Delivery_Arm_Extend_Power)
-                                ),
-                                new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Hang_Pos, ElbowR_Hang_Pos),
-                                new ServoAction(Wrist, Wrist_Hang_Pos),
-                                new MotorAction2(FrontSlide, Front_Slide_Resting_Enc,Front_Slide_Retract_Power)
-                            )
+                                        new ParallelAction(
+                                                new MotorAction2(deliveryArmLeft, Delivery_Arm_HangReady_Enc, Delivery_Arm_Extend_Power),
+                                                new MotorAction2(deliveryArmRight, -Delivery_Arm_HangReady_Enc, Delivery_Arm_Extend_Power)
+                                        ),
+                                        new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Hang_Pos, ElbowR_Hang_Pos)
+//                                        new ServoAction(Wrist, Wrist_Hang_Pos),
+//                                        new MotorAction2(FrontSlide, Front_Slide_Resting_Enc, Front_Slide_Retract_Power)
+                                )
                         )
                 );
                 telemetry.update();
@@ -327,17 +331,17 @@ public class FSM_TeleOps extends OpMode {
                 break;
 
             case SpecimenHanged:
-                move();
+                 move();
                 Actions.runBlocking(new SequentialAction(
                                 new ParallelAction(
                                         new ParallelAction(
-                                                new MotorAction2(deliveryArmLeft,Delivery_Arm_HangDone_Enc, Delivery_Arm_Retract_Power),
-                                                new MotorAction2(deliveryArmRight,-Delivery_Arm_HangDone_Enc, Delivery_Arm_Retract_Power)
+                                                new MotorAction2(deliveryArmLeft, Delivery_Arm_HangDone_Enc, Delivery_Arm_Retract_Power),
+                                                new MotorAction2(deliveryArmRight, -Delivery_Arm_HangDone_Enc, Delivery_Arm_Retract_Power)
                                         ),
-                                        new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_HangDone_Pos, ElbowR_HangDone_Pos),
-                                        new MotorAction2(FrontSlide, Front_Slide_Resting_Enc,Front_Slide_Retract_Power)
-                                ),
-                        new ServoAction(Claw, Claw_Open_Pos)
+                                        new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_HangDone_Pos, ElbowR_HangDone_Pos)
+//                                        new MotorAction2(FrontSlide, Front_Slide_Resting_Enc, Front_Slide_Retract_Power)
+                                )
+//                                new ServoAction(Claw, Claw_Open_Pos)
                         )
                 );
                 telemetry.update();
@@ -347,23 +351,23 @@ public class FSM_TeleOps extends OpMode {
             case Begin:
                 Actions.runBlocking(
                         new SequentialAction(
-                               new DoubleMotorAction(deliveryArmLeft,deliveryArmRight,Delivery_Arm_Transfer_Enc, Delivery_Arm_Transfer_Enc, Delivery_Arm_Extend_Power, Delivery_Arm_Extend_Power),
-                               new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Transfer_Pos,ElbowR_Transfer_Pos),
-                                new ServoAction(Claw,Claw_Open_Pos)
+                                new DoubleMotorAction(deliveryArmLeft, deliveryArmRight, Delivery_Arm_Transfer_Enc, -Delivery_Arm_Transfer_Enc, Delivery_Arm_Extend_Power, Delivery_Arm_Extend_Power),
+                                new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Transfer_Pos, ElbowR_Transfer_Pos),
+                                new ServoAction(Claw, Claw_Open_Pos)
                         )
                 );
                 telemetry.update();
                 CurrentState = LiftState.RegTele;
                 break;
 
-           case Stop:
+            case Stop:
                 leftFront.setPower(0);
                 leftRear.setPower(0);
                 rightFront.setPower(0);
                 rightRear.setPower(0);
                 EmergencyStop = true;
 
-                if(gamepad2.back) {
+                if (gamepad2.back) {
                     EmergencyStop = false;
                     CurrentState = LiftState.RegTele;
                 }
@@ -373,34 +377,25 @@ public class FSM_TeleOps extends OpMode {
     }
 
 
-    public void move(){
+    public void move() {
         //Driving
-        double y = -gamepad1. left_stick_y;
-        double x = gamepad1.left_stick_x;
-        double rx = gamepad1.right_stick_x;
+        double x = -gamepad1.left_stick_y;
+        double y = -gamepad1.left_stick_x;
+        double rx = -gamepad1.right_stick_x;
 
-        // Denominator is the largest motor power (absolute value) or 1
-        // This ensures all the powers maintain the same ratio,
-        // but only if at least one is out of the range [-1, 1]
+        PoseVelocity2d drivePower = new PoseVelocity2d(new Vector2d(x, y), rx);
 
-        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-
-        lfPower = (y + x + rx) / denominator;
-        lbPower = (y - x + rx) / denominator;
-        rfPower = (y - x - rx) / denominator;
-        rbPower = (y + x - rx) / denominator;
-        leftFront.setPower(lfPower);
-        leftRear.setPower(lbPower);
-        rightFront.setPower(rfPower);
-        rightRear.setPower(rbPower);
+        // Use MecanumDrive class to drive the robot
+        mecanumDrive.setDrivePowers(drivePower);
+        mecanumDrive.updatePoseEstimate(); // Update the drive to apply motor powers
     }
 
     public void TeleOperations() {
         //Back Claw
-        if(gamepad1.x){
+        if (gamepad1.x) {
             Claw.setPosition(Claw_Close_Pos);
         }
-        if(gamepad1.b){
+        if (gamepad1.b) {
             Claw.setPosition(Claw_Open_Pos);
         }
         //FrontSlide
@@ -408,41 +403,40 @@ public class FSM_TeleOps extends OpMode {
         double FrontSlidePower = Range.clip(FrontSlideStick, Front_Slide_Retract_Power, Front_Slide_Extend_Power);
         FrontSlide.setPower(FrontSlidePower);
         //Back Elbow
-        if(gamepad1.a){
+        if (gamepad1.a) {
             ElbowLeft.setPosition(ElbowL_Intake_Pos);
             ElbowRight.setPosition(ElbowR_Intake_Pos);
         }
-        if(gamepad2.dpad_up){
+        if (gamepad2.dpad_up) {
             ElbowLeft.setPosition(ElbowL_Basket_Pos);
             ElbowRight.setPosition(ElbowR_Basket_Pos);
         }
-        if(gamepad2.dpad_down){
+        if (gamepad2.dpad_down) {
             ElbowLeft.setPosition(ElbowL_Transfer_Pos);
             ElbowRight.setPosition(ElbowR_Transfer_Pos);
         }
         //Front Twist
-        if(gamepad2.left_bumper){
+        if (gamepad2.left_bumper) {
             TwistRight.setPosition(TwistR_Intake_Pos);
             TwistLeft.setPosition(TwistL_Intake_Pos);
         }
-        if(gamepad2.right_bumper){
+        if (gamepad2.right_bumper) {
             TwistRight.setPosition(TwistR_Transfer_Pos);
             TwistLeft.setPosition(TwistL_Transfer_Pos);
         }
         // Front Claw
-        if(gamepad2.y){
+        if (gamepad2.y) {
             FrontClaw.setPosition(FrontClaw_Open_Pos);
         }
-        if(gamepad2.a){
+        if (gamepad2.a) {
             FrontClaw.setPosition(FrontClaw_Close_Pos);
         }
         // Front Wrist
-        if(gamepad2.right_stick_button) {
+        if (gamepad2.right_stick_button) {
             FrontWrist.setPower(1);
-        } else if(gamepad2.left_stick_button) {
+        } else if (gamepad2.left_stick_button) {
             FrontWrist.setPower(-1);
-        }
-        else
+        } else
             FrontWrist.setPower(0);
         //Delivery Arm
         double DeliveryArmStick = gamepad2.left_stick_y;
@@ -455,16 +449,16 @@ public class FSM_TeleOps extends OpMode {
     public static class ServoAction implements Action {
         Servo servo;
         double position;
-        ElapsedTime timer= null;
+        ElapsedTime timer = null;
 
         public ServoAction(Servo srv, double pos) {
-            this.servo= srv;
+            this.servo = srv;
             this.position = pos;
         }
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if(timer == null) {
+            if (timer == null) {
                 timer = new ElapsedTime();
                 servo.setPosition(position);
             }
@@ -483,7 +477,7 @@ public class FSM_TeleOps extends OpMode {
         double power2;
         ElapsedTime timer = null;
 
-        public DoubleMotorAction (DcMotor mot1, DcMotor mot2, double pos1, double pos2, double pow1, double pow2) {
+        public DoubleMotorAction(DcMotor mot1, DcMotor mot2, double pos1, double pos2, double pow1, double pow2) {
             this.motor1 = mot1;
             this.position_tgt1 = pos1;
             this.power1 = pow1;
@@ -512,9 +506,9 @@ public class FSM_TeleOps extends OpMode {
         double position1;
         Servo servo2;
         double position2;
-        ElapsedTime timer= null;
+        ElapsedTime timer = null;
 
-        public DoubleServoAction(Servo srv1, Servo srv2,double pos1,double pos2) {
+        public DoubleServoAction(Servo srv1, Servo srv2, double pos1, double pos2) {
             this.servo1 = srv1;
             this.servo2 = srv2;
             this.position1 = pos1;
@@ -523,7 +517,7 @@ public class FSM_TeleOps extends OpMode {
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if(timer == null) {
+            if (timer == null) {
                 timer = new ElapsedTime();
                 servo1.setPosition(position1);
                 servo2.setPosition(position2);
@@ -558,4 +552,61 @@ public class FSM_TeleOps extends OpMode {
             }
         }
     }
-}
+
+    public static class AlignSensorActionB implements Action {
+        public RevColorSensorV3 colorSensor;
+        public CRServo turningServo;
+        public double position;
+        public Servo servo;
+        public int alliance_color;
+
+        // Thresholds
+        public static int LINE_THRESHOLD = 100;  //color intensity
+        public static int YELLOW_THRESHOLD = 50;  //color intensity
+        public static int BLUE_THRESHOLD = 90;
+        public static double MIN_DISTANCE_THRESHOLD = 5.0; // in cm
+
+        public AlignSensorActionB(RevColorSensorV3 colorSensor, CRServo turningServo, Servo srv, double pos, int all_col) {
+            this.colorSensor = colorSensor;
+            this.turningServo = turningServo;
+            this.position = pos;
+            this.servo = srv;
+            this.alliance_color = all_col;
+        };
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+
+            // Get RGB values
+            int red = colorSensor.red();
+            int green = colorSensor.green();
+            int blue = colorSensor.blue();
+
+            // Get the current distance measurement
+            double distance = colorSensor.getDistance(DistanceUnit.CM);
+
+            boolean isYellow = (red > LINE_THRESHOLD && green > YELLOW_THRESHOLD && blue < LINE_THRESHOLD);
+            boolean isBlue = (red < BLUE_THRESHOLD && green < BLUE_THRESHOLD && blue > LINE_THRESHOLD);
+            boolean isAligned = (red > LINE_THRESHOLD && green < LINE_THRESHOLD && blue < LINE_THRESHOLD);
+            boolean isWithinDist = (distance <= MIN_DISTANCE_THRESHOLD);
+
+            if (isAligned) {
+                turningServo.setPower(0);
+            } else {
+                turningServo.setPower(1);
+            }
+
+            if (isWithinDist) {
+                turningServo.setPower(0);
+            } else {
+                turningServo.setPower(1);
+            }
+
+            if ((isYellow || isBlue) && isAligned && isWithinDist) {
+                servo.setPosition(position);
+                return true;
+            } else
+                return false;
+        }
+
+    }
+};
