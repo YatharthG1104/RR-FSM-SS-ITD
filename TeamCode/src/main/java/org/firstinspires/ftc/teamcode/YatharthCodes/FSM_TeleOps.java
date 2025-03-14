@@ -18,7 +18,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name="AA_TeleOps FSM")
+//@TeleOp(name="AA_TeleOps FSM")
 
 public class FSM_TeleOps extends OpMode {
     // An Enum is used to represent lift states.
@@ -83,10 +83,10 @@ public class FSM_TeleOps extends OpMode {
     public double Front_Slide_Retract_Power = -0.5;
 
     //Define all Twist positions
-    public static double TwistL_Intake_Pos = -0.9;
-    public static double TwistR_Intake_Pos = 0.9;
-    public static double TwistL_Transfer_Pos = 0.75;
-    public static double TwistR_Transfer_Pos = -0.75;
+    public static double TwistL_Intake_Pos = -0.87;
+    public static double TwistR_Intake_Pos = 0.87;
+    public static double TwistL_Transfer_Pos = 0.85;
+    public static double TwistR_Transfer_Pos = -0.85;
     public static double TwistL_IntakeMiddle_Pos = 0.5;
     public static double TwistR_IntakeMiddle_Pos = -0.5;
     public static double TwistL_Rest_Pos = 0.85;
@@ -247,7 +247,7 @@ public class FSM_TeleOps extends OpMode {
                 Actions.runBlocking(new ParallelAction(
                         new MotorAction2(FrontSlide, Front_Slide_Intake_Enc,Front_Slide_Extend_Power),
                         new DoubleServoAction(TwistLeft, TwistRight, TwistL_Intake_Pos, TwistR_Intake_Pos),
-                        new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Transfer_Pos, ElbowR_Transfer_Pos),
+                     //   new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Transfer_Pos, ElbowR_Transfer_Pos),
                         new ServoAction(FrontClaw, FrontClaw_Open_Pos)
                 ));
                 telemetry.update();
@@ -264,7 +264,7 @@ public class FSM_TeleOps extends OpMode {
                                 ),
                                 new DoubleServoAction(TwistLeft, TwistRight, TwistL_Transfer_Pos, TwistR_Transfer_Pos)
                         ),
-                        new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Transfer_Pos, ElbowR_Transfer_Pos),
+                     //   new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Transfer_Pos, ElbowR_Transfer_Pos),
                         new ServoAction(Claw,Claw_Open_Pos)
                 ));
                 telemetry.update();

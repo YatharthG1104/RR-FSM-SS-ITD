@@ -25,19 +25,16 @@ public class ServoPositionHelper extends OpMode {
 
     @Override
     public void init() {
-//        axon = hardwareMap.get(Servo.class, "Wrist");
-        //        axon.setDirection(Servo.Direction.FORWARD);
-        //        axon.setPosition(servoPositionaxon);
 
-        el = hardwareMap.get(Servo.class, "Front Claw");
-      //  el.scaleRange(0,1);
-      //  er = hardwareMap.get(Servo.class, "Front Claw");
+
+        el = hardwareMap.get(Servo.class, "Twist Left");
+        er = hardwareMap.get(Servo.class, "Twist Right");
 
         el.setDirection(Servo.Direction.REVERSE);
-       // er.setDirection(Servo.Direction.FORWARD);
+        er.setDirection(Servo.Direction.FORWARD);
 
        el.setPosition(servoPositionaxon);
-       // er.setPosition(servoPositionaxon);
+       er.setPosition(servoPositionaxon);
         telemetry.addData("Status", "Initialized");
     }
 
@@ -53,13 +50,7 @@ public class ServoPositionHelper extends OpMode {
         } else if (currentGamepadA && !previousGamePadA) {
             servoPositionaxon -= positionAdjustment;
         }
-/*
-        if (currentGamepadUp && !previousGamePadUp) {
-            positionAdjustment += STEP_ADJUSTMENT;
-        } else if (currentGamepadDown && !previousGamePadDown) {
-            positionAdjustment -= STEP_ADJUSTMENT;
-        }
-*/
+
         if (positionAdjustment < 0.01) {
             positionAdjustment = 0.01;
         } else if (positionAdjustment > 0.1) {
@@ -72,8 +63,8 @@ public class ServoPositionHelper extends OpMode {
             servoPositionaxon = MIN_POSITION;
         }
 
-        el.setPosition(servoPositionaxon);
-       // er.setPosition(servoPositionaxon);
+        //el.setPosition(servoPositionaxon);
+        er.setPosition(servoPositionaxon);
 
         previousGamepadY = currentGamepadY;
         previousGamePadA = currentGamepadA;
@@ -81,9 +72,8 @@ public class ServoPositionHelper extends OpMode {
         previousGamePadDown = currentGamepadDown;
 
         telemetry.addData("El Servo Position", el.getPosition());
-       //telemetry.addData("Er Servo Position", er.getPosition());
+        telemetry.addData("Er Servo Position", er.getPosition());
         telemetry.addData("Target Servo Position", servoPositionaxon);
-        //telemetry.addData("el Servo Position", servoPositionel);
         telemetry.addData("Servo Step Size", positionAdjustment);
         telemetry.update();
     }
