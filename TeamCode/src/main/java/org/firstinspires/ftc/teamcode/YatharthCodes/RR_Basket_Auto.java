@@ -33,7 +33,6 @@ public class RR_Basket_Auto extends LinearOpMode {
     DcMotor FrontSlide = null;
 
     Servo Claw = null;
-//    Servo Wrist = null;
     Servo TwistLeft = null;
     Servo TwistRight = null;
     CRServo FrontWrist = null;
@@ -131,10 +130,8 @@ public class RR_Basket_Auto extends LinearOpMode {
         ElbowLeft = hardwareMap.get(Servo.class, "Elbow Left");
         ElbowLeft.setDirection(Servo.Direction.REVERSE);
 
-
         ElbowRight = hardwareMap.get(Servo.class, "Elbow Right");
         ElbowRight.setDirection(Servo.Direction.FORWARD);
-
 
         FrontSlide = hardwareMap.get(DcMotor.class, "Front Slide");
         FrontSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);//Front Slide zero power behavior
@@ -168,7 +165,7 @@ public class RR_Basket_Auto extends LinearOpMode {
         Actions.runBlocking(
                new SequentialAction(
                        new ServoAction(Claw,Claw_Close_Pos),
-                       new SleepAction(Pause),
+                       new SleepAction(0.2),
                        new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Hang_Pos,ElbowR_Hang_Pos),
                        new ParallelAction(
                              // new MotorAction2(FrontSlide, Front_Slide_Hold_Enc, Front_Slide_Retract_Power),
@@ -179,8 +176,11 @@ public class RR_Basket_Auto extends LinearOpMode {
                       ),
                        new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Basket_Pos,ElbowR_Basket_Pos),
                        new SleepAction(Pause),
-                       new ServoAction(Claw, Claw_Open_Pos),
-                       new ServoAction(FrontClaw, FrontClaw_Open_Pos),
+                       new ParallelAction(
+                               new ServoAction(Claw, Claw_Open_Pos),
+                               new ServoAction(FrontClaw, FrontClaw_Open_Pos)
+                       ),
+
     //Second sample pick up and drop in upper basket
                        new ParallelAction(
                                drive.actionBuilder(new Pose2d(6,24,Math.toRadians(-50)))
@@ -191,17 +191,16 @@ public class RR_Basket_Auto extends LinearOpMode {
                                        new MotorAction2(deliveryArmLeft, Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power),
                                        new MotorAction2(deliveryArmRight, Delivery_Arm_Transfer_Enc, Delivery_Arm_Retract_Power)
                                ),
-
                                new DoubleServoAction(ElbowLeft,ElbowRight,ElbowL_Transfer_Pos,ElbowR_Transfer_Pos)
                        ),
                        new DoubleServoAction(TwistLeft,TwistRight, TwistL_Intake_Pos, TwistR_Intake_Pos),
                        new ServoAction(FrontClaw, FrontClaw_Close_Pos),
-                               new SleepAction(Pause),
-                               new ParallelAction(
-                                       new MotorAction2(FrontSlide, Front_Slide_Transfer_Enc, Front_Slide_Retract_Power),
-                                       new DoubleServoAction(TwistLeft,TwistRight, TwistL_Transfer_Pos, TwistR_Transfer_Pos)
-                                       ),
-//                       new DoubleServoAction(TwistLeft,TwistRight, TwistL_Transfer_Pos, TwistR_Transfer_Pos),
+                       new SleepAction(Pause),
+                       new ParallelAction(
+                               new MotorAction2(FrontSlide, Front_Slide_Transfer_Enc, Front_Slide_Retract_Power),
+                               new DoubleServoAction(TwistLeft,TwistRight, TwistL_Transfer_Pos, TwistR_Transfer_Pos)
+                       ),
+//                     new DoubleServoAction(TwistLeft,TwistRight, TwistL_Transfer_Pos, TwistR_Transfer_Pos),
                        new ServoAction(FrontClaw, FrontClaw_Open_Pos),
                        new SleepAction(Pause),
                        new ServoAction(Claw, Claw_Close_Pos),
