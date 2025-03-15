@@ -90,26 +90,26 @@ public class RR_Tele_Test extends OpMode {
     public int Front_Slide_Resting_Enc = -100;
     public int Front_Slide_Intake_Enc = 530;
     public int Front_Slide_Transfer_Enc = -50;
-    public double Front_Slide_Extend_Power = 0.8;
+    public double Front_Slide_Extend_Power = 0.5;
     public double Front_Slide_Retract_Power = -0.5;
 
     //Define all Twist positions
-    public static double TwistL_Intake_Pos = 0.75;
-    public static double TwistR_Intake_Pos = 0.75;
-    public static double TwistL_Transfer_Pos = 0.05;
-    public static double TwistR_Transfer_Pos = 0.05;
-    public static double TwistL_IntakeMiddle_Pos = 0.45;
-    public static double TwistR_IntakeMiddle_Pos = 0.45;
+    public static double TwistL_Intake_Pos = 0.8;
+    public static double TwistR_Intake_Pos = 0.8;
+    public static double TwistL_Transfer_Pos = 0.0;
+    public static double TwistR_Transfer_Pos = 0.0;
+    public static double TwistL_IntakeMiddle_Pos = 0.4;
+    public static double TwistR_IntakeMiddle_Pos = 0.4;
     public static double TwistL_Rest_Pos = 0.0;
     public static double TwistR_Rest_Pos = 0.0;
 
     //Define all Front Claw Positions
     public static double FrontClaw_Open_Pos = 0.05;
-    public static double FrontClaw_Close_Pos = 0.5;
+    public static double FrontClaw_Close_Pos = 1.0;
 
     //Define all Claw positions
-    public static double Claw_Open_Pos = 0.25;
-    public static double Claw_Close_Pos = 0.8;
+    public static double Claw_Open_Pos = 0.1;
+    public static double Claw_Close_Pos = 0.5;
 
     //Define all Elbow positions
     public static double ElbowL_Intake_Pos = 0.015;
@@ -118,24 +118,14 @@ public class RR_Tele_Test extends OpMode {
     public static double ElbowR_Transfer_Pos = 0.6;
     public static double ElbowL_Hang_Pos = 0.2;
     public static double ElbowR_Hang_Pos = 0.2;
-    public static double ElbowL_HangDone_Pos = 0.05;
-    public static double ElbowR_HangDone_Pos = 0.05;
+    public static double ElbowL_HangDone_Pos = 0.03;
+    public static double ElbowR_HangDone_Pos = 0.03;
     public static double ElbowL_Basket_Pos = 0.18;
     public static double ElbowR_Basket_Pos = 0.18;
-
-    //Define all Wrist positions and mode
-//    public static double Wrist_Intake_Pos = 0.25;
-//    public static double Wrist_Hang_Pos = 0.9;
-//    public static double Wrist_Rest_Pos = 0.25;
 
     //Define wait variable
     public static double action_wait = 0.1;
     public static double pause = 1;
-
-//    public double lfPower;
-//    public double rfPower;
-//    public double rbPower;
-//    public double lbPower;
 
     @Override
     public void init() {
@@ -332,7 +322,12 @@ public class RR_Tele_Test extends OpMode {
 
             case SpecimenHanged:
                  move();
+                mecanumDrive.updatePoseEstimate();
+                Pose2d currentpose1 = mecanumDrive.localizer.getPose();
                 Actions.runBlocking(new SequentialAction(
+                                mecanumDrive.actionBuilder(currentpose1)
+                                        .lineToY(30)
+                                        .build(),
                                 new ParallelAction(
                                         new ParallelAction(
                                                 new MotorAction2(deliveryArmLeft, Delivery_Arm_HangDone_Enc, Delivery_Arm_Retract_Power),
@@ -399,7 +394,7 @@ public class RR_Tele_Test extends OpMode {
             Claw.setPosition(Claw_Open_Pos);
         }
         //FrontSlide
-        double FrontSlideStick = gamepad2.right_stick_x;
+        double FrontSlideStick = -gamepad2.right_stick_x;
         double FrontSlidePower = Range.clip(FrontSlideStick, Front_Slide_Retract_Power, Front_Slide_Extend_Power);
         FrontSlide.setPower(FrontSlidePower);
         //Back Elbow
@@ -433,13 +428,13 @@ public class RR_Tele_Test extends OpMode {
         }
         // Front Wrist
         if (gamepad2.right_stick_button) {
-            FrontWrist.setPower(1);
+            FrontWrist.setPower(0.5);
         } else if (gamepad2.left_stick_button) {
-            FrontWrist.setPower(-1);
+            FrontWrist.setPower(-0.5);
         } else
             FrontWrist.setPower(0);
         //Delivery Arm
-        double DeliveryArmStick = gamepad2.left_stick_y;
+        double DeliveryArmStick = -gamepad2.left_stick_y;
         double DeliveryArmPower = Range.clip(DeliveryArmStick, Delivery_Arm_Extend_Power, Delivery_Arm_Retract_Power);
         deliveryArmLeft.setPower(DeliveryArmPower);
         deliveryArmRight.setPower(-DeliveryArmPower);
@@ -553,12 +548,12 @@ public class RR_Tele_Test extends OpMode {
         }
     }
 
-    public static class AlignSensorActionB implements Action {
+    public static class AlignSensorAction implements Action {
         public RevColorSensorV3 colorSensor;
         public CRServo turningServo;
         public double position;
         public Servo servo;
-        public int alliance_color;
+       // public int alliance_color;
 
         // Thresholds
         public static int LINE_THRESHOLD = 100;  //color intensity
@@ -566,12 +561,12 @@ public class RR_Tele_Test extends OpMode {
         public static int BLUE_THRESHOLD = 90;
         public static double MIN_DISTANCE_THRESHOLD = 5.0; // in cm
 
-        public AlignSensorActionB(RevColorSensorV3 colorSensor, CRServo turningServo, Servo srv, double pos, int all_col) {
+        public AlignSensorAction(RevColorSensorV3 colorSensor, CRServo turningServo, Servo srv, double pos) {
             this.colorSensor = colorSensor;
             this.turningServo = turningServo;
             this.position = pos;
             this.servo = srv;
-            this.alliance_color = all_col;
+           // this.alliance_color = all_col;
         };
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
@@ -609,4 +604,5 @@ public class RR_Tele_Test extends OpMode {
         }
 
     }
+
 };

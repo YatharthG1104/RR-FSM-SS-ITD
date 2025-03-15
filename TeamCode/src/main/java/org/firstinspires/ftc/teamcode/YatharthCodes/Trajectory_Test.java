@@ -9,6 +9,7 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -16,6 +17,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 
@@ -45,6 +47,7 @@ public class Trajectory_Test extends LinearOpMode {
         CRServo GR = hardwareMap.get(CRServo.class, "Front Wrist");
         Servo TWL = hardwareMap.get(Servo.class, "Twist Left");
         Servo TWR = hardwareMap.get(Servo.class, "Twist Right");
+        RevColorSensorV3 color = hardwareMap.get(RevColorSensorV3.class, "Color");
 
         EL.setDirection(Servo.Direction.REVERSE);
         EL.scaleRange(-1,1);
@@ -52,7 +55,7 @@ public class Trajectory_Test extends LinearOpMode {
         ER.setDirection(Servo.Direction.FORWARD);
         ER.scaleRange(-1,1);
 
-        TWL.setDirection(Servo.Direction.FORWARD);
+        TWL.setDirection(Servo.Direction.REVERSE);
         TWR.setDirection(Servo.Direction.FORWARD);
 
         DAR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);  //Delivery arm zero power behavior
@@ -213,23 +216,24 @@ public class Trajectory_Test extends LinearOpMode {
                         //trajectorychosen,
                         //new DoubleMotorAction(DAL,DAR,1200, 1200, 0.9,0.9),
                     //    new DoubleServoAction(EL,ER, 0.15,0.15),
-                     //   new DoubleServoAction(TWL,TWR, -0.85,0.85),
+                    //    new DoubleServoAction(TWL,TWR, 0.7,0.7),
                      //   new ServoAction(W, 0.4),
-                        new ServoAction(GL, 0.25),
+                        new ServoAction(GL, 0),
+                       new AlignSensorAction(color, GR, GL, 1)
                        // new ServoAction(C, 0.55),
 //                        new DoubleServoAction(TWL,TWR, -0.5,0.5),
-                        new ServoAction(GL, 0.75),
+                     //   new ServoAction(GL, 0.75),
                       //  new DoubleServoAction(EL,ER, 0.1,0.1),
-//                        new DoubleServoAction(TWL,TWR, 0.5,-0.5),
-                        new ServoAction(GL, 0),
+                     //   new DoubleServoAction(TWL,TWR, 0.4,0.4),
+                       // new ServoAction(GL, -0.5),
                        // new DoubleMotorAction(DAL,DAR,20, 20, -0.9,-0.9),
-//                          new DoubleServoAction(TWL,TWR, 0.85,-0.85),
-                        new ServoAction(GL, 1),
+                         // new DoubleServoAction(TWL,TWR, 0,0),
+                          //new ServoAction(GL, -1)
                         //new DoubleServoAction(EL,ER, 0.45,0.45),
                         //new ServoAction(GL, 1.0),
                         //new DoubleServoAction(EL,ER, 0.7,0.7),
 //                        new DoubleServoAction(TWL,TWR, 0,0),
-                        new ServoAction(GL, -1)
+                   //     new ServoAction(GL, -1)
                        // new ServoAction(GL, -1.0),
                         //new ServoAction(GL, 1.0),
                         //new DoubleServoAction(EL,ER, 0.4,0.4)
@@ -514,6 +518,72 @@ public class Trajectory_Test extends LinearOpMode {
             }
         }
     }
+
+    public class AlignSensorAction implements Action {
+        public RevColorSensorV3 colorSensor;
+        public CRServo turningServo;
+        public double position;
+        public Servo servo;
+        // public int alliance_color;
+
+        // Thresholds
+        public  int LINE_THRESHOLD = 100;  //color intensity
+        public  int YELLOW_THRESHOLD = 50;  //color intensity
+        public  int BLUE_THRESHOLD = 90;
+        public  double MIN_DISTANCE_THRESHOLD = 5.0; // in cm
+
+        public AlignSensorAction(RevColorSensorV3 colorSensor, CRServo turningServo, Servo srv, double pos) {
+            this.colorSensor = colorSensor;
+            this.turningServo = turningServo;
+            this.position = pos;
+            this.servo = srv;
+            // this.alliance_color = all_col;
+
+        };
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+
+            // Get RGB values
+            int red = colorSensor.red();
+            int green = colorSensor.green();
+            int blue = colorSensor.blue();
+
+            // Get the current distance measurement
+            double distance = colorSensor.getDistance(DistanceUnit.CM);
+
+            telemetry.addData("Red Color", red);
+            telemetry.addData("Green Color", green);
+            telemetry.addData("Blue Color", blue);
+            telemetry.addData("Distance", distance);
+            telemetry.update();
+
+            boolean isYellow = (red > LINE_THRESHOLD && green > YELLOW_THRESHOLD && blue < LINE_THRESHOLD);
+            boolean isBlue = (red < BLUE_THRESHOLD && green < BLUE_THRESHOLD && blue > LINE_THRESHOLD);
+            boolean isAligned = (red > LINE_THRESHOLD && green < LINE_THRESHOLD && blue < LINE_THRESHOLD);
+            boolean isWithinDist = (distance <= MIN_DISTANCE_THRESHOLD);
+
+
+            if (isAligned) {
+                turningServo.setPower(0);
+            } else {
+                turningServo.setPower(1);
+            }
+
+            if (isWithinDist) {
+                turningServo.setPower(0);
+            } else {
+                turningServo.setPower(1);
+            }
+
+            if ((isYellow || isBlue) && isAligned && isWithinDist) {
+                servo.setPosition(position);
+                return true;
+            } else
+                return false;
+        }
+
+    }
+
 
 
 }

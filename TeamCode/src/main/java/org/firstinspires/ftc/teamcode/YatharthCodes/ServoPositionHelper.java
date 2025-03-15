@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class ServoPositionHelper extends OpMode {
 
     private Servo axon = null;
-    private Servo el = null;
+   // private Servo el = null;
     private Servo er = null;
     private double servoPositionaxon = 0.5;
    // private double servoPositionel = 0;
@@ -27,13 +27,13 @@ public class ServoPositionHelper extends OpMode {
     public void init() {
 
 
-        el = hardwareMap.get(Servo.class, "Twist Left");
-        er = hardwareMap.get(Servo.class, "Twist Right");
+       // el = hardwareMap.get(Servo.class, "Twist Left");
+        er = hardwareMap.get(Servo.class, "Claw");
 
-        el.setDirection(Servo.Direction.REVERSE);
+//        el.setDirection(Servo.Direction.REVERSE);
         er.setDirection(Servo.Direction.FORWARD);
 
-       el.setPosition(servoPositionaxon);
+//       el.setPosition(servoPositionaxon);
        er.setPosition(servoPositionaxon);
         telemetry.addData("Status", "Initialized");
     }
@@ -71,7 +71,7 @@ public class ServoPositionHelper extends OpMode {
         previousGamePadUp = currentGamepadUp;
         previousGamePadDown = currentGamepadDown;
 
-        telemetry.addData("El Servo Position", el.getPosition());
+//        telemetry.addData("El Servo Position", el.getPosition());
         telemetry.addData("Er Servo Position", er.getPosition());
         telemetry.addData("Target Servo Position", servoPositionaxon);
         telemetry.addData("Servo Step Size", positionAdjustment);
