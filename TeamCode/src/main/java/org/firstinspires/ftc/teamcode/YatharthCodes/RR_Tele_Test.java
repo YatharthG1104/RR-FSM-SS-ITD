@@ -143,14 +143,12 @@ public class RR_Tele_Test extends OpMode {
 
         deliveryArmLeft = hardwareMap.get(DcMotor.class, "Delivery ArmL");
         deliveryArmLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);  //Delivery arm zero power behavior
-        deliveryArmLeft.setDirection(DcMotor.Direction.FORWARD);          //Delivery arm left motor set reversed
-        deliveryArmLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);  //Delivery arm motor reset
+        deliveryArmLeft.setDirection(DcMotor.Direction.FORWARD);          //Delivery arm left motor set reversed//Delivery arm motor reset
         deliveryArmLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);       //Delivery arm run using encoders
 
         deliveryArmRight = hardwareMap.get(DcMotor.class, "Delivery ArmR");
         deliveryArmRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);  //Delivery arm zero power behavior
-        deliveryArmRight.setDirection(DcMotor.Direction.FORWARD);          //Delivery arm right motor set reversed
-        deliveryArmRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);  //Delivery arm motor reset
+        deliveryArmRight.setDirection(DcMotor.Direction.FORWARD);          //Delivery arm right motor set reversed;  //Delivery arm motor reset
         deliveryArmRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);       //Delivery arm run using encoders
 
         ElbowLeft = hardwareMap.get(Servo.class, "Elbow Left");
@@ -162,7 +160,6 @@ public class RR_Tele_Test extends OpMode {
         FrontSlide = hardwareMap.get(DcMotor.class, "Front Slide");
         FrontSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);//Front Slide zero power behavior
         FrontSlide.setDirection(DcMotor.Direction.REVERSE);          //Front Slide motor set forward
-        FrontSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);  //Front Slide motor reset
         FrontSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);       //Front Slide run using encoders
 
         FrontWrist = hardwareMap.get(CRServo.class, "Front Wrist");
@@ -238,10 +235,10 @@ public class RR_Tele_Test extends OpMode {
             case SubmersibleReady:
                 move();
                 Actions.runBlocking(new ParallelAction(
-                        new MotorAction2(FrontSlide, Front_Slide_Intake_Enc, Front_Slide_Extend_Power),
-                        new DoubleServoAction(TwistLeft, TwistRight, TwistL_Intake_Pos, TwistR_Intake_Pos),
+                        new MotorAction2(FrontSlide, Front_Slide_Intake_Enc, Front_Slide_Extend_Power)
+                       // new DoubleServoAction(TwistLeft, TwistRight, TwistL_Intake_Pos, TwistR_Intake_Pos),
                         // new DoubleServoAction(ElbowLeft, ElbowRight, ElbowL_Transfer_Pos, ElbowR_Transfer_Pos),
-                        new ServoAction(FrontClaw, FrontClaw_Open_Pos)
+                       // new ServoAction(FrontClaw, FrontClaw_Open_Pos)
                 ));
                 telemetry.update();
                 CurrentState = LiftState.RegTele;
@@ -323,11 +320,11 @@ public class RR_Tele_Test extends OpMode {
             case SpecimenHanged:
                  move();
                 mecanumDrive.updatePoseEstimate();
-                Pose2d currentpose1 = mecanumDrive.localizer.getPose();
+//                Pose2d currentpose1 = mecanumDrive.localizer.getPose();
                 Actions.runBlocking(new SequentialAction(
-                                mecanumDrive.actionBuilder(currentpose1)
-                                        .lineToY(30)
-                                        .build(),
+//                                mecanumDrive.actionBuilder(currentpose1)
+//                                        .lineToY(30)
+//                                        .build(),
                                 new ParallelAction(
                                         new ParallelAction(
                                                 new MotorAction2(deliveryArmLeft, Delivery_Arm_HangDone_Enc, Delivery_Arm_Retract_Power),

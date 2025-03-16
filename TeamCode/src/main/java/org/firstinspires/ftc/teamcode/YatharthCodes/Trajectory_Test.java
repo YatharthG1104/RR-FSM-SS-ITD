@@ -208,9 +208,25 @@ public class Trajectory_Test extends LinearOpMode {
 
         Actions.runBlocking(
                 new SequentialAction(
-                      /*  drive.actionBuilder(new Pose2d(0,0,0)) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
-                                .lineToX(10)
-                                .build(),*/
+                      drive.actionBuilder(new Pose2d(0,0,0)) // Another way of running a trajectory (not recommended because trajectories take time to build and will slow down your code, always try to build them beforehand)
+                              .lineToX(28.8)
+                              .setReversed(true)
+                              .setTangent(Math.toRadians(0))
+                              .lineToX(8)
+                              .setTangent(-Math.PI/2)
+//                                .splineToConstantHeading(new Vector2d(53,-33), Math.PI/2)
+//                                .strafeTo(new Vector2d(54,-40))
+                              .splineToConstantHeading(new Vector2d(51,-30), Math.PI/2)
+                              .strafeTo(new Vector2d(51,-40))
+                              .setReversed(true)
+                              .setTangent(0)
+                              .lineToX(12)
+                              .waitSeconds(0.5)
+                              .setReversed(true)
+                              .setTangent(0)
+                              .lineToX(7)
+                              .strafeTo(new Vector2d(0,0))
+                              .build()
 
 
                         //trajectorychosen,
@@ -218,8 +234,8 @@ public class Trajectory_Test extends LinearOpMode {
                     //    new DoubleServoAction(EL,ER, 0.15,0.15),
                     //    new DoubleServoAction(TWL,TWR, 0.7,0.7),
                      //   new ServoAction(W, 0.4),
-                        new ServoAction(GL, 0),
-                       new AlignSensorAction(color, GR, GL, 1)
+//                        new ServoAction(GL, 0),
+//                       new AlignSensorAction(color, GR, GL, 1)
                        // new ServoAction(C, 0.55),
 //                        new DoubleServoAction(TWL,TWR, -0.5,0.5),
                      //   new ServoAction(GL, 0.75),
